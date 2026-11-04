@@ -37,8 +37,9 @@ Never claim "any language"; show real counts per tier.
 **Money flow (sandbox, platform-mediated).** Sender → Orders (AUTHORIZE) → platform business account → Payouts →
 recipient. Return: wrong recipient approves an Order → platform → Payout to sender. Fallback if Payouts fails: Invoicing.
 
-**Sandbox accounts (US, USD):** Business "Verbo Platform"; Ravi Reddy (sender, Telugu), Maria Lopez (intended,
-Spanish), Maria Lopes (wrong recipient, Portuguese).
+**Sandbox accounts (US, USD):** Business "Verbo Platform"; Sreenivas Rao (sender, Telugu), Manuel Lopez (intended,
+_(Personas renamed on Nov 5 to match the sandbox accounts actually created: sender Sreenivas Rao, intended recipient Manuel Lopez, wrong recipient Manuel Lopes. Platform business account: Verbo.)_
+Spanish), Manuel Lopes (wrong recipient, Portuguese).
 
 ## Hackathon
 PayPal AI Hackathon (Devpost) "Build What's Next with PayPal and AI". Deadline Nov 12, 2026 12:00 PT. Must meaningfully
