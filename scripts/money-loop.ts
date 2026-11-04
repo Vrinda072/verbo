@@ -9,6 +9,7 @@
  *   npm run money-loop                 # all three paths against the sandbox (MOCK=0 forced)
  *   npm run money-loop -- --only=void  # one path: send | void | return
  *   npm run money-loop -- --mock       # offline dry run with the mock client (auto-approves)
+ *   npm run money-loop -- --wait=60    # minutes to wait for each approval (default 15)
  *
  * Nothing secret is printed. Emails are masked. Approval links are printed because you must open them.
  */
@@ -25,6 +26,7 @@ import { PayPalApiError } from "@/lib/paypal/types";
 const args = new Set(process.argv.slice(2));
 const only = [...args].find((a) => a.startsWith("--only="))?.split("=")[1];
 const useMock = args.has("--mock");
+const waitMinutes = Number([...args].find((a) => a.startsWith("--wait="))?.split("=")[1] ?? 15);
 
 const BASE = process.env.APP_BASE_URL || "http://localhost:3000";
 const urls = { returnUrl: `${BASE}/paypal/return`, cancelUrl: `${BASE}/paypal/return?cancelled=1` };
@@ -62,7 +64,7 @@ async function waitForApproval(t: Transfer, who: string, whoEmail: string) {
   }
   console.log(`\n  ${c.y}ACTION NEEDED${c.x} — open this link and log in as ${c.b}${who}${c.x} (${maskEmail(whoEmail)}), then approve:`);
   console.log(`  ${t.approveUrl}\n`);
-  const deadline = Date.now() + 15 * 60_000;
+  const deadline = Date.now() + waitMinutes * 60_000;
   let last = "";
   while (Date.now() < deadline) {
     const o = await pp.getOrder(t.orderId!);
@@ -75,7 +77,7 @@ async function waitForApproval(t: Transfer, who: string, whoEmail: string) {
     if (o.status === "VOIDED" || o.status === "COMPLETED") throw new Error(`Order ended as ${o.status}`);
     await new Promise((r) => setTimeout(r, 4000));
   }
-  throw new Error("Timed out waiting for approval (15 min)");
+  throw new Error(`Timed out waiting for approval (${waitMinutes} min) — rerun with --wait=60 for more time`);
 }
 
 async function waitForPayout(t: Transfer): Promise<Transfer> {
