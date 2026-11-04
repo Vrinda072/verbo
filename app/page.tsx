@@ -72,7 +72,7 @@ export default function Home() {
               </p>
               <div className="mt-6 rounded-v border border-line bg-paper-2 p-4">
                 <p className="text-sm text-ink-3">to</p>
-                <p className="text-2xl font-bold">Maria Lopes</p>
+                <p className="text-2xl font-bold">Manuel Lopes</p>
               </div>
               <div
                 role="note"
@@ -80,7 +80,7 @@ export default function Home() {
               >
                 <span aria-hidden className="text-xl">⚠</span>
                 <p className="text-base">
-                  <strong>Similar name.</strong> You usually pay <strong>Maria Lopez</strong> (with a z).
+                  <strong>Similar name.</strong> You usually pay <strong>Manuel Lopez</strong> (with a z).
                 </p>
               </div>
               <div className="mt-6 grid grid-cols-2 gap-3">

@@ -26,7 +26,7 @@
 ### What Vrinda must do by hand
 1. **Free ≥ 10 GB of disk** (e.g. empty Trash, clear Downloads, `docker system prune` once Docker is running).
 2. Paste into `.env`: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and the three `SANDBOX_*_EMAIL`s. Then run `npm run check-env`.
-3. Run `npm run money-loop` and **approve three times in the browser** when it prints a link: as Ravi (send), as Ravi (void), as Maria Lopes (return). Use the sandbox account passwords from developer.paypal.com → Testing Tools → Sandbox Accounts.
+3. Run `npm run money-loop` and **approve three times in the browser** when it prints a link: as Sreenivas (send), as Sreenivas (void), as Manuel Lopes (return). Use the sandbox account passwords from developer.paypal.com → Testing Tools → Sandbox Accounts.
 4. For webhooks: `brew install cloudflared`, run `npm run dev` and `cloudflared tunnel --url http://localhost:3000`, then `npm run register-webhook -- https://<the-trycloudflare-url>` and paste the printed `PAYPAL_WEBHOOK_ID` into `.env`.
 5. Add `SONIOX_API_KEY` and `ANTHROPIC_API_KEY` (needed Day 2).
 6. Install the APIMatic Context Plugin in your editor/Claude Code before Day 2 PayPal work.

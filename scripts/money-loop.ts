@@ -1,9 +1,9 @@
 /**
  * Day-1 proof that Verbo's platform-mediated money loop works in the PayPal sandbox.
  *
- *   1. SEND   Ravi → Order(AUTHORIZE) → [you approve as Ravi] → authorize → capture → Payout → Maria Lopez
- *   2. VOID   Ravi → Order(AUTHORIZE) → [you approve as Ravi] → authorize → VOID (risk-hold cancel)
- *   3. RETURN Maria Lopes → Order(CAPTURE) → [you approve as Maria Lopes] → capture → Payout → Ravi
+ *   1. SEND   Sreenivas → Order(AUTHORIZE) → [you approve as Sreenivas] → authorize → capture → Payout → Manuel Lopez
+ *   2. VOID   Sreenivas → Order(AUTHORIZE) → [you approve as Sreenivas] → authorize → VOID (risk-hold cancel)
+ *   3. RETURN Manuel Lopes → Order(CAPTURE) → [you approve as Manuel Lopes] → capture → Payout → Sreenivas
  *
  * Usage:
  *   npm run money-loop                 # all three paths against the sandbox (MOCK=0 forced)
@@ -89,10 +89,10 @@ async function waitForPayout(t: Transfer): Promise<Transfer> {
 }
 
 async function sendPath(): Promise<Transfer> {
-  step(`1/3 SEND  $12.34  Ravi → Maria Lopez  (Order AUTHORIZE → capture → Payout)`);
+  step(`1/3 SEND  $12.34  Sreenivas → Manuel Lopez  (Order AUTHORIZE → capture → Payout)`);
   let t = await startTransfer(pp, { id: `tr_${runId}_send`, amount: money(1234), senderEmail: RAVI, recipientEmail: LOPEZ, urls });
   ok(`order created ${t.orderId}`);
-  await waitForApproval(t, "Ravi Reddy", RAVI);
+  await waitForApproval(t, "Sreenivas Rao", RAVI);
   t = await authorizeTransfer(pp, t);
   ok(`authorized ${t.authorizationId}`);
   t = await releaseTransfer(pp, t, { note: "Verbo money-loop test (sandbox)" });
@@ -104,10 +104,10 @@ async function sendPath(): Promise<Transfer> {
 }
 
 async function voidPath(): Promise<Transfer> {
-  step(`2/3 VOID  $5.00  Ravi → (held) → cancelled  (Order AUTHORIZE → VOID)`);
+  step(`2/3 VOID  $5.00  Sreenivas → (held) → cancelled  (Order AUTHORIZE → VOID)`);
   let t = await startTransfer(pp, { id: `tr_${runId}_void`, amount: money(500), senderEmail: RAVI, recipientEmail: LOPES, urls });
   ok(`order created ${t.orderId}`);
-  await waitForApproval(t, "Ravi Reddy", RAVI);
+  await waitForApproval(t, "Sreenivas Rao", RAVI);
   t = await authorizeTransfer(pp, t, { holdMinutes: 10 });
   ok(`authorized ${t.authorizationId}, risk hold until ${t.holdUntil}`);
   t = await voidTransfer(pp, t);
@@ -116,7 +116,7 @@ async function voidPath(): Promise<Transfer> {
 }
 
 async function returnPath(original?: Transfer): Promise<Transfer> {
-  step(`3/3 RETURN  $12.34  Maria Lopes → platform → Ravi  (Order CAPTURE → Payout)`);
+  step(`3/3 RETURN  $12.34  Manuel Lopes → platform → Sreenivas  (Order CAPTURE → Payout)`);
   const base: Transfer = original ?? {
     id: `tr_${runId}_orig`,
     state: "COMPLETED",
@@ -127,7 +127,7 @@ async function returnPath(original?: Transfer): Promise<Transfer> {
   };
   let r = await startReturn(pp, { id: `rt_${runId}_ret`, original: { ...base, recipientEmail: LOPES }, returnerEmail: LOPES, urls });
   ok(`return order created ${r.orderId} for $${toPayPalValue(r.amount)}`);
-  await waitForApproval(r, "Maria Lopes", LOPES);
+  await waitForApproval(r, "Manuel Lopes", LOPES);
   r = await completeReturn(pp, r);
   ok(`captured ${r.captureId}; payout batch ${r.payoutBatchId} → ${maskEmail(RAVI || "mock")}`);
   r = await waitForPayout(r);
