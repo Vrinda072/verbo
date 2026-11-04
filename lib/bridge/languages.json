@@ -1,0 +1,791 @@
+{
+  "generatedAt": "2026-11-04T19:01:11.233Z",
+  "source": "soniox GET /v1/models",
+  "counts": {
+    "A": 0,
+    "B": 60,
+    "C": 0
+  },
+  "languages": [
+    {
+      "code": "af",
+      "englishName": "Afrikaans",
+      "nativeName": "Afrikaans",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "sq",
+      "englishName": "Albanian",
+      "nativeName": "shqip",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ar",
+      "englishName": "Arabic",
+      "nativeName": "العربية",
+      "dir": "rtl",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "az",
+      "englishName": "Azerbaijani",
+      "nativeName": "azərbaycan",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "eu",
+      "englishName": "Basque",
+      "nativeName": "euskara",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "be",
+      "englishName": "Belarusian",
+      "nativeName": "беларуская",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "bn",
+      "englishName": "Bengali",
+      "nativeName": "বাংলা",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "bs",
+      "englishName": "Bosnian",
+      "nativeName": "bosanski",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "bg",
+      "englishName": "Bulgarian",
+      "nativeName": "български",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ca",
+      "englishName": "Catalan",
+      "nativeName": "català",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "zh",
+      "englishName": "Chinese",
+      "nativeName": "中文",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "hr",
+      "englishName": "Croatian",
+      "nativeName": "hrvatski",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "cs",
+      "englishName": "Czech",
+      "nativeName": "čeština",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "da",
+      "englishName": "Danish",
+      "nativeName": "dansk",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "nl",
+      "englishName": "Dutch",
+      "nativeName": "Nederlands",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "en",
+      "englishName": "English",
+      "nativeName": "English",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "et",
+      "englishName": "Estonian",
+      "nativeName": "eesti",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "fi",
+      "englishName": "Finnish",
+      "nativeName": "suomi",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "fr",
+      "englishName": "French",
+      "nativeName": "français",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "gl",
+      "englishName": "Galician",
+      "nativeName": "galego",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "de",
+      "englishName": "German",
+      "nativeName": "Deutsch",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "el",
+      "englishName": "Greek",
+      "nativeName": "Ελληνικά",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "gu",
+      "englishName": "Gujarati",
+      "nativeName": "ગુજરાતી",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "he",
+      "englishName": "Hebrew",
+      "nativeName": "עברית",
+      "dir": "rtl",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "hi",
+      "englishName": "Hindi",
+      "nativeName": "हिन्दी",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "hu",
+      "englishName": "Hungarian",
+      "nativeName": "magyar",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "id",
+      "englishName": "Indonesian",
+      "nativeName": "Indonesia",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "it",
+      "englishName": "Italian",
+      "nativeName": "italiano",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ja",
+      "englishName": "Japanese",
+      "nativeName": "日本語",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "kn",
+      "englishName": "Kannada",
+      "nativeName": "ಕನ್ನಡ",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "kk",
+      "englishName": "Kazakh",
+      "nativeName": "қазақ тілі",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ko",
+      "englishName": "Korean",
+      "nativeName": "한국어",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "lv",
+      "englishName": "Latvian",
+      "nativeName": "latviešu",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "lt",
+      "englishName": "Lithuanian",
+      "nativeName": "lietuvių",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "mk",
+      "englishName": "Macedonian",
+      "nativeName": "македонски",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ms",
+      "englishName": "Malay",
+      "nativeName": "Melayu",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ml",
+      "englishName": "Malayalam",
+      "nativeName": "മലയാളം",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "mr",
+      "englishName": "Marathi",
+      "nativeName": "मराठी",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "no",
+      "englishName": "Norwegian",
+      "nativeName": "norsk",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "fa",
+      "englishName": "Persian",
+      "nativeName": "فارسی",
+      "dir": "rtl",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "pl",
+      "englishName": "Polish",
+      "nativeName": "polski",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "pt",
+      "englishName": "Portuguese",
+      "nativeName": "português",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "pa",
+      "englishName": "Punjabi",
+      "nativeName": "ਪੰਜਾਬੀ",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ro",
+      "englishName": "Romanian",
+      "nativeName": "română",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ru",
+      "englishName": "Russian",
+      "nativeName": "русский",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "sr",
+      "englishName": "Serbian",
+      "nativeName": "српски",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "sk",
+      "englishName": "Slovak",
+      "nativeName": "slovenčina",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "sl",
+      "englishName": "Slovenian",
+      "nativeName": "slovenščina",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "es",
+      "englishName": "Spanish",
+      "nativeName": "español",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "sw",
+      "englishName": "Swahili",
+      "nativeName": "Kiswahili",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "sv",
+      "englishName": "Swedish",
+      "nativeName": "svenska",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "tl",
+      "englishName": "Tagalog",
+      "nativeName": "Filipino",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ta",
+      "englishName": "Tamil",
+      "nativeName": "தமிழ்",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "te",
+      "englishName": "Telugu",
+      "nativeName": "తెలుగు",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "th",
+      "englishName": "Thai",
+      "nativeName": "ไทย",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "tr",
+      "englishName": "Turkish",
+      "nativeName": "Türkçe",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "uk",
+      "englishName": "Ukrainian",
+      "nativeName": "українська",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "ur",
+      "englishName": "Urdu",
+      "nativeName": "اردو",
+      "dir": "rtl",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "vi",
+      "englishName": "Vietnamese",
+      "nativeName": "Tiếng Việt",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    },
+    {
+      "code": "cy",
+      "englishName": "Welsh",
+      "nativeName": "Cymraeg",
+      "dir": "ltr",
+      "tier": "B",
+      "reviewed": false,
+      "stt": {
+        "realtime": true,
+        "model": "stt-rt-v6"
+      },
+      "translation": true
+    }
+  ]
+}

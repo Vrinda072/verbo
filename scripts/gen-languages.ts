@@ -3,7 +3,8 @@
  * supported-language list — Verbo never hardcodes a list of languages.
  *
  * Source: Soniox `GET https://api.soniox.com/v1/models` (Bearer SONIOX_API_KEY) →
- *   models[].languages[].{code,name}, models[].translation_targets, models[].transcription_mode
+ *   models[].languages[].{code,name}, models[].one_way_translation, models[].translation_targets,
+ *   models[].transcription_mode
  *   (docs.soniox.com/stt/api-reference/models/get_models, checked Nov 4, 2026)
  *
  * Tiers:
@@ -22,6 +23,8 @@ type Model = {
   transcription_mode?: string;
   languages?: Lang[];
   translation_targets?: unknown;
+  /** "all_languages" when every listed language can be translated (observed Nov 5, 2026). */
+  one_way_translation?: unknown;
 };
 
 /** Writing direction is a property of the script, derived from CLDR via Intl where available. */
@@ -75,8 +78,8 @@ async function main() {
     for (const l of m.languages ?? []) {
       const cur = langs.get(l.code) ?? { code: l.code, name: l.name, realtime: false, translation: false, models: [] };
       cur.realtime ||= realtime;
-      cur.translation ||= tr.has(l.code) || tr.size === 0; // provider may express targets as "all"; refine once seen
-      cur.models.push(m.id);
+      cur.translation ||= m.one_way_translation === "all_languages" || tr.has(l.code);
+      if (realtime) cur.models.push(m.id);
       langs.set(l.code, cur);
     }
   }
@@ -91,7 +94,8 @@ async function main() {
         dir: direction(l.code),
         tier,
         reviewed: tier === "A",
-        stt: { realtime: l.realtime, models: l.models },
+        // first real-time model in the provider's own order (currently its newest)
+        stt: { realtime: l.realtime, model: l.models[0] ?? null },
         translation: l.translation,
       };
     })
