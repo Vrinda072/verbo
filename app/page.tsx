@@ -1,103 +1,123 @@
-import Image from "next/image";
+import Link from "next/link";
+import { SiteHeader } from "@/components/SiteHeader";
+
+const PARTS = [
+  {
+    n: "01",
+    title: "Send by voice",
+    body: "Speak in your own language. Verbo reads the payment back from a fixed, checked template with large digits — and waits for your clear yes.",
+  },
+  {
+    n: "02",
+    title: "Checks before money moves",
+    body: "Look-alike names, unusual amounts, first-time recipients and pressure language are flagged. Risky payments are held for 10 minutes so you can change your mind.",
+  },
+  {
+    n: "03",
+    title: "Recovery across languages",
+    body: "If it went to the wrong person, they get a friendly link in their language with one button to send it back — and a translated chat.",
+  },
+  {
+    n: "04",
+    title: "Case Desk & evidence",
+    body: "Operators see every case on one desk, with a translated timeline and a signed evidence packet for each.",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <SiteHeader />
+      <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">
+        <section className="grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-evergreen-soft px-3 py-1 text-sm font-bold text-evergreen">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-evergreen" />
+              A safety net for person-to-person payments
+            </p>
+            <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+              Send money safely,
+              <br />
+              <span className="text-evergreen">in the language you speak.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-lg text-ink-2 sm:text-xl">
+              When money goes to the wrong person and nobody shares a language, it is usually gone. Verbo catches
+              the mistake before it happens — and makes it easy to put right after.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/send"
+                className="inline-flex min-h-14 items-center justify-center rounded-full bg-evergreen px-7 text-lg font-bold text-evergreen-ink shadow-v transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                Try sending by voice
+              </Link>
+              <Link
+                href="/desk"
+                className="inline-flex min-h-14 items-center justify-center rounded-full border-2 border-line-strong px-7 text-lg font-bold text-ink transition-colors hover:bg-paper-2"
+              >
+                Open the Case Desk
+              </Link>
+            </div>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+          {/* Illustrative confirmation card (static preview of the Send screen) */}
+          <figure aria-label="Example confirmation card" className="relative">
+            <div className="rounded-v-lg border border-line bg-card p-6 shadow-v-lg sm:p-8">
+              <p lang="te" className="text-lg text-ink-2">
+                మీరు పంపుతున్నారు
+              </p>
+              <p className="mt-1 text-sm text-ink-3">You are sending</p>
+              <p className="v-digits mt-4 text-ink">
+                $50<span className="text-ink-3">.00</span>
+              </p>
+              <div className="mt-6 rounded-v border border-line bg-paper-2 p-4">
+                <p className="text-sm text-ink-3">to</p>
+                <p className="text-2xl font-bold">Maria Lopes</p>
+              </div>
+              <div
+                role="note"
+                className="mt-4 flex gap-3 rounded-v border border-marigold/70 bg-marigold-soft p-4 text-marigold-ink"
+              >
+                <span aria-hidden className="text-xl">⚠</span>
+                <p className="text-base">
+                  <strong>Similar name.</strong> You usually pay <strong>Maria Lopez</strong> (with a z).
+                </p>
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <span className="flex min-h-14 items-center justify-center rounded-full border-2 border-line-strong text-lg font-bold">
+                  Cancel
+                </span>
+                <span className="flex min-h-14 items-center justify-center rounded-full bg-evergreen text-lg font-bold text-evergreen-ink">
+                  Yes, send
+                </span>
+              </div>
+            </div>
+            <figcaption className="mt-3 text-center text-sm text-ink-3">
+              Illustration · sandbox demo with synthetic accounts
+            </figcaption>
+          </figure>
+        </section>
+
+        <section aria-labelledby="how" className="border-t border-line py-14">
+          <h2 id="how" className="font-display text-3xl font-semibold tracking-tight">
+            How Verbo works
+          </h2>
+          <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PARTS.map((p) => (
+              <li key={p.n} className="rounded-v-lg border border-line bg-card p-6">
+                <span className="font-display text-lg text-marigold">{p.n}</span>
+                <h3 className="mt-2 text-xl font-bold">{p.title}</h3>
+                <p className="mt-2 text-base text-ink-2">{p.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <footer className="border-t border-line py-8 text-sm text-ink-3">
+          Verbo is a hackathon project running on the PayPal <strong>sandbox</strong>. No real money moves. It cannot
+          force a refund — it makes returning money easy and keeps a clear record.
+        </footer>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </>
   );
 }
