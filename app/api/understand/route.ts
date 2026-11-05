@@ -4,6 +4,7 @@ import { understand } from "@/lib/agents/extraction";
 import { ExtractionFailed } from "@/lib/agents/extraction/anthropic";
 import { formatAmount, labelsFor } from "@/lib/bridge/readback";
 import { log } from "@/lib/log";
+import { createDraft, summarizeRisk } from "@/lib/transfers/service";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,10 @@ export async function POST(req: Request) {
     const labels = labelsFor(language);
     const r = u.result;
     const draft = r.ok ? r.draft : r.partial;
+    const stored = await createDraft(u, transcript, language);
     return NextResponse.json({
+      draftId: stored?.id ?? null,
+      risk: stored ? summarizeRisk(stored.risk) : null,
       extractor: u.extractor,
       ok: r.ok,
       problems: r.ok ? [] : r.problems,

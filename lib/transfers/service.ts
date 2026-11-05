@@ -119,7 +119,8 @@ export async function handleApproval(orderId: string, now = new Date()): Promise
   if (!t) return null;
   const pp = getPayPal();
   if (t.state === "CREATED") {
-    if (pp instanceof MockPayPalClient) pp.approve(orderId, t.senderEmail);
+    // kind check, not instanceof: Next may bundle the mock class twice (route vs page) around one shared instance.
+    if (pp.kind === "mock") (pp as MockPayPalClient).approve(orderId, t.senderEmail);
     const holdMinutes = t.meta.risk?.hold ? config.riskHoldMinutes : 0;
     t = await step(t, (x) => authorizeTransfer(pp, x, { now, holdMinutes }));
   }

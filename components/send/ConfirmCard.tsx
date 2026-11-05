@@ -4,6 +4,8 @@ import { labelsFor } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";
 
 export interface UnderstandResponse {
+  draftId: string | null;
+  risk: { level: "low" | "medium" | "high"; hold: boolean; signals: string[] } | null;
   extractor: "anthropic" | "rules";
   ok: boolean;
   problems: { code: string; [k: string]: unknown }[];
@@ -22,6 +24,7 @@ export interface UnderstandResponse {
 export function ConfirmCard({
   data,
   lang,
+  holdMinutes,
   busy,
   onConfirm,
   onCancel,
@@ -29,6 +32,7 @@ export function ConfirmCard({
 }: {
   data: UnderstandResponse & { recipient: NonNullable<UnderstandResponse["recipient"]>; amount: NonNullable<UnderstandResponse["amount"]> };
   lang: string;
+  holdMinutes: number;
   busy: boolean;
   onConfirm: (typedCents?: number) => void;
   onCancel: () => void;
@@ -79,6 +83,16 @@ export function ConfirmCard({
             {L.t("lookalike", { other: o.name })}
           </Notice>
         ))}
+        {data.risk?.signals.includes("pressure_language") && (
+          <Notice tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("pressure") : undefined}>
+            {L.t("pressure")}
+          </Notice>
+        )}
+        {data.risk?.signals.includes("unusual_amount") && (
+          <Notice tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("unusual_amount") : undefined}>
+            {L.t("unusual_amount")}
+          </Notice>
+        )}
         {!data.recipient.paidBefore && (
           <Notice tone="info" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("first_time") : undefined}>
             {L.t("first_time")}
@@ -90,6 +104,16 @@ export function ConfirmCard({
           </Notice>
         )}
       </div>
+
+      {data.risk?.hold && (
+        <div className="mt-4 rounded-v border-2 border-terracotta/60 bg-terracotta-soft p-4">
+          <p className="text-sm font-bold uppercase tracking-wider text-terracotta">Safety hold</p>
+          <p lang={L.usedLang} dir={L.dir} className="mt-1 font-bold">
+            {L.t("hold_notice", { minutes: String(holdMinutes) })}
+          </p>
+          {showEnglish && <p className="mt-1 text-sm opacity-80">{en.t("hold_notice", { minutes: String(holdMinutes) })}</p>}
+        </div>
+      )}
 
       {needsTyped && (
         <div className="mt-5">
