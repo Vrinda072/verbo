@@ -41,12 +41,12 @@ export type ValidationResult = { ok: true; draft: ValidDraft } | { ok: false; pr
 const MATCH = 0.9; // name similarity needed to count as the same contact
 const LOOKALIKE = 0.85; // close enough to warn about
 
-export function resolveRecipient(spoken: string, contacts: Contact[] = CONTACTS) {
-  const s = normalizeName(spoken);
+export function resolveRecipient(spoken: string | string[], contacts: Contact[] = CONTACTS) {
+  const forms = (Array.isArray(spoken) ? spoken : [spoken]).map(normalizeName).filter(Boolean);
   const scored = contacts
     .map((c) => ({
       contact: c,
-      score: Math.max(...[c.name, ...c.aliases].map((n) => jaroWinkler(s, normalizeName(n)))),
+      score: Math.max(...forms.flatMap((s) => [c.name, ...c.aliases].map((n) => jaroWinkler(s, normalizeName(n))))),
     }))
     .sort((a, b) => b.score - a.score);
   const matches = scored.filter((m) => m.score >= MATCH);
@@ -64,7 +64,8 @@ export function validateExtraction(x: LlmExtraction, transcript: string, contact
   if (!x.recipient_spoken?.trim()) {
     problems.push({ code: "missing_recipient" });
   } else {
-    const { scored, matches, exact } = resolveRecipient(x.recipient_spoken, contacts);
+    const forms = [x.recipient_spoken, x.recipient_latin].filter((f): f is string => !!f?.trim());
+    const { scored, matches, exact } = resolveRecipient(forms, contacts);
     const chosen = exact.length === 1 ? exact[0] : matches.length === 1 ? matches[0] : undefined;
     if (chosen) {
       partial.recipient = chosen.contact;

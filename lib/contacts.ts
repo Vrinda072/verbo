@@ -21,7 +21,7 @@ export const CONTACTS: Contact[] = [
   {
     id: "c_lopez",
     name: "Manuel Lopez",
-    aliases: ["Manuel", "Manu", "మాన్యుయెల్ లోపెజ్"],
+    aliases: ["Manuel", "Manu", "Manuel López", "మాన్యుయెల్ లోపెజ్", "मैनुअल लोपेज़", "مانويل لوبيز"],
     sandboxEmailEnv: "SANDBOX_INTENDED_RECIPIENT_EMAIL",
     language: "es",
     paidBefore: true,
@@ -30,7 +30,7 @@ export const CONTACTS: Contact[] = [
   {
     id: "c_lopes",
     name: "Manuel Lopes",
-    aliases: ["మాన్యుయెల్ లోపెస్"],
+    aliases: ["మాన్యుయెల్ లోపెస్", "मैनुअल लोपेस", "مانويل لوبيس"],
     sandboxEmailEnv: "SANDBOX_WRONG_RECIPIENT_EMAIL",
     language: "pt",
     paidBefore: false,

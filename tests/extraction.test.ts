@@ -7,6 +7,7 @@ import { understand, validateExtraction, type LlmExtraction } from "@/lib/agents
 const base: LlmExtraction = {
   intent: "send_money",
   recipient_spoken: "Manuel Lopez",
+  recipient_latin: "Manuel Lopez",
   amount_spoken: "12.34",
   amount: "12.34",
   currency: "USD",
@@ -88,18 +89,26 @@ describe("validateExtraction (code decides, not the model)", () => {
     expect(r.ok && r.draft.currencyAssumed).toBe(true);
   });
 
+  it("matches a name spoken in another script via the transliteration", () => {
+    const r = validateExtraction(
+      { ...base, recipient_spoken: "मैनुएल लोपेज़", recipient_latin: "Manuel Lopez" },
+      "मैनुएल लोपेज़ को 12.34 डॉलर भेजो",
+    );
+    expect(r.ok && r.draft.recipient.id).toBe("c_lopez");
+  });
+
   it("asks when the recipient is ambiguous or unknown", () => {
-    const amb = validateExtraction({ ...base, recipient_spoken: "Manuel Lope" }, "Send 12.34 to Manuel Lope");
+    const amb = validateExtraction({ ...base, recipient_spoken: "Manuel Lope", recipient_latin: "Manuel Lope" }, "Send 12.34 to Manuel Lope");
     expect(amb.ok).toBe(false);
     if (!amb.ok) expect(amb.problems[0].code).toBe("recipient_ambiguous");
 
-    const unk = validateExtraction({ ...base, recipient_spoken: "Zed Q" }, "Send 12.34 to Zed Q");
+    const unk = validateExtraction({ ...base, recipient_spoken: "Zed Q", recipient_latin: "Zed Q" }, "Send 12.34 to Zed Q");
     expect(unk.ok).toBe(false);
     if (!unk.ok) expect(unk.problems[0].code).toBe("recipient_not_found");
   });
 
   it("rejects non-payment intents and missing fields", () => {
-    const r = validateExtraction({ ...base, intent: "other", recipient_spoken: null, amount: null }, "what's the weather");
+    const r = validateExtraction({ ...base, intent: "other", recipient_spoken: null, recipient_latin: null, amount: null }, "what's the weather");
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.problems.map((p) => p.code)).toEqual(["not_a_payment", "missing_recipient", "missing_amount"]);
   });
