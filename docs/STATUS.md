@@ -7,7 +7,9 @@
 |---|---|
 | **Send** $12.34 Sreenivas → platform → Manuel Lopez (Order AUTHORIZE → authorize → capture → Payout) | ✅ **COMPLETED**: payout batch SUCCESS. **Payouts works in the sandbox, so no Invoice fallback is needed.** |
 | **Void** $5.00 (authorize → 10-min risk hold → VOID) | ✅ **VOIDED**, no money moved |
-| **Return** $12.34 Manuel Lopes → platform → Sreenivas (Order CAPTURE → Payout) | ⏳ Not approved yet: two 15-min approval windows expired, nothing was captured. Rerun: `npm run money-loop -- --only=return --wait=60` |
+| **Return** $12.34 Manuel Lopes → platform → Sreenivas (Order CAPTURE → Payout) | ✅ **COMPLETED** (run `mw37hn0k`): Manuel Lopes approved, capture done, payout batch SUCCESS back to Sreenivas. (Two earlier 15-min approval windows expired with nothing captured.) |
+
+**The whole platform-mediated money loop (send, risk-hold void, return) works live in the PayPal sandbox.**
 
 - Keys in `.env`: PayPal client id/secret ✅ (OAuth verified; all 10 webhook event types exist), Soniox ✅, sandbox emails ✅.
 - Demo personas renamed to match the real sandbox accounts: **Sreenivas Rao** (sender), **Manuel Lopez** (intended), **Manuel Lopes** (look-alike), **Verbo** (platform business).
@@ -15,7 +17,6 @@
 - `money-loop` now takes `--wait=<minutes>`.
 
 ### Still to do by hand
-- Approve the return payment as Manuel Lopes (log in at sandbox.paypal.com in a private window).
 - Rotate the PayPal secret and Soniox key before submission (they were pasted in chat).
 - Free disk space (≥ 10 GB). Add `ANTHROPIC_API_KEY`.
 
