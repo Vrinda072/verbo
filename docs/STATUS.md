@@ -1,5 +1,38 @@
 # Status
 
+## Day 4 — Thu Nov 5, 2026 (recovery; still ahead of plan)
+
+### Done
+- **Cases** (`lib/recovery`): state machine opened → link_sent → viewed → replied → returned | refused |
+  escalated → closed, optimistic updates, immutable `case_events` timeline, `case_messages` stored in the
+  original language plus translation. One case per transfer.
+- **Signed links**: HMAC-SHA256, 7-day expiry, payload = case id + role + expiry only (no names, emails, amounts).
+- **Recipient page** `/recover/[token]`: language = `?lang` → contact's language → browser; picker; explanation with
+  code-formatted amount; "It's your choice — Verbo can't take money from your account"; **one-tap Return** (the
+  recipient approves a PayPal CAPTURE order themselves → platform → payout to the sender); "This money is mine"
+  (recorded, reversible); conversation below.
+- **Sender side**: completed payment → "Sent to the wrong person? Ask for it back" → case panel with timeline,
+  messages, and the link (delivery is simulated in the demo and labelled so).
+- **Translation**: Claude when configured; otherwise the original is shown and labelled "not translated" — never a
+  fake translation. Translations that change any number are dropped.
+- **Simulated clock**: reminder at 24 h, escalation at 72 h (`npm run recovery-tick -- --at=+73h`).
+- `npm run e2e-recovery`: full story (send → hold → released → case → Portuguese reply → return → RETURNED;
+  second case → reminder → ESCALATED) passes in mock mode.
+- **Checked in the browser (mock):** Telugu send to Manuel Lopes → ask for it back → Portuguese page → Return →
+  case RETURNED, payout to sender COMPLETED.
+- Fixed: mock PayPal ids collided with ids persisted from earlier dev sessions; language picker overflowed on phones.
+- **75 tests**, typecheck clean.
+
+### Not done / blocked
+- Messages are **untranslated** until `ANTHROPIC_API_KEY` is set (labelled honestly in the UI).
+- Recovery not yet run against the **real** sandbox (needs approval as Manuel Lopes, like the Day 2 return).
+- Link delivery is simulated (no SMS/email integration).
+
+### Next (Day 5 — Case Desk + evidence)
+1. AG Grid Case Desk: master/detail cases, timeline, quick actions, custom theme; ~300 simulated cases.
+2. Evidence packet per case: JSON + PDF + SHA-256, golden-file test.
+3. Disk: AG Grid + PDF libraries need space (currently ~2 GB free).
+
 ## Day 3 — Thu Nov 5, 2026 (same day as Day 2; ahead of plan)
 
 ### Done
