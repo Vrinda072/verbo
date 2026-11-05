@@ -18,7 +18,8 @@
     "gen-languages": "tsx scripts/gen-languages.ts",
     "verify-templates": "tsx scripts/verify-templates.ts",
     "speech-spike": "tsx scripts/speech-spike.ts",
-    "eval": "tsx scripts/eval.ts"
+    "eval": "tsx scripts/eval.ts",
+    "release-holds": "tsx scripts/release-holds.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",

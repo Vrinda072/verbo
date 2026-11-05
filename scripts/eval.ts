@@ -65,7 +65,7 @@ async function main() {
       unclear: null,
     };
     const r = validateExtraction({ ...base, ...g.model }, g.transcript);
-    const codes = r.ok ? [] : r.problems.map((p) => p.code);
+    const codes: string[] = r.ok ? [] : r.problems.map((p) => p.code);
     guardRows.push({
       id: g.id,
       tags: g.tags,
