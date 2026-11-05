@@ -1,0 +1,9 @@
+{
+  "format": "verbo-evidence/1",
+  "generatedAt": "2026-11-12T12:00:00.000Z",
+  "simulated": true,
+  "case": { "id": "case_FIXTURE", "state": "RETURNED", "amount": { "currency": "USD", "cents": 1234 },
+    "sender": { "name": "Sreenivas Rao", "language": "te" }, "recipient": { "language": "pt", "name": "Manuel Lopes" } },
+  "conversation": [ { "author": "sender", "lang": "te", "text": "నేను పొరపాటున 12.34 డాలర్లు పంపాను" } ],
+  "evidence": { "score": 85, "facts": { "hasPaymentRecord": true, "hasUtterance": false } }
+}
