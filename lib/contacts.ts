@@ -37,7 +37,7 @@ export const CONTACTS: Contact[] = [
     simulated: true,
   },
   { id: "c_lakshmi", name: "Lakshmi Rao", aliases: ["Lakshmi", "లక్ష్మి"], language: "te", paidBefore: true, simulated: true },
-  { id: "c_kiran", name: "Kiran Reddy", aliases: ["Kiran", "కిరణ్"], language: "te", paidBefore: true, simulated: true },
+  { id: "c_kiran", name: "Kiran Reddy", aliases: ["Kiran", "కిరణ్", "किरण रेड्डी"], language: "te", paidBefore: true, simulated: true },
   { id: "c_ana", name: "Ana Souza", aliases: ["Ana"], language: "pt", paidBefore: false, simulated: true },
 ];
 
