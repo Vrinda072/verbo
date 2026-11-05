@@ -27,6 +27,7 @@ export interface TransferMeta {
   recipientId?: string;
   language?: string;
   risk?: RiskAssessment;
+  originalTransferId?: string;
 }
 
 export type StoredTransfer = Transfer & { meta: TransferMeta; createdAt: Date };
@@ -59,6 +60,7 @@ export async function insertTransfer(t: Transfer, meta: TransferMeta): Promise<v
     language: meta.language,
     riskLevel: meta.risk?.level,
     risk: meta.risk,
+    originalTransferId: meta.originalTransferId,
   });
   await appendEvents(t, 0);
 }
@@ -112,6 +114,7 @@ function toTransfer(r: typeof schema.transfers.$inferSelect, events: (typeof sch
       recipientId: r.recipientId ?? undefined,
       language: r.language ?? undefined,
       risk: (r.risk as RiskAssessment | null) ?? undefined,
+      originalTransferId: r.originalTransferId ?? undefined,
     },
     createdAt: r.createdAt,
   };

@@ -41,6 +41,9 @@ export const CONTACTS: Contact[] = [
   { id: "c_ana", name: "Ana Souza", aliases: ["Ana"], language: "pt", paidBefore: false, simulated: true },
 ];
 
+/** The demo sender (simulated persona backed by the SANDBOX_SENDER_EMAIL account). */
+export const SENDER = { name: "Sreenivas Rao", shortName: "Sreenivas R.", language: "te", simulated: true } as const;
+
 export function contactEmail(c: Contact): string | undefined {
   return c.sandboxEmailEnv ? process.env[c.sandboxEmailEnv] || undefined : undefined;
 }

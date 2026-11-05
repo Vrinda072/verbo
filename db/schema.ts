@@ -69,3 +69,64 @@ export const webhookEvents = pgTable(
   },
   (t) => [index("webhook_events_resource_idx").on(t.resourceId)],
 );
+
+/**
+ * Recovery case: one per mistaken transfer. State mirrors lib/recovery/state.ts. `simulated` marks seeded
+ * demo data (Case Desk); live cases have simulated = 0.
+ */
+export const cases = pgTable(
+  "cases",
+  {
+    id: text("id").primaryKey(),
+    transferId: text("transfer_id").notNull().references(() => transfers.id),
+    state: text("state").notNull(),
+    senderName: text("sender_name").notNull(),
+    senderLanguage: text("sender_language").notNull(),
+    recipientContactId: text("recipient_contact_id"),
+    recipientName: text("recipient_name").notNull(),
+    recipientLanguage: text("recipient_language").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    currency: text("currency").notNull().default("USD"),
+    reason: text("reason").notNull().default("wrong_recipient"),
+    linkSentAt: timestamp("link_sent_at", { withTimezone: true }),
+    remindersSent: integer("reminders_sent").notNull().default(0),
+    returnTransferId: text("return_transfer_id"),
+    simulated: integer("simulated").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("cases_transfer_idx").on(t.transferId), index("cases_state_idx").on(t.state)],
+);
+
+/** Immutable case timeline. */
+export const caseEvents = pgTable(
+  "case_events",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    caseId: text("case_id").notNull().references(() => cases.id),
+    event: text("event").notNull(),
+    fromState: text("from_state").notNull(),
+    toState: text("to_state").notNull(),
+    actor: text("actor", { enum: ["sender", "recipient", "system", "operator"] }).notNull(),
+    at: timestamp("at", { withTimezone: true }).notNull(),
+    data: jsonb("data"),
+  },
+  (t) => [index("case_events_case_idx").on(t.caseId)],
+);
+
+/** Messages between sender and recipient; each stored in the original language plus a translation. */
+export const caseMessages = pgTable(
+  "case_messages",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    caseId: text("case_id").notNull().references(() => cases.id),
+    author: text("author", { enum: ["sender", "recipient", "system"] }).notNull(),
+    text: text("text").notNull(),
+    lang: text("lang").notNull(),
+    translatedText: text("translated_text"),
+    translatedLang: text("translated_lang"),
+    translator: text("translator", { enum: ["anthropic", "template", "none"] }).notNull(),
+    at: timestamp("at", { withTimezone: true }).notNull(),
+  },
+  (t) => [index("case_messages_case_idx").on(t.caseId)],
+);
