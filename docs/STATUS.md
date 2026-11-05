@@ -1,5 +1,36 @@
 # Status
 
+## Day 3 — Thu Nov 5, 2026 (same day as Day 2; ahead of plan)
+
+### Done
+- **Risk scoring** (`lib/risk`), code only: similar recipient (weighted by whether the chosen contact is a known
+  payee), first-time recipient, unusual amount vs simulated history, pressure-language cues (keyword lists in
+  en/te/hi/es/pt/ar + verbatim phrases from the model, which only count if they appear in the transcript), language
+  mismatch → **low / medium / high**. High = safety hold. Weights are hand-set and documented, not tuned on fraud data.
+- **Server-side drafts**: `/api/understand` stores recipient, amount and risk; `/api/transfers` takes only a draft id
+  + confirmation nonce, so the client can't change the amount or skip the risk check.
+- **Persistence**: transfers and an immutable `transfer_events` log in Postgres/PGlite, migrations applied
+  automatically; optimistic state check so two workers can't both advance a transfer.
+- **Hold flow**: PayPal return → authorize; high risk = authorization held uncaptured for `RISK_HOLD_MINUTES`
+  (default 10); hold screen with server-synced countdown, reasons and a big cancel button (VOID, no money moves);
+  release after the window (status page polling or `npm run release-holds`). Low risk releases straight away.
+- **Checked in the browser (mock mode):** Telugu "send 12.34 to Manuel Lopes urgently" → high risk with 4 reasons →
+  Telugu hold screen → cancel → **VOIDED**. Low-risk English send → **COMPLETED**.
+- **Eval** (`npm run eval` → `docs/eval.md`): 50 team-written scenarios. Offline rules run: 41/41 pipeline,
+  9/9 deliberately wrong model outputs caught by code. Caveats in the doc (same team wrote parser and scenarios).
+- **65 tests**, typecheck clean.
+
+### Not done / blocked
+- Live speech (Soniox out of credit) and Claude extraction (no `ANTHROPIC_API_KEY`), as on Day 2.
+- The hold flow has not yet been run against the **real** sandbox (only mock). Needs one manual approval:
+  set `MOCK=0`, send to Manuel Lopes, approve as Sreenivas, then cancel or wait 10 minutes.
+- Webhooks still not wired into the DB (the return page does the work for now).
+
+### Next (Day 4 — recovery)
+1. Cases state machine + signed expiring `app/recover/[token]` link.
+2. Recipient-side page in their language with one-tap Return (reuses the sandbox-proven return flow).
+3. Translated one-way message + reply; simulated clock for reminders and escalation.
+
 ## Day 2 — Thu Nov 5, 2026
 
 ### Live sandbox money loop (run `mw2hk374`, IDs in git-ignored `docs/private/`)
