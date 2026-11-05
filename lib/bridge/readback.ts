@@ -8,7 +8,10 @@ import type { Money } from "@/lib/paypal/types";
 
 export type TemplateKey =
   | "title" | "readback" | "confirm" | "cancel" | "edit" | "lookalike" | "typed_amount" | "currency_assumed" | "first_time"
-  | "unusual_amount" | "pressure" | "hold_title" | "hold_notice" | "cancel_hold" | "sent" | "cancelled";
+  | "unusual_amount" | "pressure" | "hold_title" | "hold_notice" | "cancel_hold" | "sent" | "cancelled"
+  | "rc_title" | "rc_body" | "rc_choice" | "rc_return" | "rc_keep" | "rc_chat" | "rc_placeholder" | "rc_send"
+  | "rc_returned" | "rc_refused" | "rc_untranslated" | "rc_translated" | "rc_expired"
+  | "ask_back" | "case_sent" | "returned_sender";
 
 interface TemplateEntry {
   source: "authored" | "machine" | "native";
@@ -23,6 +26,12 @@ export const PLACEHOLDERS: Partial<Record<TemplateKey, string[]>> = {
   lookalike: ["other"],
   hold_notice: ["minutes"],
   sent: ["recipient"],
+  rc_body: ["sender", "amount"],
+  rc_chat: ["sender"],
+  rc_returned: ["sender"],
+  rc_refused: ["sender"],
+  case_sent: ["recipient"],
+  returned_sender: ["recipient"],
 };
 
 export interface LanguageInfo {

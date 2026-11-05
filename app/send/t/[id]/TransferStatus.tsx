@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
+import { SenderCase } from "./SenderCase";
 
 export interface TransferView {
   id: string;
@@ -21,7 +22,7 @@ export interface TransferView {
 const SENDING = new Set(["APPROVED", "AUTHORIZED", "CAPTURED", "PAYOUT_PENDING"]);
 
 /** Sender's live view of one transfer: waiting → (hold countdown with cancel) → sent / cancelled. */
-export function TransferStatus({ initial }: { initial: TransferView }) {
+export function TransferStatus({ initial, caseId }: { initial: TransferView; caseId: string | null }) {
   const [t, setT] = useState(initial);
   const [now, setNow] = useState(() => Date.now());
   const [busy, setBusy] = useState(false);
@@ -130,10 +131,7 @@ export function TransferStatus({ initial }: { initial: TransferView }) {
             {L.t("sent", { recipient: t.recipientName })}
           </h1>
           {showEnglish && <p className="mt-1 text-ink-3">{en.t("sent", { recipient: t.recipientName })}</p>}
-          <p className="mt-6 text-ink-2">
-            Sent to the wrong person? Verbo can ask them to send it back.{" "}
-            <span className="text-ink-3">(Recovery arrives on Day 4.)</span>
-          </p>
+          <SenderCase transferId={t.id} lang={t.language} initialCaseId={caseId} />
         </>
       )}
 

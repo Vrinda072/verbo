@@ -1,16 +1,54 @@
-import { EmptyState } from "@/components/EmptyState";
+import { headers } from "next/headers";
+import { Logo } from "@/components/SiteHeader";
+import { caseDetail, caseFromToken, recordView } from "@/lib/recovery/service";
+import { recipientView } from "@/lib/recovery/views";
+import { labelsFor, templateLanguages } from "@/lib/bridge/readback";
+import { RecoverView } from "./RecoverView";
 
 export const metadata = { title: "Money sent to you by mistake", robots: { index: false } };
+export const dynamic = "force-dynamic";
 
-export default async function RecoverPage({ params }: { params: Promise<{ token: string }> }) {
-  await params; // token verification lands on Day 4
-  return (
-    <main id="main" className="px-4 py-16">
-      <EmptyState
-        eyebrow="Arriving Day 4"
-        title="Someone sent you money by mistake"
-        body="This page will explain what happened in your language and let you send it back with one tap."
-      />
-    </main>
-  );
+const HAS_TEMPLATE = new Set(templateLanguages());
+
+/** Language: ?lang= → the contact's known language → the browser's Accept-Language → English. */
+async function pickLanguage(param: string | undefined, caseLang: string | undefined): Promise<string> {
+  if (param && HAS_TEMPLATE.has(param)) return param;
+  if (caseLang && HAS_TEMPLATE.has(caseLang)) return caseLang;
+  const accept = (await headers()).get("accept-language") ?? "";
+  const fromBrowser = accept
+    .split(",")
+    .map((p) => p.split(";")[0].trim().split("-")[0])
+    .find((l) => HAS_TEMPLATE.has(l));
+  return fromBrowser ?? "en";
+}
+
+export default async function RecoverPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ lang?: string }>;
+}) {
+  const { token } = await params;
+  const { lang: langParam } = await searchParams;
+  const found = await caseFromToken(token);
+
+  if (!found.ok) {
+    const lang = await pickLanguage(langParam, undefined);
+    const L = labelsFor(lang);
+    return (
+      <main id="main" className="mx-auto max-w-lg px-4 py-16 text-center">
+        <Logo />
+        <h1 lang={L.usedLang} dir={L.dir} className="mt-8 font-display text-3xl font-semibold">
+          {L.t("rc_expired")}
+        </h1>
+        {L.usedLang !== "en" && <p className="mt-2 text-ink-3">{labelsFor("en").t("rc_expired")}</p>}
+      </main>
+    );
+  }
+
+  await recordView(found.caseRow);
+  const view = recipientView((await caseDetail(found.caseRow.id))!);
+  const lang = await pickLanguage(langParam, view.caseLanguage);
+  return <RecoverView token={token} initial={view} initialLang={lang} />;
 }
