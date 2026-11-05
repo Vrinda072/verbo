@@ -100,7 +100,7 @@ export async function createTransferFromDraft(args: { draftId: string; nonce: st
 }
 
 /** Run one money step and persist it. If a racing worker got there first, return the stored version. */
-async function step(t: StoredTransfer, fn: (t: Transfer) => Promise<Transfer>): Promise<StoredTransfer> {
+export async function step(t: StoredTransfer, fn: (t: Transfer) => Promise<Transfer>): Promise<StoredTransfer> {
   let next: Transfer;
   try {
     next = await fn(t);
