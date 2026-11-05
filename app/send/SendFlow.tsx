@@ -30,12 +30,12 @@ const EXAMPLES: Record<string, string> = {
   ar: "أرسل 30 دولارا إلى مانويل لوبيز",
 };
 
-export function SendFlow() {
+export function SendFlow({ holdMinutes }: { holdMinutes: number }) {
   const [lang, setLang] = useState("en");
   const [phase, setPhase] = useState<Phase>("input");
   const [result, setResult] = useState<UnderstandResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [created, setCreated] = useState<{ approveUrl: string; orderId: string; mode: string } | null>(null);
+  const [created, setCreated] = useState<{ id: string; approveUrl?: string; mode: string } | null>(null);
   const [nonce, setNonce] = useState("");
   const terms = useMemo(() => CONTACTS.map((c) => c.name), []);
   const mic = useSoniox(lang, terms);
@@ -74,20 +74,14 @@ export function SendFlow() {
   }
 
   async function confirm(typedCents?: number) {
-    if (!result?.recipient || !result.amount) return;
+    if (!result?.draftId) return;
     setPhase("creating");
     setError(null);
     try {
       const res = await fetch("/api/transfers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nonce,
-          recipientId: result.recipient.id,
-          cents: result.amount.cents,
-          typedCents,
-          amountSource: result.amountSource,
-        }),
+        body: JSON.stringify({ draftId: result.draftId, nonce, typedCents }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error);
@@ -97,7 +91,9 @@ export function SendFlow() {
       setError(
         (e as Error).message === "recipient_not_payable_in_demo"
           ? "This contact is part of the simulated address book and can’t receive sandbox money. Try Manuel Lopez or Manuel Lopes."
-          : "PayPal didn’t accept the request. Nothing was sent.",
+          : (e as Error).message === "draft_expired"
+            ? "This check is more than 15 minutes old. Please say it again."
+            : "PayPal didn’t accept the request. Nothing was sent.",
       );
       setPhase("review");
     }
@@ -111,7 +107,7 @@ export function SendFlow() {
     setPhase("input");
   }
 
-  const reviewable = result?.ok && result.recipient && result.amount;
+  const reviewable = result?.ok && result.draftId && result.recipient && result.amount;
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -191,6 +187,7 @@ export function SendFlow() {
           <ConfirmCard
             data={result as Parameters<typeof ConfirmCard>[0]["data"]}
             lang={lang}
+            holdMinutes={holdMinutes}
             busy={phase === "creating"}
             onConfirm={confirm}
             onEdit={() => setPhase("input")}
@@ -215,11 +212,12 @@ export function SendFlow() {
             One last step on PayPal: approve ${result.amount.digits} to {result.recipient.name}
           </h2>
           <p className="mt-3 text-ink-2">
-            Verbo holds the payment as an authorization until checks pass — the money only moves after that.
+            PayPal only authorizes the payment at this point. Verbo sends it after approval
+            {result.risk?.hold ? ` and a ${holdMinutes}-minute safety hold` : ""}.
             {created.mode === "mock" && " (Offline demo mode: no real sandbox call.)"}
           </p>
           <a
-            href={created.approveUrl}
+            href={created.approveUrl ?? `/send/t/${created.id}`}
             className="mt-6 inline-flex min-h-14 items-center rounded-full bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v"
           >
             Approve on PayPal
