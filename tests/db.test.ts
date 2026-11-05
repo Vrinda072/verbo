@@ -11,7 +11,7 @@ describe("database migrations", () => {
     const r = await db.query<{ table_name: string }>(
       "select table_name from information_schema.tables where table_schema = 'public' order by 1",
     );
-    expect(r.rows.map((x) => x.table_name)).toEqual(["transfer_events", "transfers", "webhook_events"]);
+    expect(r.rows.map((x) => x.table_name)).toEqual(["drafts", "transfer_events", "transfers", "webhook_events"]);
     await db.close();
   }, 30_000);
 });

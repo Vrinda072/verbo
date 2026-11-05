@@ -15,7 +15,7 @@ export const config = {
     apiBase: "https://api-m.sandbox.paypal.com",
   },
   /** Risk hold window in minutes (authorization left uncaptured). */
-  riskHoldMinutes: 10,
+  riskHoldMinutes: Number(process.env.RISK_HOLD_MINUTES || 10),
 } as const;
 
 export function assertSandbox(): void {
