@@ -26,8 +26,12 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",
     "@electric-sql/pglite": "^0.5.15",
+    "ag-grid-community": "^36.3.0",
+    "ag-grid-enterprise": "^36.3.0",
+    "ag-grid-react": "^36.3.0",
     "drizzle-orm": "^0.45.4",
     "next": "15.5.29",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.23.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
