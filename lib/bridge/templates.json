@@ -16,7 +16,23 @@
     "hold_notice",
     "cancel_hold",
     "sent",
-    "cancelled"
+    "cancelled",
+    "rc_title",
+    "rc_body",
+    "rc_choice",
+    "rc_return",
+    "rc_keep",
+    "rc_chat",
+    "rc_placeholder",
+    "rc_send",
+    "rc_returned",
+    "rc_refused",
+    "rc_untranslated",
+    "rc_translated",
+    "rc_expired",
+    "ask_back",
+    "case_sent",
+    "returned_sender"
   ],
   "templates": {
     "en": {
@@ -38,7 +54,23 @@
         "hold_notice": "To keep you safe, Verbo will wait {minutes} minutes before sending. You can cancel until then.",
         "cancel_hold": "Cancel this payment",
         "sent": "Sent. {recipient} will receive the money shortly.",
-        "cancelled": "Cancelled. No money moved."
+        "cancelled": "Cancelled. No money moved.",
+        "rc_title": "Did you get money by mistake?",
+        "rc_body": "{sender} sent you {amount} on PayPal by mistake. It was meant for someone else.",
+        "rc_choice": "It's your choice. Verbo can't take money from your account. If you send it back, you approve it yourself on PayPal.",
+        "rc_return": "Send it back",
+        "rc_keep": "This money is mine",
+        "rc_chat": "Message {sender}",
+        "rc_placeholder": "Write a message",
+        "rc_send": "Send message",
+        "rc_returned": "Thank you. The money is on its way back to {sender}.",
+        "rc_refused": "Understood. {sender} has been told. You can still send it back later.",
+        "rc_untranslated": "Not translated",
+        "rc_translated": "Translated automatically",
+        "rc_expired": "This link has expired or is not valid.",
+        "ask_back": "Sent to the wrong person? Ask for it back",
+        "case_sent": "We sent {recipient} a link in their language. They can return the money with one tap.",
+        "returned_sender": "{recipient} sent your money back."
       }
     },
     "te": {
@@ -60,7 +92,23 @@
         "hold_notice": "మీ భద్రత కోసం, Verbo పంపే ముందు {minutes} నిమిషాలు ఆగుతుంది. అప్పటి వరకు మీరు రద్దు చేయవచ్చు.",
         "cancel_hold": "ఈ చెల్లింపును రద్దు చేయండి",
         "sent": "పంపబడింది. {recipient} కి త్వరలో డబ్బు చేరుతుంది.",
-        "cancelled": "రద్దు చేయబడింది. డబ్బు ఏమీ కదలలేదు."
+        "cancelled": "రద్దు చేయబడింది. డబ్బు ఏమీ కదలలేదు.",
+        "rc_title": "మీకు పొరపాటున డబ్బు వచ్చిందా?",
+        "rc_body": "{sender} పొరపాటున PayPal లో మీకు {amount} పంపారు. ఆ డబ్బు వేరొకరి కోసం.",
+        "rc_choice": "నిర్ణయం మీదే. Verbo మీ ఖాతా నుండి డబ్బు తీసుకోలేదు. మీరు తిరిగి పంపితే, PayPal లో మీరే ఆమోదిస్తారు.",
+        "rc_return": "డబ్బు తిరిగి పంపండి",
+        "rc_keep": "ఈ డబ్బు నాదే",
+        "rc_chat": "{sender} కి సందేశం",
+        "rc_placeholder": "సందేశం రాయండి",
+        "rc_send": "సందేశం పంపండి",
+        "rc_returned": "ధన్యవాదాలు. డబ్బు {sender} కి తిరిగి వెళ్తోంది.",
+        "rc_refused": "అర్థమైంది. {sender} కి తెలియజేశాం. మీరు తర్వాత కూడా తిరిగి పంపవచ్చు.",
+        "rc_untranslated": "అనువదించలేదు",
+        "rc_translated": "ఆటోమేటిక్‌గా అనువదించబడింది",
+        "rc_expired": "ఈ లింక్ గడువు ముగిసింది లేదా చెల్లదు.",
+        "ask_back": "తప్పు వ్యక్తికి పంపారా? తిరిగి అడగండి",
+        "case_sent": "{recipient} కి వారి భాషలో ఒక లింక్ పంపాం. వారు ఒక్క ట్యాప్‌తో డబ్బు తిరిగి పంపవచ్చు.",
+        "returned_sender": "{recipient} మీ డబ్బు తిరిగి పంపారు."
       }
     },
     "hi": {
@@ -82,7 +130,23 @@
         "hold_notice": "आपकी सुरक्षा के लिए Verbo भेजने से पहले {minutes} मिनट रुकेगा। तब तक आप इसे रद्द कर सकते हैं।",
         "cancel_hold": "यह भुगतान रद्द करें",
         "sent": "भेज दिया गया। {recipient} को जल्द ही पैसे मिल जाएंगे।",
-        "cancelled": "रद्द कर दिया गया। कोई पैसा नहीं गया।"
+        "cancelled": "रद्द कर दिया गया। कोई पैसा नहीं गया।",
+        "rc_title": "क्या आपको गलती से पैसे मिले?",
+        "rc_body": "{sender} ने गलती से PayPal पर आपको {amount} भेज दिए। ये पैसे किसी और के लिए थे।",
+        "rc_choice": "फ़ैसला आपका है। Verbo आपके खाते से पैसे नहीं ले सकता। अगर आप पैसे लौटाते हैं, तो आप ख़ुद PayPal पर इसकी मंज़ूरी देते हैं।",
+        "rc_return": "पैसे वापस भेजें",
+        "rc_keep": "ये पैसे मेरे हैं",
+        "rc_chat": "{sender} को संदेश",
+        "rc_placeholder": "संदेश लिखें",
+        "rc_send": "संदेश भेजें",
+        "rc_returned": "धन्यवाद। पैसे {sender} के पास वापस जा रहे हैं।",
+        "rc_refused": "ठीक है। {sender} को बता दिया गया है। आप बाद में भी पैसे लौटा सकते हैं।",
+        "rc_untranslated": "अनुवाद नहीं हुआ",
+        "rc_translated": "अपने-आप अनुवादित",
+        "rc_expired": "यह लिंक समाप्त हो गया है या मान्य नहीं है।",
+        "ask_back": "गलत व्यक्ति को भेज दिया? वापस माँगें",
+        "case_sent": "हमने {recipient} को उनकी भाषा में एक लिंक भेजा है। वे एक टैप में पैसे लौटा सकते हैं।",
+        "returned_sender": "{recipient} ने आपके पैसे लौटा दिए।"
       }
     },
     "es": {
@@ -104,7 +168,23 @@
         "hold_notice": "Para protegerte, Verbo esperará {minutes} minutos antes de enviar. Puedes cancelar hasta entonces.",
         "cancel_hold": "Cancelar este pago",
         "sent": "Enviado. {recipient} recibirá el dinero en breve.",
-        "cancelled": "Cancelado. No se movió dinero."
+        "cancelled": "Cancelado. No se movió dinero.",
+        "rc_title": "¿Recibiste dinero por error?",
+        "rc_body": "{sender} te envió {amount} por PayPal por error. Era para otra persona.",
+        "rc_choice": "Tú decides. Verbo no puede sacar dinero de tu cuenta. Si lo devuelves, lo apruebas tú mismo en PayPal.",
+        "rc_return": "Devolver el dinero",
+        "rc_keep": "Este dinero es mío",
+        "rc_chat": "Mensaje para {sender}",
+        "rc_placeholder": "Escribe un mensaje",
+        "rc_send": "Enviar mensaje",
+        "rc_returned": "Gracias. El dinero está volviendo a {sender}.",
+        "rc_refused": "Entendido. Se le ha avisado a {sender}. Todavía puedes devolverlo más tarde.",
+        "rc_untranslated": "Sin traducir",
+        "rc_translated": "Traducido automáticamente",
+        "rc_expired": "Este enlace ha caducado o no es válido.",
+        "ask_back": "¿Lo enviaste a la persona equivocada? Pide que te lo devuelvan",
+        "case_sent": "Le enviamos a {recipient} un enlace en su idioma. Puede devolver el dinero con un toque.",
+        "returned_sender": "{recipient} te devolvió el dinero."
       }
     },
     "pt": {
@@ -126,7 +206,23 @@
         "hold_notice": "Para sua segurança, o Verbo vai esperar {minutes} minutos antes de enviar. Você pode cancelar até lá.",
         "cancel_hold": "Cancelar este pagamento",
         "sent": "Enviado. {recipient} vai receber o dinheiro em breve.",
-        "cancelled": "Cancelado. Nenhum dinheiro foi movimentado."
+        "cancelled": "Cancelado. Nenhum dinheiro foi movimentado.",
+        "rc_title": "Você recebeu dinheiro por engano?",
+        "rc_body": "{sender} enviou {amount} para você no PayPal por engano. O dinheiro era para outra pessoa.",
+        "rc_choice": "A escolha é sua. O Verbo não pode tirar dinheiro da sua conta. Se você devolver, é você quem aprova no PayPal.",
+        "rc_return": "Devolver o dinheiro",
+        "rc_keep": "Este dinheiro é meu",
+        "rc_chat": "Mensagem para {sender}",
+        "rc_placeholder": "Escreva uma mensagem",
+        "rc_send": "Enviar mensagem",
+        "rc_returned": "Obrigado. O dinheiro está voltando para {sender}.",
+        "rc_refused": "Entendido. {sender} foi avisado. Você ainda pode devolver depois.",
+        "rc_untranslated": "Não traduzido",
+        "rc_translated": "Traduzido automaticamente",
+        "rc_expired": "Este link expirou ou não é válido.",
+        "ask_back": "Enviou para a pessoa errada? Peça de volta",
+        "case_sent": "Enviamos a {recipient} um link no idioma dele. Ele pode devolver o dinheiro com um toque.",
+        "returned_sender": "{recipient} devolveu seu dinheiro."
       }
     },
     "ar": {
@@ -148,7 +244,23 @@
         "hold_notice": "لحمايتك، سينتظر Verbo مدة {minutes} دقائق قبل الإرسال. يمكنك الإلغاء حتى ذلك الحين.",
         "cancel_hold": "إلغاء هذه الدفعة",
         "sent": "تم الإرسال. سيستلم {recipient} المال قريبًا.",
-        "cancelled": "تم الإلغاء. لم يتم تحويل أي أموال."
+        "cancelled": "تم الإلغاء. لم يتم تحويل أي أموال.",
+        "rc_title": "هل وصلتك أموال عن طريق الخطأ؟",
+        "rc_body": "أرسل لك {sender} مبلغ {amount} عبر PayPal عن طريق الخطأ. كان المبلغ مخصصًا لشخص آخر.",
+        "rc_choice": "القرار لك. لا يستطيع Verbo سحب أموال من حسابك. إذا أعدتها، فأنت من يوافق على ذلك في PayPal.",
+        "rc_return": "إعادة المبلغ",
+        "rc_keep": "هذا المال لي",
+        "rc_chat": "رسالة إلى {sender}",
+        "rc_placeholder": "اكتب رسالة",
+        "rc_send": "إرسال الرسالة",
+        "rc_returned": "شكرًا لك. المبلغ في طريقه إلى {sender}.",
+        "rc_refused": "تم. أبلغنا {sender}. لا يزال بإمكانك إعادة المبلغ لاحقًا.",
+        "rc_untranslated": "غير مترجم",
+        "rc_translated": "تمت الترجمة تلقائيًا",
+        "rc_expired": "انتهت صلاحية هذا الرابط أو أنه غير صالح.",
+        "ask_back": "أرسلتها إلى الشخص الخطأ؟ اطلب استردادها",
+        "case_sent": "أرسلنا إلى {recipient} رابطًا بلغته. يمكنه إعادة المبلغ بلمسة واحدة.",
+        "returned_sender": "أعاد {recipient} أموالك."
       }
     }
   }

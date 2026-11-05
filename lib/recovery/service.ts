@@ -204,4 +204,10 @@ export async function caseForTransfer(transferId: string) {
   return c ?? null;
 }
 
+export async function caseIdForReturn(returnTransferId: string): Promise<string | null> {
+  const db = await getDb();
+  const [c] = await db.select({ id: schema.cases.id }).from(schema.cases).where(eq(schema.cases.returnTransferId, returnTransferId));
+  return c?.id ?? null;
+}
+
 export type { CaseRow };

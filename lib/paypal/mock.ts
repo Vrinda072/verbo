@@ -30,6 +30,8 @@ interface MockOrder {
 export class MockPayPalClient implements PayPalClient {
   readonly kind = "mock" as const;
   private seq = 0;
+  /** Random per-instance prefix so ids never collide with ones stored in a persistent DB by an earlier process. */
+  private readonly run = Math.random().toString(36).slice(2, 6).toUpperCase();
   readonly orders = new Map<string, MockOrder>();
   readonly authorizations = new Map<string, { orderId: string; status: AuthorizedOrder["authorizationStatus"]; amount: Money }>();
   readonly payouts = new Map<string, PayoutDetails & { senderBatchId: string; receiver: string; amount: Money }>();
@@ -41,7 +43,7 @@ export class MockPayPalClient implements PayPalClient {
 
   private id(prefix: string) {
     this.seq += 1;
-    return `${prefix}${String(this.seq).padStart(6, "0")}MOCK`;
+    return `${prefix}${this.run}${String(this.seq).padStart(6, "0")}MOCK`;
   }
 
   private once<T>(requestId: string, fn: () => T): T {

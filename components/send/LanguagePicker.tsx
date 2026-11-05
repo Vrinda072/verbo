@@ -36,7 +36,7 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
         <span lang={current?.code} dir={current?.dir}>
           {current?.nativeName ?? value}
         </span>
-        <span className="text-sm font-normal text-ink-3">{current?.englishName}</span>
+        <span className="hidden text-sm font-normal text-ink-3 sm:inline">{current?.englishName}</span>
       </button>
 
       {open && (
