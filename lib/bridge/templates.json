@@ -1,0 +1,96 @@
+{
+  "_note": "Fixed read-back strings. Never generated per request. Amounts/names are inserted by code. 'reviewed' flips to true only after a native speaker signs off (docs/language-coverage.md).",
+  "keys": ["title", "readback", "confirm", "cancel", "edit", "lookalike", "typed_amount", "currency_assumed", "first_time"],
+  "templates": {
+    "en": {
+      "source": "authored",
+      "reviewed": true,
+      "strings": {
+        "title": "Check before you send",
+        "readback": "Send {amount} to {recipient}?",
+        "confirm": "Yes, send",
+        "cancel": "No, cancel",
+        "edit": "Change",
+        "lookalike": "You also have a contact named {other}. Make sure this is the right person.",
+        "typed_amount": "Type the amount to confirm",
+        "currency_assumed": "The amount is in US dollars.",
+        "first_time": "You have never sent money to this person before."
+      }
+    },
+    "te": {
+      "source": "machine",
+      "reviewed": false,
+      "strings": {
+        "title": "పంపే ముందు సరిచూసుకోండి",
+        "readback": "{recipient} కి {amount} పంపాలా?",
+        "confirm": "అవును, పంపండి",
+        "cancel": "వద్దు, రద్దు చేయండి",
+        "edit": "మార్చండి",
+        "lookalike": "మీ కాంటాక్ట్‌లలో {other} అనే మరో వ్యక్తి కూడా ఉన్నారు. ఇది సరైన వ్యక్తేనా అని నిర్ధారించుకోండి.",
+        "typed_amount": "నిర్ధారించడానికి మొత్తాన్ని టైప్ చేయండి",
+        "currency_assumed": "మొత్తం అమెరికన్ డాలర్లలో ఉంది.",
+        "first_time": "మీరు ఈ వ్యక్తికి ఇంతకు ముందు ఎప్పుడూ డబ్బు పంపలేదు."
+      }
+    },
+    "hi": {
+      "source": "machine",
+      "reviewed": false,
+      "strings": {
+        "title": "भेजने से पहले जाँच लें",
+        "readback": "{recipient} को {amount} भेजें?",
+        "confirm": "हाँ, भेजें",
+        "cancel": "नहीं, रद्द करें",
+        "edit": "बदलें",
+        "lookalike": "आपके संपर्कों में {other} नाम का एक और व्यक्ति भी है। पक्का करें कि यह सही व्यक्ति है।",
+        "typed_amount": "पुष्टि के लिए राशि टाइप करें",
+        "currency_assumed": "राशि अमेरिकी डॉलर में है।",
+        "first_time": "आपने इस व्यक्ति को पहले कभी पैसे नहीं भेजे हैं।"
+      }
+    },
+    "es": {
+      "source": "machine",
+      "reviewed": false,
+      "strings": {
+        "title": "Revisa antes de enviar",
+        "readback": "¿Enviar {amount} a {recipient}?",
+        "confirm": "Sí, enviar",
+        "cancel": "No, cancelar",
+        "edit": "Cambiar",
+        "lookalike": "También tienes un contacto llamado {other}. Asegúrate de que sea la persona correcta.",
+        "typed_amount": "Escribe el monto para confirmar",
+        "currency_assumed": "El monto está en dólares estadounidenses.",
+        "first_time": "Nunca le has enviado dinero a esta persona."
+      }
+    },
+    "pt": {
+      "source": "machine",
+      "reviewed": false,
+      "strings": {
+        "title": "Confira antes de enviar",
+        "readback": "Enviar {amount} para {recipient}?",
+        "confirm": "Sim, enviar",
+        "cancel": "Não, cancelar",
+        "edit": "Alterar",
+        "lookalike": "Você também tem um contato chamado {other}. Confirme se é a pessoa certa.",
+        "typed_amount": "Digite o valor para confirmar",
+        "currency_assumed": "O valor está em dólares americanos.",
+        "first_time": "Você nunca enviou dinheiro para esta pessoa."
+      }
+    },
+    "ar": {
+      "source": "machine",
+      "reviewed": false,
+      "strings": {
+        "title": "تحقق قبل الإرسال",
+        "readback": "هل تريد إرسال {amount} إلى {recipient}؟",
+        "confirm": "نعم، أرسل",
+        "cancel": "لا، إلغاء",
+        "edit": "تغيير",
+        "lookalike": "لديك أيضًا جهة اتصال باسم {other}. تأكد من أنه الشخص الصحيح.",
+        "typed_amount": "اكتب المبلغ للتأكيد",
+        "currency_assumed": "المبلغ بالدولار الأمريكي.",
+        "first_time": "لم ترسل أموالاً إلى هذا الشخص من قبل."
+      }
+    }
+  }
+}
