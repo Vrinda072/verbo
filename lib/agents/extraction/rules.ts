@@ -31,7 +31,7 @@ export class RulesExtractor implements Extractor {
     for (const c of this.contacts) {
       for (const n of [c.name, ...c.aliases]) {
         const nn = normalizeName(n);
-        if (nn && norm.includes(nn) && nn.length > best) {
+        if (nn && ` ${norm} `.includes(` ${nn} `) && nn.length > best) {
           best = nn.length;
           recipient = n;
         }
