@@ -88,6 +88,11 @@ export async function authorizeTransfer(
   return next;
 }
 
+/** Sender cancelled before approving/authorizing on PayPal: nothing to call, nothing moved. */
+export function cancelTransfer(t: Transfer, now = new Date()): Transfer {
+  return apply(t, "CANCELLED", now);
+}
+
 /** Sender cancelled (or risk confirmed): void the uncaptured authorization. No money moved. */
 export async function voidTransfer(pp: PayPalClient, t: Transfer, now = new Date()): Promise<Transfer> {
   if (!t.authorizationId) throw new Error("Transfer has no authorization");

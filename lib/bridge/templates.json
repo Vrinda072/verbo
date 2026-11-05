@@ -1,6 +1,23 @@
 {
   "_note": "Fixed read-back strings. Never generated per request. Amounts/names are inserted by code. 'reviewed' flips to true only after a native speaker signs off (docs/language-coverage.md).",
-  "keys": ["title", "readback", "confirm", "cancel", "edit", "lookalike", "typed_amount", "currency_assumed", "first_time"],
+  "keys": [
+    "title",
+    "readback",
+    "confirm",
+    "cancel",
+    "edit",
+    "lookalike",
+    "typed_amount",
+    "currency_assumed",
+    "first_time",
+    "unusual_amount",
+    "pressure",
+    "hold_title",
+    "hold_notice",
+    "cancel_hold",
+    "sent",
+    "cancelled"
+  ],
   "templates": {
     "en": {
       "source": "authored",
@@ -14,7 +31,14 @@
         "lookalike": "You also have a contact named {other}. Make sure this is the right person.",
         "typed_amount": "Type the amount to confirm",
         "currency_assumed": "The amount is in US dollars.",
-        "first_time": "You have never sent money to this person before."
+        "first_time": "You have never sent money to this person before.",
+        "unusual_amount": "This is much more than you usually send.",
+        "pressure": "Someone may be rushing you. A real bank, the police or your family can wait a few minutes.",
+        "hold_title": "Payment on hold",
+        "hold_notice": "To keep you safe, Verbo will wait {minutes} minutes before sending. You can cancel until then.",
+        "cancel_hold": "Cancel this payment",
+        "sent": "Sent. {recipient} will receive the money shortly.",
+        "cancelled": "Cancelled. No money moved."
       }
     },
     "te": {
@@ -29,7 +53,14 @@
         "lookalike": "మీ కాంటాక్ట్‌లలో {other} అనే మరో వ్యక్తి కూడా ఉన్నారు. ఇది సరైన వ్యక్తేనా అని నిర్ధారించుకోండి.",
         "typed_amount": "నిర్ధారించడానికి మొత్తాన్ని టైప్ చేయండి",
         "currency_assumed": "మొత్తం అమెరికన్ డాలర్లలో ఉంది.",
-        "first_time": "మీరు ఈ వ్యక్తికి ఇంతకు ముందు ఎప్పుడూ డబ్బు పంపలేదు."
+        "first_time": "మీరు ఈ వ్యక్తికి ఇంతకు ముందు ఎప్పుడూ డబ్బు పంపలేదు.",
+        "unusual_amount": "మీరు సాధారణంగా పంపే దానికంటే ఇది చాలా ఎక్కువ.",
+        "pressure": "ఎవరైనా మిమ్మల్ని తొందరపెడుతున్నారేమో. నిజమైన బ్యాంకు, పోలీసులు లేదా కుటుంబం కొన్ని నిమిషాలు ఆగగలరు.",
+        "hold_title": "చెల్లింపు నిలిపివేయబడింది",
+        "hold_notice": "మీ భద్రత కోసం, Verbo పంపే ముందు {minutes} నిమిషాలు ఆగుతుంది. అప్పటి వరకు మీరు రద్దు చేయవచ్చు.",
+        "cancel_hold": "ఈ చెల్లింపును రద్దు చేయండి",
+        "sent": "పంపబడింది. {recipient} కి త్వరలో డబ్బు చేరుతుంది.",
+        "cancelled": "రద్దు చేయబడింది. డబ్బు ఏమీ కదలలేదు."
       }
     },
     "hi": {
@@ -44,7 +75,14 @@
         "lookalike": "आपके संपर्कों में {other} नाम का एक और व्यक्ति भी है। पक्का करें कि यह सही व्यक्ति है।",
         "typed_amount": "पुष्टि के लिए राशि टाइप करें",
         "currency_assumed": "राशि अमेरिकी डॉलर में है।",
-        "first_time": "आपने इस व्यक्ति को पहले कभी पैसे नहीं भेजे हैं।"
+        "first_time": "आपने इस व्यक्ति को पहले कभी पैसे नहीं भेजे हैं।",
+        "unusual_amount": "यह आपकी आम भेजी जाने वाली राशि से बहुत ज़्यादा है।",
+        "pressure": "हो सकता है कोई आपको जल्दबाज़ी करवा रहा हो। असली बैंक, पुलिस या परिवार कुछ मिनट रुक सकते हैं।",
+        "hold_title": "भुगतान रोका गया है",
+        "hold_notice": "आपकी सुरक्षा के लिए Verbo भेजने से पहले {minutes} मिनट रुकेगा। तब तक आप इसे रद्द कर सकते हैं।",
+        "cancel_hold": "यह भुगतान रद्द करें",
+        "sent": "भेज दिया गया। {recipient} को जल्द ही पैसे मिल जाएंगे।",
+        "cancelled": "रद्द कर दिया गया। कोई पैसा नहीं गया।"
       }
     },
     "es": {
@@ -59,7 +97,14 @@
         "lookalike": "También tienes un contacto llamado {other}. Asegúrate de que sea la persona correcta.",
         "typed_amount": "Escribe el monto para confirmar",
         "currency_assumed": "El monto está en dólares estadounidenses.",
-        "first_time": "Nunca le has enviado dinero a esta persona."
+        "first_time": "Nunca le has enviado dinero a esta persona.",
+        "unusual_amount": "Esto es mucho más de lo que sueles enviar.",
+        "pressure": "Puede que alguien te esté presionando. Un banco real, la policía o tu familia pueden esperar unos minutos.",
+        "hold_title": "Pago en espera",
+        "hold_notice": "Para protegerte, Verbo esperará {minutes} minutos antes de enviar. Puedes cancelar hasta entonces.",
+        "cancel_hold": "Cancelar este pago",
+        "sent": "Enviado. {recipient} recibirá el dinero en breve.",
+        "cancelled": "Cancelado. No se movió dinero."
       }
     },
     "pt": {
@@ -74,7 +119,14 @@
         "lookalike": "Você também tem um contato chamado {other}. Confirme se é a pessoa certa.",
         "typed_amount": "Digite o valor para confirmar",
         "currency_assumed": "O valor está em dólares americanos.",
-        "first_time": "Você nunca enviou dinheiro para esta pessoa."
+        "first_time": "Você nunca enviou dinheiro para esta pessoa.",
+        "unusual_amount": "Isso é muito mais do que você costuma enviar.",
+        "pressure": "Alguém pode estar pressionando você. Um banco de verdade, a polícia ou sua família podem esperar alguns minutos.",
+        "hold_title": "Pagamento em espera",
+        "hold_notice": "Para sua segurança, o Verbo vai esperar {minutes} minutos antes de enviar. Você pode cancelar até lá.",
+        "cancel_hold": "Cancelar este pagamento",
+        "sent": "Enviado. {recipient} vai receber o dinheiro em breve.",
+        "cancelled": "Cancelado. Nenhum dinheiro foi movimentado."
       }
     },
     "ar": {
@@ -89,7 +141,14 @@
         "lookalike": "لديك أيضًا جهة اتصال باسم {other}. تأكد من أنه الشخص الصحيح.",
         "typed_amount": "اكتب المبلغ للتأكيد",
         "currency_assumed": "المبلغ بالدولار الأمريكي.",
-        "first_time": "لم ترسل أموالاً إلى هذا الشخص من قبل."
+        "first_time": "لم ترسل أموالاً إلى هذا الشخص من قبل.",
+        "unusual_amount": "هذا أكثر بكثير مما ترسله عادةً.",
+        "pressure": "ربما يستعجلك أحدهم. البنك الحقيقي أو الشرطة أو العائلة يمكنهم الانتظار بضع دقائق.",
+        "hold_title": "الدفعة معلّقة",
+        "hold_notice": "لحمايتك، سينتظر Verbo مدة {minutes} دقائق قبل الإرسال. يمكنك الإلغاء حتى ذلك الحين.",
+        "cancel_hold": "إلغاء هذه الدفعة",
+        "sent": "تم الإرسال. سيستلم {recipient} المال قريبًا.",
+        "cancelled": "تم الإلغاء. لم يتم تحويل أي أموال."
       }
     }
   }

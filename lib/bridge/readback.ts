@@ -6,8 +6,9 @@ import templatesFile from "./templates.json";
 import languagesFile from "./languages.json";
 import type { Money } from "@/lib/paypal/types";
 
-export type TemplateKey = (typeof templatesFile.keys)[number] &
-  ("title" | "readback" | "confirm" | "cancel" | "edit" | "lookalike" | "typed_amount" | "currency_assumed" | "first_time");
+export type TemplateKey =
+  | "title" | "readback" | "confirm" | "cancel" | "edit" | "lookalike" | "typed_amount" | "currency_assumed" | "first_time"
+  | "unusual_amount" | "pressure" | "hold_title" | "hold_notice" | "cancel_hold" | "sent" | "cancelled";
 
 interface TemplateEntry {
   source: "authored" | "machine" | "native";
@@ -20,6 +21,8 @@ export const TEMPLATE_KEYS = templatesFile.keys as TemplateKey[];
 export const PLACEHOLDERS: Partial<Record<TemplateKey, string[]>> = {
   readback: ["amount", "recipient"],
   lookalike: ["other"],
+  hold_notice: ["minutes"],
+  sent: ["recipient"],
 };
 
 export interface LanguageInfo {

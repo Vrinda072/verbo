@@ -6,10 +6,10 @@ import { RealPayPalClient } from "./real";
 export type { PayPalClient } from "./client";
 export * from "./types";
 
-let instance: PayPalClient | undefined;
+const g = globalThis as unknown as { __verboPayPal?: PayPalClient };
 
-/** MOCK=1 → in-memory fake; MOCK=0 → PayPal sandbox. */
+/** MOCK=1 → in-memory fake; MOCK=0 → PayPal sandbox. One instance per process (survives dev hot reload). */
 export function getPayPal(): PayPalClient {
-  instance ??= config.mock ? new MockPayPalClient() : new RealPayPalClient();
-  return instance;
+  g.__verboPayPal ??= config.mock ? new MockPayPalClient() : new RealPayPalClient();
+  return g.__verboPayPal;
 }

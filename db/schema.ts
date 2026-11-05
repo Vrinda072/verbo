@@ -5,6 +5,7 @@ export const transfers = pgTable("transfers", {
   id: text("id").primaryKey(),
   kind: text("kind", { enum: ["send", "return"] }).notNull(),
   state: text("state").notNull(),
+  approveUrl: text("approve_url"),
   amountCents: integer("amount_cents").notNull(),
   currency: text("currency").notNull().default("USD"),
   senderEmail: text("sender_email").notNull(),
@@ -15,9 +16,33 @@ export const transfers = pgTable("transfers", {
   payoutBatchId: text("payout_batch_id"),
   holdUntil: timestamp("hold_until", { withTimezone: true }),
   originalTransferId: text("original_transfer_id"),
+  draftId: text("draft_id"),
+  recipientId: text("recipient_id"),
+  language: text("language"),
+  riskLevel: text("risk_level", { enum: ["low", "medium", "high"] }),
+  risk: jsonb("risk"),
   simulated: integer("simulated").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("transfers_order_idx").on(t.orderId)]);
+
+/**
+ * What Verbo understood from one utterance, after code validation and risk scoring. The confirmation
+ * card is rendered from this, and a transfer can only be created from a draft id — the client never
+ * sends amounts or recipients back. Drafts expire after 15 minutes.
+ */
+export const drafts = pgTable("drafts", {
+  id: text("id").primaryKey(),
+  language: text("language").notNull(),
+  transcript: text("transcript").notNull(),
+  extractor: text("extractor").notNull(),
+  recipientId: text("recipient_id").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  currency: text("currency").notNull().default("USD"),
+  amountSource: text("amount_source", { enum: ["numerals", "words"] }).notNull(),
+  risk: jsonb("risk").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
 });
 
 /** Immutable append-only log of transfer state changes. */
@@ -29,7 +54,7 @@ export const transferEvents = pgTable("transfer_events", {
   toState: text("to_state").notNull(),
   at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
   data: jsonb("data"),
-});
+}, (t) => [index("transfer_events_transfer_idx").on(t.transferId)]);
 
 /** Verified PayPal webhook deliveries, de-duplicated by PayPal event id. */
 export const webhookEvents = pgTable(

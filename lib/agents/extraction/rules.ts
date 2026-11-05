@@ -46,6 +46,7 @@ export class RulesExtractor implements Extractor {
       amount_spoken: num ? num[1] : null,
       amount,
       currency,
+      pressure_cues: [],
       unclear: null,
     };
   }

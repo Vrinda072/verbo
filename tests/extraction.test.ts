@@ -11,6 +11,7 @@ const base: LlmExtraction = {
   amount_spoken: "12.34",
   amount: "12.34",
   currency: "USD",
+  pressure_cues: [],
   unclear: null,
 };
 

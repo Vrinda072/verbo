@@ -27,6 +27,9 @@ export const LlmExtraction = z
       .string()
       .nullable()
       .describe("ISO 4217 code if the speaker named a currency (dollars → USD), else null. Do not guess."),
+    pressure_cues: z
+      .array(z.string())
+      .describe("Verbatim phrases from the transcript suggesting urgency, secrecy, threats or prizes. Empty if none."),
     unclear: z.string().nullable().describe("Short note if anything was ambiguous, else null."),
   })
   .strict();
