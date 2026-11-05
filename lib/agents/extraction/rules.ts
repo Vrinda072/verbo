@@ -42,6 +42,7 @@ export class RulesExtractor implements Extractor {
     return {
       intent: PAY_WORDS.test(transcript) || (amount && recipient) ? "send_money" : "other",
       recipient_spoken: recipient,
+      recipient_latin: null,
       amount_spoken: num ? num[1] : null,
       amount,
       currency,

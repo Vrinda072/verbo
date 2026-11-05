@@ -15,6 +15,7 @@ const SYSTEM = `You read one short voice transcript from a person who wants to s
 The transcript may be in any language or mix languages, and may contain speech-recognition errors.
 Fill the fields exactly as described. Rules:
 - Copy recipient_spoken and amount_spoken verbatim from the transcript; never translate or "fix" a name.
+- recipient_latin is a plain phonetic transliteration of recipient_spoken into Latin letters; do not substitute a different person.
 - amount is the same number as a plain decimal ("12.34", "20"). Convert number words to digits only if they are unambiguous; otherwise null.
 - currency only if the speaker said one. Never guess.
 - If the person is not asking to pay someone, intent is "other".

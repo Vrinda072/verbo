@@ -16,7 +16,8 @@
     "register-webhook": "tsx scripts/register-webhook.ts",
     "db:generate": "drizzle-kit generate",
     "gen-languages": "tsx scripts/gen-languages.ts",
-    "verify-templates": "tsx scripts/verify-templates.ts"
+    "verify-templates": "tsx scripts/verify-templates.ts",
+    "speech-spike": "tsx scripts/speech-spike.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",
@@ -35,6 +36,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.2",
     "dotenv": "^18.0.9",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
@@ -42,7 +44,8 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
-    "vitest": "^4.1.12"
+    "vitest": "^4.1.12",
+    "ws": "^8.22.1"
   },
   "engines": {
     "node": ">=20"

@@ -11,6 +11,10 @@ export const LlmExtraction = z
       .string()
       .nullable()
       .describe("The recipient exactly as spoken (keep original script/spelling). null if not said."),
+    recipient_latin: z
+      .string()
+      .nullable()
+      .describe("recipient_spoken transliterated to Latin script (unchanged if already Latin). null if not said."),
     amount_spoken: z
       .string()
       .nullable()
