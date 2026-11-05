@@ -62,6 +62,10 @@ describe("evidence packet for a live (mock) recovery", () => {
   it("replaces non-Latin text in the PDF with a pointer instead of dropping it", () => {
     expect(pdfSafe("Olá, vou devolver.")).toBe("Olá, vou devolver.");
     expect(pdfSafe("నమస్తే")).toMatch(/JSON/);
+    expect(pdfSafe("Verbo — evidence packet")).toBe("Verbo — evidence packet");
+    expect(pdfSafe("s***@x.test → r***@y.test")).toBe("s***@x.test -> r***@y.test");
+    expect(pdfSafe("Said (te): మాన్యుయెల్ లోపెస్ కి 12.34")).toBe("Said (te): [non-Latin text — exact original in the JSON packet] 12.34");
+    expect(pdfSafe("నమస్తే, నేను. పంపాను?")).toBe("[non-Latin text — exact original in the JSON packet]");
   });
 });
 

@@ -210,4 +210,21 @@ export async function caseIdForReturn(returnTransferId: string): Promise<string 
   return c?.id ?? null;
 }
 
+/** Case Desk operator actions (demo: no operator login yet). */
+export async function operatorAction(caseId: string, action: "remind" | "escalate" | "close", now = new Date()) {
+  const c = await loadCase(caseId);
+  if (!c) throw new TransferError("not_found", 404);
+  const ev: CaseEvent = action === "remind" ? "REMINDER_SENT" : action === "escalate" ? "ESCALATED" : "CLOSED";
+  try {
+    nextCaseState(c.state as CaseState, ev);
+  } catch {
+    throw new TransferError("action_not_allowed", 409);
+  }
+  return applyEvent(c, ev, "operator", {
+    now,
+    set: ev === "REMINDER_SENT" ? { remindersSent: c.remindersSent + 1 } : {},
+    data: ev === "REMINDER_SENT" ? { channel: "simulated" } : undefined,
+  });
+}
+
 export type { CaseRow };
