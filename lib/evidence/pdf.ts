@@ -12,9 +12,48 @@ const INK = rgb(0.114, 0.102, 0.086);
 const MUTED = rgb(0.435, 0.4, 0.353);
 const GREEN = rgb(0.118, 0.353, 0.294);
 
-/** Keep Latin-1 text; replace anything the standard font can't encode. */
+/** Code points the WinAnsi-encoded standard fonts can draw: Latin-1 plus the WinAnsi extras (dashes, quotes, €, …). */
+const WIN_ANSI_EXTRAS = new Set([
+  0x20ac, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021, 0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0x017d, 0x2018, 0x2019,
+  0x201c, 0x201d, 0x2022, 0x2013, 0x2014, 0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0x017e, 0x0178,
+]);
+const drawable = (cp: number) => (cp >= 0x20 && cp <= 0x7e) || (cp >= 0xa0 && cp <= 0xff) || WIN_ANSI_EXTRAS.has(cp);
+
+export const NON_LATIN_NOTE = "[non-Latin text — exact original in the JSON packet]";
+
+/** Keep what the font can draw; arrows become "->"; each run of another script becomes one pointer to the JSON. */
 export function pdfSafe(s: string): string {
-  return /^[ -~ -ÿ\n]*$/.test(s) ? s : "[text in non-Latin script — exact original in the JSON packet]";
+  const parts: string[] = [];
+  let inRun = false;
+  for (const ch of s.replace(/→/g, "->").replace(/←/g, "<-")) {
+    const ok = drawable(ch.codePointAt(0)!);
+    if (inRun && (!ok || /[\s\p{P}]/u.test(ch))) continue; // spaces and punctuation inside a non-Latin run belong to it
+    if (ok) {
+      if (inRun) parts.push(" ");
+      inRun = false;
+      parts.push(ch);
+    } else {
+      inRun = true;
+      parts.push(NON_LATIN_NOTE);
+    }
+  }
+  return parts.join("").replace(/\s+/g, " ").trim();
+}
+
+/** Greedy word wrap to a pixel width. */
+function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
+  const lines: string[] = [];
+  let cur = "";
+  for (const w of text.split(" ")) {
+    const next = cur ? `${cur} ${w}` : w;
+    if (!cur || font.widthOfTextAtSize(next, size) <= width) cur = next;
+    else {
+      lines.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
 }
 
 const usd = (cents: number) => `$${(cents / 100).toFixed(2)}`;
@@ -37,13 +76,17 @@ export async function renderPdf(p: EvidencePacket): Promise<Uint8Array> {
     pg.drawText(`SHA-256 of JSON packet: ${sha256}`, { x: 40, y: 28, size: 7.5, font, color: MUTED });
   const line = (text: string, o: { f?: PDFFont; size?: number; color?: typeof INK; gap?: number } = {}) => {
     const size = o.size ?? 10;
-    if (y < 60) {
-      footer(page);
-      page = doc.addPage([595, 842]);
-      y = 790;
-    }
-    page.drawText(pdfSafe(text).slice(0, 110), { x: 40, y, size, font: o.f ?? font, color: o.color ?? INK });
-    y -= o.gap ?? size + 6;
+    const f = o.f ?? font;
+    const parts = wrap(pdfSafe(text), f, size, 515);
+    parts.forEach((part, i) => {
+      if (y < 60) {
+        footer(page);
+        page = doc.addPage([595, 842]);
+        y = 790;
+      }
+      page.drawText(part, { x: 40, y, size, font: f, color: o.color ?? INK });
+      y -= i === parts.length - 1 ? (o.gap ?? size + 6) : size + 3;
+    });
   };
 
   line("Verbo — evidence packet", { f: bold, size: 18, gap: 26 });

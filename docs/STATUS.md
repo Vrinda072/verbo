@@ -1,5 +1,34 @@
 # Status
 
+## Day 5 — Thu Nov 5, 2026 (Case Desk + evidence)
+
+### Done
+- **Case Desk** `/desk` on **AG Grid 36.3** (community + enterprise; every API checked against the installed type
+  definitions): custom "warm paper & ink" theme built only from design tokens (follows dark mode), master/detail rows
+  (timeline, conversation with translations, evidence checklist, quick actions remind / escalate / close, PDF + JSON
+  downloads), row-group panel, set filters, quick search, live / simulated / all toggle.
+- **Widgets**: KPI tiles (cases, open, returned + share of resolved, escalated, median evidence), clickable
+  recipient-language tiles (native names) that filter the grid, **pre-send alerts** grid (live drafts only).
+- **300 simulated cases**, deterministic, legal state-machine timelines, SIM- ids, example.test emails; marked "sim" in
+  the grid and called out in the header and under the KPIs.
+- **Evidence packet**: canonical JSON (sorted keys) + SHA-256 + PDF (pdf-lib, fixed dates, hash on every page).
+  Non-Latin text in the PDF is replaced by a pointer to the JSON, which holds the exact original. Download header
+  `X-Evidence-SHA256` verified equal to the body's hash. Golden-file and PDF-determinism tests.
+- **Evidence meter** (0–100, documented weights); the live mock recovery case scores 100.
+
+### Not done / blocked
+- **AG Grid licence**: no key, so Enterprise runs in trial mode with a watermark and console notice. Set
+  `AG_GRID_LICENSE_KEY` (a trial key from AG Grid, or the hackathon sponsor) to remove it.
+- **AG Studio** and the **ask-the-dashboard agent**: not built (AG Studio API unverified; agent is cut-list item 2).
+- Operator actions have **no login** (labelled "demo operator").
+- One test run timed out while the Mac was overloaded (load ≈ 19, `fileproviderd` at 100 % CPU, 1.5 GB disk free);
+  the re-run passed (**81 tests**). Low disk space makes this likelier — freeing space is still the top manual task.
+
+### Next (Nov 9–12 polish & ship)
+1. Render deploy (web + Postgres + cron for `release-holds` and `recovery-tick`), real-sandbox run of hold + recovery.
+2. README by judging criterion, accessibility pass, empty/loading/error states.
+3. With keys: Claude extraction eval + translation, Soniox speech spike; then the demo video.
+
 ## Day 4 — Thu Nov 5, 2026 (recovery; still ahead of plan)
 
 ### Done
