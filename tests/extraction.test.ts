@@ -129,9 +129,22 @@ describe("RulesExtractor + understand()", () => {
       expect(u.result.draft.amount.cents).toBe(1234);
     }
   });
+  it("does not resolve a bare first name shared by two contacts", async () => {
+    const u = await understand({ transcript: "Send 50 dollars to Manuel", language: "en" }, rules);
+    expect(u.result.ok).toBe(false);
+  });
   it("reads a Spanish command with decimal comma", async () => {
     const u = await understand({ transcript: "Envía 12,34 dólares a Manuel Lopes", language: "es" }, rules);
     expect(u.result.ok).toBe(true);
     if (u.result.ok) expect(u.result.draft.recipient.id).toBe("c_lopes");
+  });
+});
+
+describe("normalizeName keeps Indic vowel signs", () => {
+  it("distinguishes names that differ only by a vowel sign", async () => {
+    const { normalizeName } = await import("@/lib/agents/similarity");
+    expect(normalizeName("లోపెజ్")).not.toBe(normalizeName("లపజ"));
+    expect(normalizeName("లోపెజ్")).not.toContain(" ");
+    expect(normalizeName("Manuel López")).toBe("manuel lopez");
   });
 });
