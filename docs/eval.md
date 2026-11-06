@@ -1,6 +1,6 @@
 # Evaluation — scripted scenarios
 
-**What this is:** 57 scenarios written by the Verbo team (`evals/scenarios.ts`),
+**What this is:** 66 scenarios written by the Verbo team (`evals/scenarios.ts`),
 run by `npm run eval` on 2026-11-06. They check that Verbo behaves the way we intended on cases we chose.
 **What this is not:** a measure of real-world accuracy. No real users, no real voice audio, no fraud data.
 
@@ -13,7 +13,7 @@ contradicted those weights; two more changed on Nov 6 when the parser learned nu
 and real recorded speech.
 
 ## Pipeline (transcript → extraction → code validation → risk)
-**48/48** scenarios matched the expected recipient, amount and risk level (or the expected refusal).
+**57/57** scenarios matched the expected recipient, amount and risk level (or the expected refusal).
 
 | Scenario | Tags | Expected | Got | |
 |---|---|---|---|---|
@@ -64,6 +64,15 @@ and real recorded speech.
 | te-spelling | speech-spelling | c_lopez · 2000¢ · low | c_lopez · 2000¢ · low | ✅ |
 | en-dollars-cents | speech-format | c_lopez · 1234¢ · low | c_lopez · 1234¢ · low | ✅ |
 | en-two-amounts | ambiguous | ✘ missing_amount | ✘ missing_amount | ✅ |
+| hi-no-nukta | speech-spelling, native-script | c_lopez · 2500¢ · low | c_lopez · 2500¢ · low | ✅ |
+| hi-spelling | speech-spelling, native-script | c_lopez · 2500¢ · low | c_lopez · 2500¢ · low | ✅ |
+| hi-lopes-spelling | speech-spelling, look-alike | c_lopes · 2500¢ · high | c_lopes · 2500¢ · high | ✅ |
+| hi-first-name | native-script | c_kiran · 3000¢ · low | c_kiran · 3000¢ · low | ✅ |
+| hi-full-name-sound | native-script | c_lakshmi · 4000¢ · low | c_lakshmi · 4000¢ · low | ✅ |
+| hi-words-lakshmi | words, native-script | c_lakshmi · 5000¢ · low | c_lakshmi · 5000¢ · low | ✅ |
+| hi-bare-manuel | ambiguous | ✘ recipient_ambiguous | ✘ recipient_ambiguous | ✅ |
+| hi-karna-not-kiran | false-positive-check | ✘ missing_recipient | ✘ not_a_payment, missing_recipient | ✅ |
+| te-sound | native-script | c_lakshmi · 4000¢ · low | c_lakshmi · 4000¢ · low | ✅ |
 | hi-rupees | currency, native-script | ✘ currency_unsupported | ✘ currency_unsupported | ✅ |
 
 ## Guards (deliberately wrong model output → code validation)
