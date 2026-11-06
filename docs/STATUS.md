@@ -1,5 +1,20 @@
 # Status
 
+## Nov 6 — making it feel like a product
+
+Vrinda said it felt rusty and not like a hackathon project. Deployment, sandbox and other submission work are deferred at
+her request.
+- **Send:** stepper, recording timer, progress while working, mic stage with suggestions, text box only when needed, and
+  spoken read-back using the same fixed templates as the card (`?quiet` turns off auto-speak).
+- **`/demo`:** an 8-step split-screen rescue with a tracker showing where the $40 is. It is scripted, calls nothing and
+  says so. Screen text comes from real templates; chat lines are real Gemini output saved on Nov 6.
+- **Homepage:** leads with the problem, cycles the read-back through its 6 languages, and shows how code keeps control of
+  money. Corrected "signed" evidence packet (it is hashed, not signed) and softened two claims with no data behind them.
+- **Checked by eye:** homepage, Send and `/demo` at desktop and phone width, light and dark; Arabic right-to-left.
+- **Read-aloud voices in her Chrome:** en, hi, es, pt and ar have one; **Telugu has none**, so its card stays silent.
+- **Not checked:** how the read-aloud actually sounds, since her Mac's output was muted and the app was tested without
+  listening; the new recording screen with a real voice (the pane blocks mics). Case Desk was not redesigned.
+
 ## Nov 6 — microphone rebuilt after real failures
 
 Vrinda reported the mic wouldn't connect, stopped mid-sentence and missed words.
