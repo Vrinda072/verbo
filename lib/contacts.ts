@@ -21,7 +21,7 @@ export const CONTACTS: Contact[] = [
   {
     id: "c_lopez",
     name: "Manuel Lopez",
-    aliases: ["Manuel López", "మాన్యుయెల్ లోపెజ్", "मैनुअल लोपेज़", "مانويل لوبيز"],
+    aliases: ["Manuel López", "మాన్యుయెల్ లోపెజ్", "मैनुअल लोपेज़", "مانويل لوبيز", "మాన్యుయెల్", "मैनुअल", "مانويل"],
     sandboxEmailEnv: "SANDBOX_INTENDED_RECIPIENT_EMAIL",
     language: "es",
     paidBefore: true,
@@ -30,15 +30,15 @@ export const CONTACTS: Contact[] = [
   {
     id: "c_lopes",
     name: "Manuel Lopes",
-    aliases: ["మాన్యుయెల్ లోపెస్", "मैनुअल लोपेस", "مانويل لوبيس"],
+    aliases: ["మాన్యుయెల్ లోపెస్", "मैनुअल लोपेस", "مانويل لوبيس", "మాన్యుయెల్", "मैनुअल", "مانويل"],
     sandboxEmailEnv: "SANDBOX_WRONG_RECIPIENT_EMAIL",
     language: "pt",
     paidBefore: false,
     simulated: true,
   },
-  { id: "c_lakshmi", name: "Lakshmi Rao", aliases: ["Lakshmi", "లక్ష్మి"], language: "te", paidBefore: true, simulated: true },
-  { id: "c_kiran", name: "Kiran Reddy", aliases: ["Kiran", "కిరణ్", "किरण रेड्डी"], language: "te", paidBefore: true, simulated: true },
-  { id: "c_ana", name: "Ana Souza", aliases: ["Ana"], language: "pt", paidBefore: false, simulated: true },
+  { id: "c_lakshmi", name: "Lakshmi Rao", aliases: ["Lakshmi", "లక్ష్మి", "लक्ष्मी", "لاكشمي"], language: "te", paidBefore: true, simulated: true },
+  { id: "c_kiran", name: "Kiran Reddy", aliases: ["Kiran", "కిరణ్", "किरण", "كيران"], language: "te", paidBefore: true, simulated: true },
+  { id: "c_ana", name: "Ana Souza", aliases: ["Ana", "అనా", "अना", "آنا"], language: "pt", paidBefore: false, simulated: true },
 ];
 
 /** The demo sender (simulated persona backed by the SANDBOX_SENDER_EMAIL account). */

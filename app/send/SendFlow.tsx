@@ -11,7 +11,7 @@ type Phase = "input" | "understanding" | "review" | "creating" | "created" | "ca
 
 const PROBLEM_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   not_a_payment: () => "That didn’t sound like a payment. Try: “Send 20 dollars to Manuel Lopez”.",
-  missing_recipient: () => "Who should receive the money? Say or type their name.",
+  missing_recipient: () => "I couldn’t find a contact’s name in that. Say a full name from the list, or tap one.",
   recipient_not_found: (p) => `“${p.spoken}” isn’t in your contacts. Check the name.`,
   recipient_ambiguous: () => "More than one contact matches. Tap the right person:",
   missing_amount: () => "How much? Say or type the amount.",
@@ -122,8 +122,37 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       {(phase === "input" || phase === "understanding") && (
         <div className="mt-10 grid gap-8">
           {mic.status !== "unavailable" && (
-            <MicButton status={mic.status} analyser={mic.analyser} onStart={mic.start} onStop={mic.stop} />
+            <div>
+              <p className="mb-4 text-center text-lg">
+                Listening in{" "}
+                <strong lang={lang} dir={langInfo?.dir}>
+                  {langInfo?.nativeName ?? lang}
+                </strong>
+                {langInfo && langInfo.nativeName !== langInfo.englishName && <span className="text-ink-3"> ({langInfo.englishName})</span>}
+                <span className="block text-sm text-ink-3">Speak this language, or change it with the language button above.</span>
+              </p>
+              <MicButton status={mic.status} analyser={mic.analyser} onStart={mic.start} onStop={mic.stop} />
+            </div>
           )}
+
+          <section aria-labelledby="contacts-title" className="mx-auto w-full max-w-xl text-center">
+            <h2 id="contacts-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
+              People you can pay (simulated)
+            </h2>
+            <ul className="mt-2 flex flex-wrap justify-center gap-2">
+              {CONTACTS.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => mic.setTranscript(`${mic.transcript} ${c.name}`.trim())}
+                    className="min-h-11 rounded-full border border-line-strong bg-card px-4 font-bold hover:bg-paper-2"
+                  >
+                    {c.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
 
           {(mic.status === "unavailable" || mic.status === "error") && (
             <p role="status" className="mx-auto max-w-xl rounded-v border border-marigold/70 bg-marigold-soft p-4 text-center text-marigold-ink">

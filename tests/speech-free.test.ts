@@ -105,3 +105,15 @@ describe("MyMemory translator", () => {
     expect((await new MyMemoryTranslator(fetch).translate("hola", "es", "es")).note).toBe("same_language");
   });
 });
+
+describe("names by sound across scripts", () => {
+  it("gives Latin, Devanagari, Telugu and Arabic spellings the same key, and keeps Lopez apart from Lopes", async () => {
+    const { phoneticKey } = await import("@/lib/agents/phonetic");
+    expect(phoneticKey("मैनुअल लोपेज")).toBe(phoneticKey("Manuel Lopez"));
+    expect(phoneticKey("మాన్యుయల్ లోపెజ్")).toBe(phoneticKey("Manuel Lopez"));
+    expect(phoneticKey("مانويل لوبيز")).toBe(phoneticKey("Manuel Lopez"));
+    expect(phoneticKey("लक्ष्मी राव")).toBe(phoneticKey("Lakshmi Rao"));
+    expect(phoneticKey("Manuel Lopez")).not.toBe(phoneticKey("Manuel Lopes"));
+    expect(phoneticKey("मैनुअल लोपेस")).toBe(phoneticKey("Manuel Lopes"));
+  });
+});

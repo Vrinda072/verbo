@@ -6,6 +6,7 @@
 import { CONTACTS, type Contact } from "@/lib/contacts";
 import { dollarsAndCents, normalizeDigits } from "@/lib/agents/numbers";
 import { parseNumberWords } from "@/lib/agents/numberWords";
+import { phoneticKey } from "@/lib/agents/phonetic";
 import { jaroWinkler, normalizeName } from "@/lib/agents/similarity";
 import type { ExtractionInput, Extractor, LlmExtraction } from "./schema";
 
@@ -28,9 +29,28 @@ const PAY_WORDS = /send|pay|transfer|give|env[ií]a|manda|paga|transfere|envie|p
 const NAME_MATCH = 0.9;
 const MAX_NAME_WORDS = 3;
 
+/**
+ * A full name said in any script, matched by sound: "मैनुअल लोपेज" → Manuel Lopez. Two words minimum, because a single
+ * word's sound key can collide with ordinary words (करना, "to do", sounds like Kiran).
+ */
+function findBySound(words: string[], contacts: Contact[]): { spoken: string; contact: Contact } | null {
+  const keyed = contacts.map((c) => ({ c, keys: [c.name, ...c.aliases].map(phoneticKey).filter((k) => k.includes(" ")) }));
+  for (let size = MAX_NAME_WORDS; size >= 2; size--) {
+    for (let i = 0; i + size <= words.length; i++) {
+      const spoken = words.slice(i, i + size).join(" ");
+      const key = phoneticKey(spoken);
+      const hits = keyed.filter((k) => k.keys.includes(key));
+      if (hits.length === 1) return { spoken, contact: hits[0].c };
+    }
+  }
+  return null;
+}
+
 /** The stretch of the transcript that sounds most like a contact, e.g. a differently spelled "మాన్యుయల్ లోపెజ్". */
-function findRecipient(transcript: string, contacts: Contact[]): string | null {
+function findRecipient(transcript: string, contacts: Contact[]): { spoken: string; latin: string | null } | null {
   const words = normalizeName(transcript).split(" ").filter(Boolean);
+  const bySound = findBySound(words, contacts);
+  if (bySound) return { spoken: bySound.spoken, latin: bySound.contact.name };
   const names = contacts.flatMap((c) => [c.name, ...c.aliases]).map(normalizeName).filter(Boolean);
   let best: { text: string; score: number; size: number } | null = null;
   for (let size = MAX_NAME_WORDS; size >= 1; size--) {
@@ -43,7 +63,7 @@ function findRecipient(transcript: string, contacts: Contact[]): string | null {
       }
     }
   }
-  return best?.text ?? null;
+  return best ? { spoken: best.text, latin: null } : null;
 }
 
 /** The one amount said, or null when there is none or several different ones. */
@@ -71,8 +91,8 @@ export class RulesExtractor implements Extractor {
     const currency = CURRENCY_WORDS.find(([re]) => re.test(transcript))?.[1] ?? null;
     return {
       intent: PAY_WORDS.test(transcript) || (amount && recipient) ? "send_money" : "other",
-      recipient_spoken: recipient,
-      recipient_latin: null,
+      recipient_spoken: recipient?.spoken ?? null,
+      recipient_latin: recipient?.latin ?? null,
       amount_spoken: found && "spoken" in found ? found.spoken : null,
       amount,
       currency,

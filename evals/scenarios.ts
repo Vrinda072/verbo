@@ -92,6 +92,15 @@ export const PIPELINE: PipelineScenario[] = [
   { kind: "pipeline", id: "te-spelling", lang: "te", transcript: "మాన్యుయల్ లోపెజ్ కి 20 డాలర్లు పంపండి", expect: ok("c_lopez", 2000, "low"), tags: ["speech-spelling"] },
   { kind: "pipeline", id: "en-dollars-cents", lang: "en", transcript: "Send 12 dollars and 34 cents to Manuel Lopez", expect: ok("c_lopez", 1234, "low"), tags: ["speech-format"] },
   { kind: "pipeline", id: "en-two-amounts", lang: "en", transcript: "Send 20 to Kiran Reddy, no wait 200", expect: no("missing_amount"), tags: ["ambiguous"] },
+  { kind: "pipeline", id: "hi-no-nukta", lang: "hi", transcript: "मैनुअल लोपेज को 25 डॉलर भेजो", expect: ok("c_lopez", 2500, "low"), tags: ["speech-spelling", "native-script"] },
+  { kind: "pipeline", id: "hi-spelling", lang: "hi", transcript: "मैन्युअल लोपेज को $25 भेजो", expect: ok("c_lopez", 2500, "low"), tags: ["speech-spelling", "native-script"] },
+  { kind: "pipeline", id: "hi-lopes-spelling", lang: "hi", transcript: "मनुअल लोपेस को 25 डॉलर भेजना है", expect: ok("c_lopes", 2500, "high"), tags: ["speech-spelling", "look-alike"] },
+  { kind: "pipeline", id: "hi-first-name", lang: "hi", transcript: "किरण को 30 डॉलर भेजो", expect: ok("c_kiran", 3000, "low"), tags: ["native-script"] },
+  { kind: "pipeline", id: "hi-full-name-sound", lang: "hi", transcript: "लक्ष्मी राव को 40 डॉलर भेज दो", expect: ok("c_lakshmi", 4000, "low"), tags: ["native-script"] },
+  { kind: "pipeline", id: "hi-words-lakshmi", lang: "hi", transcript: "लक्ष्मी को पचास डॉलर दे दो", expect: ok("c_lakshmi", 5000, "low"), tags: ["words", "native-script"] },
+  { kind: "pipeline", id: "hi-bare-manuel", lang: "hi", transcript: "मैनुअल को 25 डॉलर भेजो", expect: no("recipient_ambiguous"), tags: ["ambiguous"] },
+  { kind: "pipeline", id: "hi-karna-not-kiran", lang: "hi", transcript: "मुझे 25 डॉलर ट्रांसफर करना है", expect: no("missing_recipient"), tags: ["false-positive-check"] },
+  { kind: "pipeline", id: "te-sound", lang: "te", transcript: "లక్ష్మి రావ్ కి 40 డాలర్లు పంపండి", expect: ok("c_lakshmi", 4000, "low"), tags: ["native-script"] },
   { kind: "pipeline", id: "hi-rupees", lang: "hi", transcript: "किरण रेड्डी को 500 रुपये भेजो", expect: no("currency_unsupported"), tags: ["currency", "native-script"] },
 ];
 
