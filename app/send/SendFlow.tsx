@@ -6,6 +6,7 @@ import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { MicButton } from "@/components/send/MicButton";
 import { ConfirmCard, type UnderstandResponse } from "@/components/send/ConfirmCard";
+import { Stepper } from "@/components/send/Stepper";
 
 type Phase = "input" | "understanding" | "review" | "creating" | "created" | "cancelled";
 
@@ -41,6 +42,9 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
   const mic = useSpeech(speechProvider, lang, terms);
   const langInfo = LANGUAGES.find((l) => l.code === lang);
   const heardByVoice = useRef("");
+  const [typing, setTyping] = useState(false);
+  const step = phase === "created" ? 2 : phase === "review" || phase === "creating" ? 1 : 0;
+  const working = phase === "understanding" || mic.status === "finishing";
 
   // Default to the browser language when we support it.
   useEffect(() => {
@@ -108,94 +112,88 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
     setCreated(null);
     setError(null);
     mic.setTranscript("");
+    setTyping(false);
     setPhase("input");
   }
 
   const reviewable = result?.ok && result.draftId && result.recipient && result.amount;
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-5xl">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">Send by voice</h1>
-          <p className="mt-2 text-lg text-ink-2">Say who and how much, in your language. You’ll check it before anything moves.</p>
+          <div className="mt-4">
+            <Stepper current={step} />
+          </div>
         </div>
         <LanguagePicker value={lang} onChange={setLang} />
       </div>
 
       {(phase === "input" || phase === "understanding") && (
-        <div className="mt-10 grid gap-8">
-          {mic.status !== "unavailable" && (
-            <div>
-              <p className="mb-4 text-center text-lg">
-                Listening in{" "}
-                <strong lang={lang} dir={langInfo?.dir}>
-                  {langInfo?.nativeName ?? lang}
-                </strong>
-                {langInfo && langInfo.nativeName !== langInfo.englishName && <span className="text-ink-3"> ({langInfo.englishName})</span>}
-                <span className="block text-sm text-ink-3">Speak this language, or change it with the language button above.</span>
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="grid gap-6">
+            {mic.status !== "unavailable" && (
+              <section aria-label="Microphone" className="rounded-v-lg border border-line bg-card px-6 py-10 text-center shadow-v sm:py-12">
+                {working ? (
+                  <Working stage={phase === "understanding" ? 1 : 0} />
+                ) : (
+                  <>
+                    <p className="mb-6 text-lg">
+                      Say who and how much, in{" "}
+                      <strong lang={lang} dir={langInfo?.dir}>
+                        {langInfo?.nativeName ?? lang}
+                      </strong>
+                      {langInfo && langInfo.nativeName !== langInfo.englishName && <span className="text-ink-3"> ({langInfo.englishName})</span>}
+                    </p>
+                    <MicButton status={mic.status} analyser={mic.analyser} onStart={mic.start} onStop={mic.stop} />
+                  </>
+                )}
+              </section>
+            )}
+
+            {(mic.status === "unavailable" || mic.status === "error") && (
+              <p role="status" className="rounded-v border border-marigold/70 bg-marigold-soft p-4 text-center text-marigold-ink">
+                {mic.error ?? "Your browser doesn’t support speech recognition. Chrome, Edge and Safari do."} You can also type — everything else works the same.
               </p>
-              <MicButton status={mic.status} analyser={mic.analyser} onStart={mic.start} onStop={mic.stop} />
-            </div>
-          )}
+            )}
 
-          <section aria-labelledby="contacts-title" className="mx-auto w-full max-w-xl text-center">
-            <h2 id="contacts-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
-              People you can pay (simulated)
-            </h2>
-            <ul className="mt-2 flex flex-wrap justify-center gap-2">
-              {CONTACTS.map((c) => (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    onClick={() => mic.setTranscript(`${mic.transcript} ${c.name}`.trim())}
-                    className="min-h-11 rounded-full border border-line-strong bg-card px-4 font-bold hover:bg-paper-2"
-                  >
-                    {c.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {(mic.status === "unavailable" || mic.status === "error") && (
-            <p role="status" className="mx-auto max-w-xl rounded-v border border-marigold/70 bg-marigold-soft p-4 text-center text-marigold-ink">
-              {mic.error ?? "Your browser doesn’t support speech recognition. Chrome, Edge and Safari do."} You can also type — everything else works the same.
-            </p>
-          )}
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (mic.transcript.trim()) void check(mic.transcript.trim());
-            }}
-            className="mx-auto w-full max-w-xl"
-          >
-            <label htmlFor="transcript" className="block text-sm font-bold uppercase tracking-wider text-ink-3">
-              {mic.status === "listening" ? "Listening…" : "What you said (you can edit it)"}
-            </label>
-            <textarea
-              id="transcript"
-              lang={lang}
-              dir={langInfo?.dir}
-              rows={2}
-              value={mic.transcript}
-              onChange={(e) => mic.setTranscript(e.target.value)}
-              placeholder={EXAMPLES[lang] ?? EXAMPLES.en}
-              aria-live="polite"
-              className="mt-2 w-full resize-none rounded-v-lg border-2 border-line bg-card px-5 py-4 text-2xl leading-snug outline-none focus:border-sky"
-            />
-            <div className="mt-3 flex items-center justify-between gap-3">
-              <p className="text-sm text-ink-3">Try: “{EXAMPLES[lang] ?? EXAMPLES.en}”</p>
-              <button
-                type="submit"
-                disabled={!mic.transcript.trim() || phase === "understanding" || mic.status === "listening"}
-                className="min-h-12 shrink-0 rounded-full bg-ink px-6 font-bold text-paper disabled:opacity-40"
+            {typing || mic.transcript || mic.status === "unavailable" || mic.status === "error" ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (mic.transcript.trim()) void check(mic.transcript.trim());
+                }}
               >
-                {phase === "understanding" ? "Checking…" : "Check"}
+                <label htmlFor="transcript" className="block text-sm font-bold uppercase tracking-wider text-ink-3">
+                  What you said (you can edit it)
+                </label>
+                <textarea
+                  id="transcript"
+                  lang={lang}
+                  dir={langInfo?.dir}
+                  rows={2}
+                  value={mic.transcript}
+                  onChange={(e) => mic.setTranscript(e.target.value)}
+                  placeholder={EXAMPLES[lang] ?? EXAMPLES.en}
+                  aria-live="polite"
+                  className="mt-2 w-full resize-none rounded-v-lg border-2 border-line bg-card px-5 py-4 text-2xl leading-snug outline-none focus:border-sky"
+                />
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={!mic.transcript.trim() || phase === "understanding" || mic.status === "listening"}
+                    className="min-h-12 shrink-0 rounded-full bg-ink px-6 font-bold text-paper disabled:opacity-40"
+                  >
+                    {phase === "understanding" ? "Checking…" : "Check"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button type="button" onClick={() => setTyping(true)} className="justify-self-center rounded-full px-4 py-2 font-bold text-ink-2 underline underline-offset-4 hover:text-ink">
+                Prefer to type?
               </button>
-            </div>
-          </form>
+            )}
 
           {result && !result.ok && (
             <div role="alert" className="mx-auto w-full max-w-xl rounded-v-lg border border-terracotta/50 bg-terracotta-soft p-5">
@@ -245,6 +243,43 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
               {error}
             </p>
           )}
+          </div>
+
+          <aside className="grid gap-6">
+            <section aria-labelledby="try-title" className="rounded-v-lg border border-line bg-paper-2 p-6">
+              <h2 id="try-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
+                Try saying
+              </h2>
+              <p lang={lang} dir={langInfo?.dir} className="mt-3 font-display text-2xl leading-snug">
+                “{EXAMPLES[lang] ?? EXAMPLES.en}”
+              </p>
+              {lang !== "en" && EXAMPLES[lang] && <p className="mt-2 text-sm text-ink-3">“{EXAMPLES.en}”</p>}
+            </section>
+            <section aria-labelledby="contacts-title" className="rounded-v-lg border border-line bg-card p-6">
+              <h2 id="contacts-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
+                People you can pay (simulated)
+              </h2>
+              <ul className="mt-3 grid gap-2">
+                {CONTACTS.map((c) => (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTyping(true);
+                        mic.setTranscript(`${mic.transcript} ${c.name}`.trim());
+                      }}
+                      className="flex min-h-11 w-full items-center gap-3 rounded-v px-2 text-left font-bold hover:bg-paper-2"
+                    >
+                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-evergreen-soft text-sm text-evergreen">
+                        {c.name[0]}
+                      </span>
+                      {c.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </aside>
         </div>
       )}
 
@@ -293,6 +328,27 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function Working({ stage }: { stage: 0 | 1 }) {
+  const lines = ["Writing down your words", "Checking the name, amount and risk"];
+  return (
+    <div role="status" className="mx-auto flex max-w-sm flex-col gap-4 py-10 text-left">
+      {lines.map((line, i) => (
+        <p key={line} className={`flex items-center gap-3 text-xl font-bold ${i > stage ? "text-ink-3" : ""}`}>
+          {i < stage ? (
+            <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-evergreen text-sm text-evergreen-ink">✓</span>
+          ) : i === stage ? (
+            <span aria-hidden className="v-spin h-7 w-7 rounded-full border-4 border-line-strong border-t-evergreen" />
+          ) : (
+            <span aria-hidden className="h-7 w-7 rounded-full border-2 border-line-strong" />
+          )}
+          {line}
+        </p>
+      ))}
+      <p className="text-ink-3">Nothing moves until you confirm.</p>
     </div>
   );
 }

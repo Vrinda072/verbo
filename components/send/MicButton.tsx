@@ -18,6 +18,13 @@ export function MicButton({
   const busy = status === "connecting" || status === "finishing";
   const label = listening ? "Stop and check" : busy ? (status === "connecting" ? "Connecting…" : "Writing it down…") : "Tap and speak";
   const [slow, setSlow] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    setSeconds(0);
+    if (status !== "listening") return;
+    const t = setInterval(() => setSeconds((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, [status]);
   useEffect(() => {
     setSlow(false);
     if (status !== "connecting") return;
@@ -43,10 +50,31 @@ export function MicButton({
       <p className="text-xl font-bold" aria-live="polite">
         {label}
       </p>
-      {listening && <p className="-mt-3 text-sm text-ink-3">Take your time, pauses are fine. Tap when you’ve finished.</p>}
+      {listening && (
+        <div className="-mt-2 flex flex-col items-center gap-2">
+          <div className="flex items-center gap-3">
+            <Bars />
+            <span className="font-display text-2xl tabular-nums" aria-hidden>
+              {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
+            </span>
+            <Bars />
+          </div>
+          <p className="text-sm text-ink-3">Take your time, pauses are fine. Tap when you’ve finished.</p>
+        </div>
+      )}
       {slow && <p className="-mt-3 max-w-md text-center text-sm text-ink-3">Your computer is taking a long time to start the microphone. You can wait, or type below.</p>}
-      <Waveform analyser={analyser} active={listening} />
+      {analyser && <Waveform analyser={analyser} active={listening} />}
     </div>
+  );
+}
+
+function Bars() {
+  return (
+    <span aria-hidden className="flex h-6 items-center gap-1">
+      {[0, 180, 360, 90, 270].map((delay) => (
+        <span key={delay} className="v-bar h-6 w-1 rounded-full bg-terracotta" style={{ animationDelay: `${delay}ms` }} />
+      ))}
+    </span>
   );
 }
 

@@ -5,6 +5,17 @@ import { candidateCents, dollarsAndCents } from "@/lib/agents/numbers";
 import { chunkByBytes, MyMemoryTranslator } from "@/lib/bridge/translate";
 import { RulesExtractor } from "@/lib/agents/extraction/rules";
 
+describe("reading aloud", () => {
+  it("prefers an exact on-device voice, falls back to the base language, and admits when there is none", async () => {
+    const { pickVoice } = await import("@/lib/speech/speak");
+    const voices = [{ lang: "hi-IN", localService: false }, { lang: "hi-IN", localService: true }, { lang: "pt_BR" }, { lang: "en-US" }];
+    expect(pickVoice(voices, "hi-IN")).toBe(voices[1]);
+    expect(pickVoice(voices, "hi")).toBe(voices[1]);
+    expect(pickVoice(voices, "pt")).toBe(voices[2]);
+    expect(pickVoice(voices, "te")).toBeNull();
+  });
+});
+
 describe("recording the microphone", () => {
   it("picks a type the browser can record, in order, and names the file to match", async () => {
     const { pickMimeType, extensionFor } = await import("@/lib/speech/recorder");

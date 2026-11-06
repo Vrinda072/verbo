@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";
+import { useReadAloud } from "@/lib/speech/useReadAloud";
 
 export interface UnderstandResponse {
   draftId: string | null;
@@ -48,6 +49,14 @@ export function ConfirmCard({
   const typedOk = !needsTyped || typedCents === data.amount.cents;
   const [whole, frac] = data.amount.digits.split(".");
   const vars = { amount: data.amount.localized, recipient: data.recipient.name };
+  // Same fixed templates as the screen, so the voice can never say anything the card doesn't.
+  const spoken = [L.t("readback", vars), ...data.lookAlikes.map((o) => L.t("lookalike", { other: o.name }))].join(" ");
+  const voice = useReadAloud(spoken, L.usedLang);
+  useEffect(() => {
+    if (voice.available && !muted()) voice.play();
+    // Once per card, as soon as a voice is ready.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [voice.available]);
 
   return (
     <section
@@ -60,6 +69,12 @@ export function ConfirmCard({
         </h2>
         <p className="mt-2 text-xl text-ink-2">{L.t("readback", vars)}</p>
       </div>
+      {voice.available && (
+        <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong px-4 text-sm font-bold hover:bg-paper-2">
+          <SpeakerIcon />
+          {voice.speaking ? "Speaking…" : "Hear it again"}
+        </button>
+      )}
       {showEnglish && <p className="mt-1 text-sm text-ink-3">{en.t("readback", vars)}</p>}
 
       <p className="v-digits mt-6 text-ink" aria-label={`${data.amount.currency} ${data.amount.digits}`}>
@@ -161,6 +176,19 @@ export function ConfirmCard({
         Understood by {data.extractor === "anthropic" ? "Claude (checked by code)" : data.extractor === "gemini" ? "Gemini AI (checked by code)" : data.fellBack ? "rule-based parser, because the AI was unavailable" : "rule-based parser (offline mode)"}.
       </p>
     </section>
+  );
+}
+
+/** Add ?quiet to the URL to stop the card speaking by itself, e.g. while recording a demo. */
+function muted() {
+  return new URLSearchParams(window.location.search).has("quiet");
+}
+
+function SpeakerIcon() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 10v4h3l5 4V6L7 10H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" />
+    </svg>
   );
 }
 
