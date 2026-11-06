@@ -3,6 +3,7 @@
  *
  *   npm run eval                      # rules extractor (offline, deterministic)
  *   npm run eval -- --extractor=gemini      # Gemini (needs GEMINI_API_KEY; free tier, paced 7 s per request, --pace=ms to change)
+ *   GEMINI_MODEL=gemini-3.5-flash-lite npm run eval -- --extractor=gemini   # test one model on its own
  *   npm run eval -- --extractor=anthropic   # Claude extractor (needs ANTHROPIC_API_KEY; costs a few cents)
  *
  * Numbers in docs/eval.md describe these scripted cases only — not real users or real-world accuracy.
@@ -13,7 +14,7 @@ import { understand, validateExtraction, type LlmExtraction } from "@/lib/agents
 import { RulesExtractor } from "@/lib/agents/extraction/rules";
 import { AnthropicExtractor, EXTRACTION_MODEL } from "@/lib/agents/extraction/anthropic";
 import { GeminiExtractor } from "@/lib/agents/extraction/gemini";
-import { GEMINI_MODEL } from "@/lib/ai/gemini";
+import { GEMINI_MODELS, GeminiFailed } from "@/lib/ai/gemini";
 import { assessRisk } from "@/lib/risk/score";
 import { GUARDS, PIPELINE, type Expect } from "@/evals/scenarios";
 
@@ -27,19 +28,38 @@ interface Row {
   expected: string;
   got: string;
   pass: boolean;
+  /** The provider never answered (free quota or outage), so this says nothing about Verbo either way. */
+  notRun?: boolean;
 }
 
 const fmt = (e: Expect) => (e.ok ? `${e.recipient} · ${e.cents}¢ · ${e.level}` : `✘ ${e.problem}`);
 
 async function main() {
   const rows: Row[] = [];
+  let quotaGone = false;
   for (const s of PIPELINE) {
+    if (quotaGone) {
+      rows.push({ id: s.id, tags: s.tags, expected: fmt(s.expect), got: "not run (free quota used up)", pass: false, notRun: true });
+      continue;
+    }
     if (paceMs && rows.length) await new Promise((r) => setTimeout(r, paceMs));
     let u: Awaited<ReturnType<typeof understand>>;
+    // No fallback: a provider error must show as an error here, not be credited to the rules parser.
+    const ask = () => understand({ transcript: s.transcript, language: s.lang }, extractor, undefined, { fallback: false });
     try {
-      // No fallback: a provider error must show as an error here, not be credited to the rules parser.
-      u = await understand({ transcript: s.transcript, language: s.lang }, extractor, undefined, { fallback: false });
+      try {
+        u = await ask();
+      } catch (err) {
+        if (!(err instanceof GeminiFailed && err.reason === "unavailable")) throw err;
+        await new Promise((r) => setTimeout(r, 30_000)); // a brief outage shouldn't cost the scenario
+        u = await ask();
+      }
     } catch (err) {
+      if (err instanceof GeminiFailed && (err.reason === "quota" || err.reason === "unavailable")) {
+        quotaGone ||= err.reason === "quota";
+        rows.push({ id: s.id, tags: s.tags, expected: fmt(s.expect), got: `not run (${err.reason})`, pass: false, notRun: true });
+        continue;
+      }
       rows.push({ id: s.id, tags: s.tags, expected: fmt(s.expect), got: `error: ${String((err as Error).message).slice(0, 80).replace(/\|/g, "/")}`, pass: false });
       continue;
     }
@@ -88,12 +108,14 @@ async function main() {
   }
 
   const p = rows.filter((r) => r.pass).length;
+  const ran = rows.filter((r) => !r.notRun);
+  const skipped = rows.length - ran.length;
   const gp = guardRows.filter((r) => r.pass).length;
   const table = (rs: Row[]) =>
     `| Scenario | Tags | Expected | Got | |\n|---|---|---|---|---|\n` +
-    rs.map((r) => `| ${r.id} | ${r.tags.join(", ")} | ${r.expected} | ${r.got} | ${r.pass ? "✅" : "❌"} |`).join("\n");
+    rs.map((r) => `| ${r.id} | ${r.tags.join(", ")} | ${r.expected} | ${r.got} | ${r.notRun ? "–" : r.pass ? "✅" : "❌"} |`).join("\n");
 
-  const label = which === "anthropic" ? `Claude (\`${EXTRACTION_MODEL}\`)` : which === "gemini" ? `Gemini (\`${GEMINI_MODEL}\`)` : "rule-based parser (offline)";
+  const label = which === "anthropic" ? `Claude (\`${EXTRACTION_MODEL}\`)` : which === "gemini" ? `Gemini (\`${GEMINI_MODELS.join("`, then `")}\`)` : "rule-based parser (offline)";
   const md = `# Evaluation — scripted scenarios
 
 **What this is:** ${PIPELINE.length + GUARDS.length} scenarios written by the Verbo team (\`evals/scenarios.ts\`),
@@ -105,11 +127,10 @@ Extractor: **${label}**.
 **Caveats.** The rule-based parser and these scenarios were written by the same team at the same time, so a high
 score on the offline run mainly shows the parts are consistent with each other. Risk expectations follow the
 documented weights in \`lib/risk/score.ts\`; three expectations were corrected after the first run (Nov 5) because they
-contradicted those weights; two more changed on Nov 6 when the parser learned number words and name matching. The meaningful tests still to run are the Claude extractor (\`--extractor=anthropic\`)
-and real recorded speech.
+contradicted those weights; two more changed on Nov 6 when the parser learned number words and name matching. The offline run and the AI runs are reported separately. Real recorded speech is not covered here.
 
 ## Pipeline (transcript → extraction → code validation → risk)
-**${p}/${rows.length}** scenarios matched the expected recipient, amount and risk level (or the expected refusal).
+**${p}/${ran.length}** scenarios run matched the expected recipient, amount and risk level (or the expected refusal).${skipped ? ` **${skipped} of ${rows.length} were not run** because the provider gave no answer (free quota or outage); they count neither way.` : ""}
 
 ${table(rows)}
 
@@ -120,8 +141,8 @@ These feed a wrong extraction straight into validation to check that code — no
 ${table(guardRows)}
 `;
   writeFileSync(which === "rules" ? "docs/eval.md" : `docs/eval-${which}.md`, md);
-  console.log(`pipeline ${p}/${rows.length} · guards ${gp}/${guardRows.length} · extractor ${which}`);
-  for (const r of [...rows, ...guardRows].filter((r) => !r.pass)) console.log(`  ✘ ${r.id}: expected ${r.expected}, got ${r.got}`);
+  console.log(`pipeline ${p}/${ran.length} run${skipped ? ` (${skipped} not run)` : ""} · guards ${gp}/${guardRows.length} · extractor ${which}`);
+  for (const r of [...rows, ...guardRows].filter((r) => !r.pass && !r.notRun)) console.log(`  ✘ ${r.id}: expected ${r.expected}, got ${r.got}`);
 }
 
 main().catch((e) => {
