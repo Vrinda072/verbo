@@ -49,6 +49,8 @@ export function hasDigits(s: string): boolean {
 export function candidateCents(transcript: string): Set<number> {
   const text = normalizeDigits(transcript);
   const out = new Set<number>();
+  const split = dollarsAndCents(text);
+  if (split !== null) out.add(split);
   for (const m of text.matchAll(/\d[\d.,\s  ']*\d|\d/g)) {
     const token = m[0].replace(/[\s  ']/g, "");
     for (const v of interpretations(token)) if (Number.isFinite(v) && v > 0) out.add(Math.round(v * 100));
@@ -69,6 +71,15 @@ function interpretations(token: string): number[] {
   // As a whole number: every separator is a thousands separator.
   res.push(Number(token.replace(/[.,]/g, "")));
   return res;
+}
+
+const DOLLARS_AND_CENTS =
+  /(\d{1,7})\s*(?:dollars?|d[oó]lar(?:es)?|డాలర్\S*|डॉलर|دولار\S*)\s*(?:and|y|e|और|మరియు|و)?\s*(\d{1,2})\s*(?:cents?|centavos?|సెంట్\S*|सेंट|سنت\S*)/iu;
+
+/** "12 dollars 34 cents" (after digit normalisation) → 1234, or null. */
+export function dollarsAndCents(transcript: string): number | null {
+  const m = DOLLARS_AND_CENTS.exec(normalizeDigits(transcript));
+  return m ? Number(m[1]) * 100 + Number(m[2]) : null;
 }
 
 /** Parse a strict decimal string ("12", "12.3", "12.34") to integer cents, or null. */

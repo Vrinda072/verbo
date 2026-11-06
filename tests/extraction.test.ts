@@ -130,6 +130,10 @@ describe("RulesExtractor + understand()", () => {
       expect(u.result.draft.amount.cents).toBe(1234);
     }
   });
+  it("resolves a bare first name once the user taps a contact", async () => {
+    const u = await understand({ transcript: "Send 50 dollars to Manuel", language: "en" }, rules, "Manuel Lopes");
+    expect(u.result.ok && u.result.draft.recipient.id).toBe("c_lopes");
+  });
   it("does not resolve a bare first name shared by two contacts", async () => {
     const u = await understand({ transcript: "Send 50 dollars to Manuel", language: "en" }, rules);
     expect(u.result.ok).toBe(false);

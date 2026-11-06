@@ -81,11 +81,18 @@ export const PIPELINE: PipelineScenario[] = [
   { kind: "pipeline", id: "en-euros", lang: "en", transcript: "Send 50 euros to Manuel Lopez", expect: no("currency_unsupported"), tags: ["currency"] },
   { kind: "pipeline", id: "en-rupees", lang: "en", transcript: "Send 500 rupees to Kiran Reddy", expect: no("currency_unsupported"), tags: ["currency"] },
   { kind: "pipeline", id: "en-unknown", lang: "en", transcript: "Send 20 dollars to Zara Khan", expect: no("missing_recipient"), tags: ["unknown"] },
-  { kind: "pipeline", id: "en-bare-manuel", lang: "en", transcript: "Send 20 dollars to Manuel", expect: no("missing_recipient"), tags: ["ambiguous"] },
+  { kind: "pipeline", id: "en-bare-manuel", lang: "en", transcript: "Send 20 dollars to Manuel", expect: no("recipient_ambiguous"), tags: ["ambiguous"] },
   { kind: "pipeline", id: "en-no-amount", lang: "en", transcript: "Send money to Manuel Lopez", expect: no("missing_amount"), tags: ["missing"] },
   { kind: "pipeline", id: "en-too-much", lang: "en", transcript: "Send 20000 dollars to Kiran Reddy", expect: no("amount_out_of_range"), tags: ["limit"] },
   { kind: "pipeline", id: "en-weather", lang: "en", transcript: "What's the weather tomorrow", expect: no("not_a_payment"), tags: ["off-topic"] },
-  { kind: "pipeline", id: "en-words-only", lang: "en", transcript: "Send twenty dollars to Manuel Lopez", expect: no("missing_amount"), tags: ["words", "rules-limit"] },
+  { kind: "pipeline", id: "en-words-only", lang: "en", transcript: "Send twenty dollars to Manuel Lopez", expect: ok("c_lopez", 2000, "low"), tags: ["words"] },
+  { kind: "pipeline", id: "es-words", lang: "es", transcript: "Envía veinte dólares a Manuel López", expect: ok("c_lopez", 2000, "low"), tags: ["words"] },
+  { kind: "pipeline", id: "te-words", lang: "te", transcript: "మాన్యుయెల్ లోపెజ్ కి ఇరవై ఐదు డాలర్లు పంపండి", expect: ok("c_lopez", 2500, "low"), tags: ["words", "native-script"] },
+  { kind: "pipeline", id: "hi-words-do", lang: "hi", transcript: "मैनुअल लोपेज़ को बीस डॉलर भेज दो", expect: ok("c_lopez", 2000, "low"), tags: ["words", "native-script"] },
+  { kind: "pipeline", id: "te-spelling", lang: "te", transcript: "మాన్యుయల్ లోపెజ్ కి 20 డాలర్లు పంపండి", expect: ok("c_lopez", 2000, "low"), tags: ["speech-spelling"] },
+  { kind: "pipeline", id: "en-dollars-cents", lang: "en", transcript: "Send 12 dollars and 34 cents to Manuel Lopez", expect: ok("c_lopez", 1234, "low"), tags: ["speech-format"] },
+  { kind: "pipeline", id: "en-two-amounts", lang: "en", transcript: "Send 20 to Kiran Reddy, no wait 200", expect: no("missing_amount"), tags: ["ambiguous"] },
+  { kind: "pipeline", id: "hi-rupees", lang: "hi", transcript: "किरण रेड्डी को 500 रुपये भेजो", expect: no("currency_unsupported"), tags: ["currency", "native-script"] },
 ];
 
 export const GUARDS: GuardScenario[] = [

@@ -1,6 +1,8 @@
 /**
- * Free-text translation for recovery messages. Claude when ANTHROPIC_API_KEY is set; otherwise none
- * (the UI then shows the original and says it is untranslated — never a fake translation).
+ * Free-text translation for recovery messages. Claude when ANTHROPIC_API_KEY is set; otherwise MyMemory (free, no
+ * key, 5,000 chars/day); if that fails the UI shows the original and says it is untranslated — never a fake translation.
+ * MyMemory source: mymemory.translated.net/doc/spec.php and usagelimits.php (read Nov 6, 2026); GET /get?q&langpair,
+ * q max 500 bytes. Response fields responseStatus/responseData.translatedText observed live. No email is sent to it.
  * Safety: every numeral in the original must survive translation unchanged, or the translation is dropped.
  * Source: @anthropic-ai/sdk 1.5.0 beta.messages.parse + betaZodOutputFormat (same as extraction).
  */
@@ -13,13 +15,13 @@ import { log } from "@/lib/log";
 
 export interface Translation {
   text: string | null;
-  translator: "anthropic" | "none";
+  translator: "anthropic" | "mymemory" | "none";
   /** Why there is no translation, if there isn't one. */
   note?: "same_language" | "unavailable" | "numbers_changed" | "error";
 }
 
 export interface Translator {
-  readonly kind: "anthropic" | "none";
+  readonly kind: "anthropic" | "mymemory" | "none";
   translate(text: string, from: string, to: string): Promise<Translation>;
 }
 
@@ -70,8 +72,81 @@ export class AnthropicTranslator implements Translator {
   }
 }
 
+const MYMEMORY_URL = "https://api.mymemory.translated.net/get";
+const MYMEMORY_MAX_BYTES = 450; // documented limit is 500 bytes per request
+const MYMEMORY_LANG: Record<string, string> = { zh: "zh-CN" };
+
+/** Splits at sentence ends, then spaces, so each piece fits the per-request byte limit. */
+export function chunkByBytes(text: string, maxBytes = MYMEMORY_MAX_BYTES): string[] {
+  const bytes = (s: string) => Buffer.byteLength(s, "utf8");
+  const chunks: string[] = [];
+  let cur = "";
+  const push = (piece: string) => {
+    if (cur && bytes(`${cur} ${piece}`) > maxBytes) {
+      chunks.push(cur);
+      cur = "";
+    }
+    cur = cur ? `${cur} ${piece}` : piece;
+  };
+  for (const sentence of text.split(/(?<=[.!?।؟])\s+/u)) {
+    if (bytes(sentence) <= maxBytes) push(sentence);
+    else for (const word of sentence.split(/\s+/)) push(word);
+  }
+  if (cur) chunks.push(cur);
+  return chunks;
+}
+
+export class MyMemoryTranslator implements Translator {
+  readonly kind = "mymemory" as const;
+  constructor(private fetcher: typeof fetch = fetch) {}
+
+  /** One request. Null when MyMemory has nothing for this pair (it can answer 200 with empty text). */
+  private async once(q: string, a: string, b: string): Promise<string | null> {
+    const url = `${MYMEMORY_URL}?${new URLSearchParams({ q, langpair: `${MYMEMORY_LANG[a] ?? a}|${MYMEMORY_LANG[b] ?? b}` })}`;
+    const res = await this.fetcher(url, { signal: AbortSignal.timeout(15_000) });
+    const body = (await res.json()) as { responseStatus?: number | string; responseData?: { translatedText?: string | null } };
+    const out = body.responseData?.translatedText?.trim();
+    if (Number(body.responseStatus) !== 200 || !out || /MYMEMORY WARNING/i.test(out)) {
+      log.warn("mymemory: no translation", { status: body.responseStatus, pair: `${a}|${b}` });
+      return null;
+    }
+    return out;
+  }
+
+  /** Direct first; if the pair has nothing, go through English. */
+  private async piece(q: string, a: string, b: string): Promise<string | null> {
+    const direct = await this.once(q, a, b);
+    if (direct || a === "en" || b === "en") return direct;
+    const english = await this.once(q, a, "en");
+    return english ? this.once(english, "en", b) : null;
+  }
+
+  async translate(text: string, from: string, to: string): Promise<Translation> {
+    const a = from.split("-")[0];
+    const b = to.split("-")[0];
+    if (a === b) return { text: null, translator: "mymemory", note: "same_language" };
+    try {
+      const parts: string[] = [];
+      for (const q of chunkByBytes(text)) {
+        const out = await this.piece(q, a, b);
+        if (!out) return { text: null, translator: "mymemory", note: "unavailable" };
+        parts.push(out);
+      }
+      const joined = parts.join(" ");
+      if (!numbersPreserved(text, joined)) return { text: null, translator: "mymemory", note: "numbers_changed" };
+      return { text: joined, translator: "mymemory" };
+    } catch (err) {
+      log.warn("mymemory failed", { message: (err as Error).message });
+      return { text: null, translator: "mymemory", note: "error" };
+    }
+  }
+}
+
 let cached: Translator | undefined;
 export function getTranslator(): Translator {
-  cached ??= !config.mock && process.env.ANTHROPIC_API_KEY ? new AnthropicTranslator() : new NoTranslator();
+  if (cached) return cached;
+  if (process.env.TRANSLATION_PROVIDER === "none") cached = new NoTranslator();
+  else if (!config.mock && process.env.ANTHROPIC_API_KEY) cached = new AnthropicTranslator();
+  else cached = new MyMemoryTranslator();
   return cached;
 }

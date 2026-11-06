@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { CONTACTS } from "@/lib/contacts";
 import { LANGUAGES } from "@/lib/bridge/readback";
-import { useSoniox } from "@/lib/speech/useSoniox";
+import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { MicButton } from "@/components/send/MicButton";
 import { ConfirmCard, type UnderstandResponse } from "@/components/send/ConfirmCard";
@@ -13,7 +13,7 @@ const PROBLEM_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   not_a_payment: () => "That didn’t sound like a payment. Try: “Send 20 dollars to Manuel Lopez”.",
   missing_recipient: () => "Who should receive the money? Say or type their name.",
   recipient_not_found: (p) => `“${p.spoken}” isn’t in your contacts. Check the name.`,
-  recipient_ambiguous: (p) => `More than one contact matches: ${(p.candidates as string[]).join(", ")}. Say the full name.`,
+  recipient_ambiguous: () => "More than one contact matches. Tap the right person:",
   missing_amount: () => "How much? Say or type the amount.",
   amount_invalid: () => "The amount wasn’t clear. Use digits, e.g. 12.50.",
   amount_out_of_range: () => "This demo only sends between $0.01 and $10,000.",
@@ -30,7 +30,7 @@ const EXAMPLES: Record<string, string> = {
   ar: "أرسل 30 دولارا إلى مانويل لوبيز",
 };
 
-export function SendFlow({ holdMinutes }: { holdMinutes: number }) {
+export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number; speechProvider: SpeechProvider }) {
   const [lang, setLang] = useState("en");
   const [phase, setPhase] = useState<Phase>("input");
   const [result, setResult] = useState<UnderstandResponse | null>(null);
@@ -38,7 +38,7 @@ export function SendFlow({ holdMinutes }: { holdMinutes: number }) {
   const [created, setCreated] = useState<{ id: string; approveUrl?: string; mode: string } | null>(null);
   const [nonce, setNonce] = useState("");
   const terms = useMemo(() => CONTACTS.map((c) => c.name), []);
-  const mic = useSoniox(lang, terms);
+  const mic = useSpeech(speechProvider, lang, terms);
   const langInfo = LANGUAGES.find((l) => l.code === lang);
 
   // Default to the browser language when we support it.
@@ -53,14 +53,14 @@ export function SendFlow({ holdMinutes }: { holdMinutes: number }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mic.status]);
 
-  async function check(text: string) {
+  async function check(text: string, chosenRecipient?: string) {
     setError(null);
     setPhase("understanding");
     try {
       const res = await fetch("/api/understand", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: text, language: lang }),
+        body: JSON.stringify({ transcript: text, language: lang, chosenRecipient }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "error");
       const data = (await res.json()) as UnderstandResponse;
@@ -127,7 +127,7 @@ export function SendFlow({ holdMinutes }: { holdMinutes: number }) {
 
           {(mic.status === "unavailable" || mic.status === "error") && (
             <p role="status" className="mx-auto max-w-xl rounded-v border border-marigold/70 bg-marigold-soft p-4 text-center text-marigold-ink">
-              {mic.error ?? "Speech isn’t available right now."} You can type instead — everything else works the same.
+              {mic.error ?? "Your browser doesn’t support speech recognition. Chrome, Edge and Safari do."} You can also type — everything else works the same.
             </p>
           )}
 
@@ -169,7 +169,23 @@ export function SendFlow({ holdMinutes }: { holdMinutes: number }) {
               <p className="font-bold text-terracotta">Nothing was sent. Verbo needs a bit more:</p>
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 {result.problems.map((p, i) => (
-                  <li key={i}>{PROBLEM_TEXT[p.code]?.(p) ?? p.code}</li>
+                  <li key={i}>
+                    {PROBLEM_TEXT[p.code]?.(p) ?? p.code}
+                    {p.code === "recipient_ambiguous" && (
+                      <span className="mt-2 flex flex-wrap gap-2">
+                        {(p.candidates as string[]).map((name) => (
+                          <button
+                            key={name}
+                            type="button"
+                            onClick={() => void check(mic.transcript.trim(), name)}
+                            className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                          >
+                            {name}
+                          </button>
+                        ))}
+                      </span>
+                    )}
+                  </li>
                 ))}
               </ul>
             </div>

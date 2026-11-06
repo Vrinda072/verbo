@@ -10,7 +10,7 @@ export default function SendPage() {
     <>
       <SiteHeader />
       <main id="main" className="px-4 py-10 sm:px-6 sm:py-14">
-        <SendFlow holdMinutes={config.riskHoldMinutes} />
+        <SendFlow holdMinutes={config.riskHoldMinutes} speechProvider={config.speechProvider} />
         <p className="mx-auto mt-16 max-w-3xl text-center text-sm text-ink-3">
           PayPal sandbox only. Contacts are simulated. No real money moves.
         </p>

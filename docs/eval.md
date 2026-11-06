@@ -1,7 +1,7 @@
 # Evaluation — scripted scenarios
 
-**What this is:** 50 scenarios written by the Verbo team (`evals/scenarios.ts`),
-run by `npm run eval` on 2026-11-05. They check that Verbo behaves the way we intended on cases we chose.
+**What this is:** 57 scenarios written by the Verbo team (`evals/scenarios.ts`),
+run by `npm run eval` on 2026-11-06. They check that Verbo behaves the way we intended on cases we chose.
 **What this is not:** a measure of real-world accuracy. No real users, no real voice audio, no fraud data.
 
 Extractor: **rule-based parser (offline)**.
@@ -9,11 +9,11 @@ Extractor: **rule-based parser (offline)**.
 **Caveats.** The rule-based parser and these scenarios were written by the same team at the same time, so a high
 score on the offline run mainly shows the parts are consistent with each other. Risk expectations follow the
 documented weights in `lib/risk/score.ts`; three expectations were corrected after the first run (Nov 5) because they
-contradicted those weights. The meaningful tests still to run are the Claude extractor (`--extractor=anthropic`)
+contradicted those weights; two more changed on Nov 6 when the parser learned number words and name matching. The meaningful tests still to run are the Claude extractor (`--extractor=anthropic`)
 and real recorded speech.
 
 ## Pipeline (transcript → extraction → code validation → risk)
-**41/41** scenarios matched the expected recipient, amount and risk level (or the expected refusal).
+**48/48** scenarios matched the expected recipient, amount and risk level (or the expected refusal).
 
 | Scenario | Tags | Expected | Got | |
 |---|---|---|---|---|
@@ -53,11 +53,18 @@ and real recorded speech.
 | en-euros | currency | ✘ currency_unsupported | ✘ currency_unsupported | ✅ |
 | en-rupees | currency | ✘ currency_unsupported | ✘ currency_unsupported | ✅ |
 | en-unknown | unknown | ✘ missing_recipient | ✘ missing_recipient | ✅ |
-| en-bare-manuel | ambiguous | ✘ missing_recipient | ✘ missing_recipient | ✅ |
+| en-bare-manuel | ambiguous | ✘ recipient_ambiguous | ✘ recipient_ambiguous | ✅ |
 | en-no-amount | missing | ✘ missing_amount | ✘ missing_amount | ✅ |
 | en-too-much | limit | ✘ amount_out_of_range | ✘ amount_out_of_range | ✅ |
 | en-weather | off-topic | ✘ not_a_payment | ✘ not_a_payment, missing_recipient, missing_amount | ✅ |
-| en-words-only | words, rules-limit | ✘ missing_amount | ✘ missing_amount | ✅ |
+| en-words-only | words | c_lopez · 2000¢ · low | c_lopez · 2000¢ · low | ✅ |
+| es-words | words | c_lopez · 2000¢ · low | c_lopez · 2000¢ · low | ✅ |
+| te-words | words, native-script | c_lopez · 2500¢ · low | c_lopez · 2500¢ · low | ✅ |
+| hi-words-do | words, native-script | c_lopez · 2000¢ · low | c_lopez · 2000¢ · low | ✅ |
+| te-spelling | speech-spelling | c_lopez · 2000¢ · low | c_lopez · 2000¢ · low | ✅ |
+| en-dollars-cents | speech-format | c_lopez · 1234¢ · low | c_lopez · 1234¢ · low | ✅ |
+| en-two-amounts | ambiguous | ✘ missing_amount | ✘ missing_amount | ✅ |
+| hi-rupees | currency, native-script | ✘ currency_unsupported | ✘ currency_unsupported | ✅ |
 
 ## Guards (deliberately wrong model output → code validation)
 These feed a wrong extraction straight into validation to check that code — not the model — decides money.

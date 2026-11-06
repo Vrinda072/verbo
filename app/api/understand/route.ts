@@ -3,6 +3,7 @@ import { z } from "zod";
 import { understand } from "@/lib/agents/extraction";
 import { ExtractionFailed } from "@/lib/agents/extraction/anthropic";
 import { formatAmount, labelsFor } from "@/lib/bridge/readback";
+import { CONTACTS } from "@/lib/contacts";
 import { log } from "@/lib/log";
 import { createDraft, summarizeRisk } from "@/lib/transfers/service";
 
@@ -11,6 +12,8 @@ export const dynamic = "force-dynamic";
 const Body = z.object({
   transcript: z.string().trim().min(1).max(500),
   language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/),
+  /** Set when the user tapped a name after an ambiguous match; only an exact contact name is honoured. */
+  chosenRecipient: z.string().max(100).optional(),
 });
 
 /**
@@ -22,8 +25,9 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
   const { transcript, language } = parsed.data;
+  const chosen = CONTACTS.find((c) => c.name === parsed.data.chosenRecipient)?.name;
   try {
-    const u = await understand({ transcript, language });
+    const u = await understand({ transcript, language }, undefined, chosen);
     const labels = labelsFor(language);
     const r = u.result;
     const draft = r.ok ? r.draft : r.partial;
