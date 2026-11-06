@@ -82,6 +82,12 @@ export function dollarsAndCents(transcript: string): number | null {
   return m ? Number(m[1]) * 100 + Number(m[2]) : null;
 }
 
+/** The different numbers said, as plain decimals. "20, no wait 200" → ["20", "200"]. */
+export function distinctNumerals(transcript: string): string[] {
+  const text = normalizeDigits(transcript).replace(/(\d),(\d{3})\b/g, "$1$2");
+  return [...new Set([...text.matchAll(/\d{1,7}(?:[.,]\d{1,2})?/g)].map((m) => m[0].replace(",", ".")))];
+}
+
 /** Parse a strict decimal string ("12", "12.3", "12.34") to integer cents, or null. */
 export function decimalToCents(s: string): number | null {
   const m = /^(\d{1,7})(?:\.(\d{1,2}))?$/.exec(s.trim());

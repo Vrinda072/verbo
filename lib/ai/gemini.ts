@@ -2,7 +2,7 @@
  * Gemini client for typed JSON. It only fills fields or translates text; code decides money.
  * Source: aistudio.google.com/docs/structured-output, /docs/models (read Nov 6, 2026) and @google/genai 3.0.0 genai.d.ts:
  * client.interactions.create({ model, input, system_instruction, response_format, store }) → interaction.output_text.
- * gemini-3.6-flash is marked Stable and listed with a free tier. store:false: not kept for later retrieval. Free-tier
+ * store:false: not kept for later retrieval. Free-tier
  * content is still used by Google to improve its products, so only synthetic demo data belongs here.
  * Free quota is small and per model (the API answered "limit: 20 requests per day on Free Tier" for gemini-3.6-flash on
  * Nov 6, 2026), so requests walk a list of models, skip any at quota until its stated retry time, and reuse answers.
@@ -10,10 +10,10 @@
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
-/** Tried in order. GEMINI_MODEL pins one model, which the eval uses to test a model on its own. */
+/** Tried in order: the model the eval ran on first, the 20-a-day one last. GEMINI_MODEL pins one model, which the eval uses to test a model on its own. */
 export const GEMINI_MODELS = process.env.GEMINI_MODEL
   ? [process.env.GEMINI_MODEL]
-  : ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
+  : ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
 
 export interface GeminiRequest {
   model: string;

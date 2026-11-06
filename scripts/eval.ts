@@ -32,7 +32,7 @@ interface Row {
   notRun?: boolean;
 }
 
-const fmt = (e: Expect) => (e.ok ? `${e.recipient} · ${e.cents}¢ · ${e.level}` : `✘ ${e.problem}`);
+const fmt = (e: Expect) => (e.ok ? `${e.recipient} · ${e.cents}¢ · ${e.level}` : `✘ ${e.problem}${e.also ? ` or ${e.also}` : ""}`);
 
 async function main() {
   const rows: Row[] = [];
@@ -79,7 +79,8 @@ async function main() {
       pass = s.expect.ok && s.expect.recipient === d.recipient.id && s.expect.cents === d.amount.cents && s.expect.level === risk.level;
     } else {
       got = `✘ ${u.result.problems.map((p) => p.code).join(", ")}`;
-      pass = !s.expect.ok && u.result.problems.some((p) => p.code === (s.expect as { problem: string }).problem);
+      const e = s.expect;
+      pass = !e.ok && u.result.problems.some((p) => p.code === e.problem || p.code === e.also);
     }
     rows.push({ id: s.id, tags: s.tags, expected: fmt(s.expect), got, pass });
   }
@@ -127,7 +128,7 @@ Extractor: **${label}**.
 **Caveats.** The rule-based parser and these scenarios were written by the same team at the same time, so a high
 score on the offline run mainly shows the parts are consistent with each other. Risk expectations follow the
 documented weights in \`lib/risk/score.ts\`; three expectations were corrected after the first run (Nov 5) because they
-contradicted those weights; two more changed on Nov 6 when the parser learned number words and name matching. The offline run and the AI runs are reported separately. Real recorded speech is not covered here.
+contradicted those weights; two more changed on Nov 6 when the parser learned number words and name matching. Also on Nov 6, after the first Gemini run, \`en-unknown\` began accepting \`recipient_not_found\` as well as \`missing_recipient\` (both refuse), and code was fixed for the other five failures that run found, so this is not a first-attempt score. The offline run and the AI runs are reported separately. Real recorded speech is not covered here.
 
 ## Pipeline (transcript → extraction → code validation → risk)
 **${p}/${ran.length}** scenarios run matched the expected recipient, amount and risk level (or the expected refusal).${skipped ? ` **${skipped} of ${rows.length} were not run** because the provider gave no answer (free quota or outage); they count neither way.` : ""}

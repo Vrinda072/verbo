@@ -1,7 +1,7 @@
 import { log } from "@/lib/log";
 import { AnthropicExtractor } from "./anthropic";
 import { GeminiExtractor } from "./gemini";
-import { RulesExtractor } from "./rules";
+import { findAmount, RulesExtractor } from "./rules";
 import type { Extractor, ExtractionInput } from "./schema";
 import { validateExtraction, type ValidationResult } from "./validate";
 import type { LlmExtraction } from "./schema";
@@ -52,6 +52,12 @@ export async function understand(
     used = new RulesExtractor();
     extraction = await used.extract(input);
     fellBack = true;
+  }
+  // Models can decline number words they read fine ("ఇరవై ఐదు"). Code's own parser fills the gap; it refuses several
+  // amounts, and word amounts still need the person to type the digits.
+  if (extraction.amount == null) {
+    const found = findAmount(input.transcript, input.language);
+    if (found && "amount" in found) extraction.amount = found.amount;
   }
   if (chosenRecipient) {
     extraction.recipient_spoken = chosenRecipient;

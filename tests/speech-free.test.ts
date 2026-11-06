@@ -161,6 +161,51 @@ describe("Gemini integration (fake client, no network)", () => {
     await expect(understand(input, new GeminiExtractor(async () => { throw new Error("429"); }), undefined, { fallback: false })).rejects.toThrow("429");
   });
 
+  describe("code catches what a live model got wrong (seen on Nov 6)", () => {
+    const fake = (o: object) => ({ kind: "gemini" as const, extract: async () => ({ ...good, intent: "send_money" as const, ...o }) });
+
+    it("refuses rupees when the model leaves currency empty", async () => {
+      const { understand } = await import("@/lib/agents/extraction");
+      const u = await understand({ transcript: "किरण रेड्डी को 500 रुपये भेजो", language: "hi" }, fake({ recipient_spoken: "किरण रेड्डी", amount: "500", currency: null }));
+      expect(!u.result.ok && u.result.problems.map((p) => p.code)).toContain("currency_unsupported");
+    });
+
+    it("refuses when two amounts were said and the model picked one", async () => {
+      const { understand } = await import("@/lib/agents/extraction");
+      const u = await understand({ transcript: "Send 20 to Kiran Reddy, no wait 200", language: "en" }, fake({ recipient_spoken: "Kiran Reddy", amount: "200", currency: null }));
+      expect(!u.result.ok && u.result.problems.map((p) => p.code)).toContain("missing_amount");
+    });
+
+    it("still accepts dollars and cents, and thousands separators, as one amount", async () => {
+      const { understand } = await import("@/lib/agents/extraction");
+      const a = await understand({ transcript: "Send 12 dollars and 34 cents to Kiran Reddy", language: "en" }, fake({ recipient_spoken: "Kiran Reddy", amount: "12.34", currency: "USD" }));
+      expect(a.result.ok && a.result.draft.amount.cents).toBe(1234);
+      const b = await understand({ transcript: "Send 1,000 dollars to Kiran Reddy", language: "en" }, fake({ recipient_spoken: "Kiran Reddy", amount: "1000", currency: "USD" }));
+      expect(b.result.ok && b.result.draft.amount.cents).toBe(100000);
+    });
+
+    it("fills in number words the model declined, and they still need typing", async () => {
+      const { understand } = await import("@/lib/agents/extraction");
+      const u = await understand({ transcript: "మాన్యుయెల్ లోపెజ్ కి ఇరవై ఐదు డాలర్లు పంపండి", language: "te" }, fake({ recipient_spoken: "మాన్యుయెల్ లోపెజ్", recipient_latin: "Manuel Lopez", amount: null, currency: "USD" }));
+      expect(u.result.ok && u.result.draft.amount.cents).toBe(2500);
+      expect(u.result.ok && u.result.draft.amountSource).toBe("words");
+    });
+
+    it("resolves Lopez and Lopes by the sound of what was said, not a blurred romanisation", async () => {
+      const { understand } = await import("@/lib/agents/extraction");
+      const u = await understand({ transcript: "मैनुअल लोपेज को 25 डॉलर भेजो", language: "hi" }, fake({ recipient_spoken: "मैनुअल लोपेज", recipient_latin: "mainual lopej", amount: "25", currency: "USD" }));
+      expect(u.result.ok && u.result.draft.recipient.id).toBe("c_lopez");
+      const s = await understand({ transcript: "मनुअल लोपेस को 25 डॉलर भेजना है", language: "hi" }, fake({ recipient_spoken: "मनुअल लोपेस", recipient_latin: "manual lopes", amount: "25", currency: "USD" }));
+      expect(s.result.ok && s.result.draft.recipient.id).toBe("c_lopes");
+    });
+
+    it("says the currency was assumed unless dollars were actually said, whatever the model claims", async () => {
+      const { understand } = await import("@/lib/agents/extraction");
+      const u = await understand({ transcript: "Send 20 to Kiran Reddy", language: "en" }, fake({ recipient_spoken: "Kiran Reddy", amount: "20", currency: "USD" }));
+      expect(u.result.ok && u.result.draft.currencyAssumed).toBe(true);
+    });
+  });
+
   describe("free quota handling", () => {
     const req = { model: "x", input: "hello", system_instruction: "s", store: false, response_format: { type: "text" as const, mime_type: "application/json" as const, schema: {} } };
     const quota = () => Object.assign(new Error("429 limit: 20 requests per day. Please retry in 1h2m3s or upgrade"), { status: 429 });
