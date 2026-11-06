@@ -6,17 +6,17 @@ import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 const ACTS = [
   {
     when: "Before you send",
-    title: "It catches the slip.",
+    title: "Checks every payment",
     body: "Names that sound alike make you stop and choose. First-time recipients, unusual amounts and pressure tactics get flagged. Risky payments wait 10 minutes, and until then you can cancel.",
   },
   {
     when: "If it still goes wrong",
-    title: "It gets you talking.",
+    title: "Helps you ask for it back",
     body: "The other person gets a private link in their language with one button to send the money back, plus a chat translated in both directions.",
   },
   {
     when: "Afterwards",
-    title: "It keeps the record.",
+    title: "Keeps a record",
     body: "Each case lands on one desk, with a translated timeline and an evidence packet to hand over if you need to escalate.",
   },
 ];
@@ -38,20 +38,20 @@ export default function Home() {
         <section className="grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <h1 className="font-display text-5xl font-semibold leading-[1.02] tracking-tight sm:text-7xl">
-              You paid the wrong person.
+              Send money by voice,
               <br />
-              <span className="text-evergreen">They don’t speak your language.</span>
+              <span className="text-evergreen">in your own language.</span>
             </h1>
             <p className="mt-6 max-w-xl text-xl text-ink-2">
-              Often, that money is gone. Verbo is a voice-first safety net for PayPal: it helps stop the mistake before
-              it happens, and gives two strangers a way to put it right afterwards.
+              Verbo reads every PayPal payment back to you before it goes, flags risky ones, and helps you ask for the
+              money back if it reaches the wrong person, even if you don’t share a language.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/demo"
                 className="inline-flex min-h-14 items-center justify-center rounded-full bg-evergreen px-7 text-lg font-bold text-evergreen-ink shadow-v transition-transform duration-200 hover:-translate-y-0.5"
               >
-                Watch a rescue
+                See how it works
               </Link>
               <Link
                 href="/send"
@@ -76,7 +76,7 @@ export default function Home() {
 
         <section aria-labelledby="money" className="py-14 sm:py-20">
           <h2 id="money" className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-            AI helps. It never decides money.
+            How payments are checked
           </h2>
           <p className="mt-3 max-w-2xl text-lg text-ink-2">
             If a model invents an amount, code rejects it. If speech blurs Lopez and Lopes, you choose. What you hear back
