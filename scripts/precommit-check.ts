@@ -26,6 +26,8 @@ if (existsSync(".env")) {
 
 const PATTERNS = [
   /sk-ant-[A-Za-z0-9_-]{20,}/, // Anthropic
+  /gsk_[A-Za-z0-9]{20,}/, // Groq
+  /AIza[A-Za-z0-9_-]{30,}|AQ\.[A-Za-z0-9_-]{30,}/, // Google
   /A21AA[A-Za-z0-9_-]{40,}/, // PayPal access token
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
   /ghp_[A-Za-z0-9]{30,}|gho_[A-Za-z0-9]{30,}/,

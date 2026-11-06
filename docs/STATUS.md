@@ -16,8 +16,18 @@ Vrinda reported the mic wouldn't connect, stopped mid-sentence and missed words.
   invented words too; 3.7 and 3.8 flash timed out or hit 20 a day. Gemini still does understanding and translation.
 - **Tested in her Chrome:** connects in about 0.15 s with a 57 ms longest pause (was 10 s); dead-mic message at about 3 s;
   a synthetic tone with a 5 s gap kept recording until tapped and uploaded a WebM file; tapping again after an error works.
-- **Not tested:** Whisper itself. No key yet, so its code has only run against a stand-in. No real voice has gone through
-  the new path, because her mic delivers nothing. Groq's page doesn't state free-tier Whisper limits or a language count.
+- **Real Whisper run (`whisper-large-v3-turbo`, 10 synthetic Mac-voice recordings with a 3 s pause; our own test, not an
+  accuracy measure):** all of the audio was attempted in about 0.5 s each. Results through the app: 8 languages (en, hi,
+  es, pt, ar, de, ja, ko) reached the right amount and a name choice; French misheard the name and offered buttons;
+  Chinese came back garbled and was refused. No sentence ended on a wrong person. Telugu has not been tried, because the
+  Mac has no Telugu voice. Response headers report a limit of 2,000 requests.
+- **Spelling hints removed:** passing contact names to Whisper made it write Latin names into other scripts and invent
+  names in Chinese.
+- **Speech never chooses between sound-alikes:** "Lopez" was heard as "Lopes" even without the hint. A name from the mic
+  with a sound-alike contact now makes the person tap one. A name that can't be matched, in any language, offers
+  buttons. Tested on the real page with a tone and a fixed transcript: buttons, card and safety hold all appear.
+- **Not tested:** a real human voice through this path, because her mic still delivered 0 bytes after the key was added.
+- **To do by hand:** the Groq key was pasted in chat too, so rotate it before submission.
 - **"All languages" can't be claimed.** The picker has 60 languages, all tier B. Six have written read-backs (en plus
   machine-translated te, hi, es, pt, ar), none reviewed by a native speaker; the other 54 read back in English.
 

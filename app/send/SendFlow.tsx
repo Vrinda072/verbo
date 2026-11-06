@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CONTACTS } from "@/lib/contacts";
 import { LANGUAGES } from "@/lib/bridge/readback";
 import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
@@ -13,7 +13,7 @@ const PROBLEM_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   not_a_payment: () => "That didn’t sound like a payment. Try: “Send 20 dollars to Manuel Lopez”.",
   missing_recipient: () => "I couldn’t find a contact’s name in that. Say a full name from the list, or tap one.",
   recipient_not_found: (p) => `“${p.spoken}” isn’t in your contacts. Check the name.`,
-  recipient_ambiguous: () => "More than one contact matches. Tap the right person:",
+  recipient_ambiguous: () => "These names sound alike, so Verbo won’t guess. Tap the right person:",
   missing_amount: () => "How much? Say or type the amount.",
   amount_invalid: () => "The amount wasn’t clear. Use digits, e.g. 12.50.",
   amount_out_of_range: () => "This demo only sends between $0.01 and $10,000.",
@@ -40,6 +40,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
   const terms = useMemo(() => CONTACTS.map((c) => c.name), []);
   const mic = useSpeech(speechProvider, lang, terms);
   const langInfo = LANGUAGES.find((l) => l.code === lang);
+  const heardByVoice = useRef("");
 
   // Default to the browser language when we support it.
   useEffect(() => {
@@ -49,7 +50,10 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
 
   // When the mic finishes, check what was said.
   useEffect(() => {
-    if (mic.status === "done" && mic.transcript) void check(mic.transcript);
+    if (mic.status === "done" && mic.transcript) {
+      heardByVoice.current = mic.transcript;
+      void check(mic.transcript);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mic.status]);
 
@@ -60,7 +64,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       const res = await fetch("/api/understand", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: text, language: lang, chosenRecipient }),
+        body: JSON.stringify({ transcript: text, language: lang, chosenRecipient, fromVoice: text === heardByVoice.current }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "error");
       const data = (await res.json()) as UnderstandResponse;
@@ -200,6 +204,23 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                 {result.problems.map((p, i) => (
                   <li key={i}>
                     {PROBLEM_TEXT[p.code]?.(p) ?? p.code}
+                    {(p.code === "recipient_not_found" || p.code === "missing_recipient") && (
+                      <span className="mt-2 block">
+                        <span className="block">Or tap who you meant:</span>
+                        <span className="mt-2 flex flex-wrap gap-2">
+                          {CONTACTS.map((c) => (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => void check(mic.transcript.trim(), c.name)}
+                              className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                            >
+                              {c.name}
+                            </button>
+                          ))}
+                        </span>
+                      </span>
+                    )}
                     {p.code === "recipient_ambiguous" && (
                       <span className="mt-2 flex flex-wrap gap-2">
                         {(p.candidates as string[]).map((name) => (

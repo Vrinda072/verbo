@@ -18,7 +18,7 @@ import {
   transcribeErrorMessage,
 } from "./recorder";
 
-export function useRecorder(language: string, names: string[]) {
+export function useRecorder(language: string) {
   const [status, setStatus] = useState<MicStatus>("idle");
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +53,6 @@ export function useRecorder(language: string, names: string[]) {
       const form = new FormData();
       form.set("audio", audio, `speech.${extensionFor(mimeType)}`);
       form.set("language", language);
-      form.set("names", names.join(", "));
       try {
         const res = await fetch("/api/stt/transcribe", { method: "POST", body: form });
         const body = (await res.json().catch(() => ({}))) as { text?: string; error?: string };
@@ -64,7 +63,7 @@ export function useRecorder(language: string, names: string[]) {
         fail(transcribeErrorMessage(undefined));
       }
     },
-    [fail, language, names],
+    [fail, language],
   );
 
   const start = useCallback(async () => {
