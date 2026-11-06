@@ -26,7 +26,11 @@ Vrinda reported the mic wouldn't connect, stopped mid-sentence and missed words.
 - **Speech never chooses between sound-alikes:** "Lopez" was heard as "Lopes" even without the hint. A name from the mic
   with a sound-alike contact now makes the person tap one. A name that can't be matched, in any language, offers
   buttons. Tested on the real page with a tone and a fixed transcript: buttons, card and safety hold all appear.
-- **Not tested:** a real human voice through this path, because her mic still delivered 0 bytes after the key was added.
+- **Her mic:** a Mac restart fixed it. The macOS audio system had been logging repeated errors starting mic input, and they
+  stopped after the restart. Afterwards a 3-second recording held 47,639 bytes of real sound.
+- **Real voice:** Vrinda reports it's working (Nov 6). The server log shows three recordings transcribed and understood
+  (`/api/stt/transcribe` about 0.5–0.7 s, `/api/understand` 1.7–5.9 s). Language and exact sentences not recorded, so
+  this doesn't confirm any specific language. Sending money after that step wasn't part of this check.
 - **To do by hand:** the Groq key was pasted in chat too, so rotate it before submission.
 - **"All languages" can't be claimed.** The picker has 60 languages, all tier B. Six have written read-backs (en plus
   machine-translated te, hi, es, pt, ar), none reviewed by a native speaker; the other 54 read back in English.
