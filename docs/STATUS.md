@@ -13,7 +13,10 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
 - **Ambiguous names** now show tappable contact buttons.
 - **Tested:** 102 tests; eval 48/48 and 9/9 (`docs/eval.md`, same caveats). Live MyMemory te → es. Mic code driven by a
   **stand-in recogniser**, because the app's Browser pane blocks microphones.
-- **Not tested:** a real voice in real Chrome, including Telugu. Needs Vrinda at `http://localhost:3000/send` in Chrome.
+- **Real voice:** Vrinda spoke the Telugu test sentence in Chrome at `/send` and it reached the confirmation card
+  (Nov 6). One person, one sentence: a working check, not an accuracy measure.
+- **Risk for submission:** the rules require meaningful use of AI, and without `ANTHROPIC_API_KEY` the running app uses
+  only the rule-based parser and MyMemory. The Claude code paths exist but have never run live.
 
 ## Day 5 — Thu Nov 5, 2026 (Case Desk + evidence)
 
