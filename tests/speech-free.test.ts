@@ -5,6 +5,121 @@ import { candidateCents, dollarsAndCents } from "@/lib/agents/numbers";
 import { chunkByBytes, MyMemoryTranslator } from "@/lib/bridge/translate";
 import { RulesExtractor } from "@/lib/agents/extraction/rules";
 
+describe("recording the microphone", () => {
+  it("picks a type the browser can record, in order, and names the file to match", async () => {
+    const { pickMimeType, extensionFor } = await import("@/lib/speech/recorder");
+    expect(pickMimeType(() => true)).toBe("audio/webm;codecs=opus");
+    const safari = pickMimeType((t) => t === "audio/mp4");
+    expect(safari).toBe("audio/mp4");
+    expect(extensionFor(safari!)).toBe("mp4");
+    expect(extensionFor("audio/webm;codecs=opus")).toBe("webm");
+    expect(pickMimeType(() => false)).toBeNull();
+  });
+
+  it("explains each microphone failure in plain words", async () => {
+    const { micErrorMessage } = await import("@/lib/speech/recorder");
+    expect(micErrorMessage("NotAllowedError")).toContain("blocked");
+    expect(micErrorMessage("NotFoundError")).toContain("No microphone");
+    expect(micErrorMessage("NotReadableError")).toContain("Another app");
+    expect(micErrorMessage("Whatever")).toContain("couldn’t start");
+  });
+
+  describe("silent microphone check", () => {
+    const fakeAnalyser = (value: () => number) =>
+      ({ fftSize: 4, getFloatTimeDomainData: (b: Float32Array) => b.fill(value()) }) as unknown as AnalyserNode;
+
+    it("reports a microphone that sends nothing but zeros", async () => {
+      const { watchForDeadMic } = await import("@/lib/speech/recorder");
+      vi.useFakeTimers();
+      const dead = vi.fn();
+      watchForDeadMic(fakeAnalyser(() => 0), dead, 1000);
+      vi.advanceTimersByTime(900);
+      expect(dead).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(300);
+      expect(dead).toHaveBeenCalledOnce();
+      vi.useRealTimers();
+    });
+
+    it("stays quiet once any sound arrives, even a very faint one, and can be cancelled", async () => {
+      const { watchForDeadMic } = await import("@/lib/speech/recorder");
+      vi.useFakeTimers();
+      const dead = vi.fn();
+      watchForDeadMic(fakeAnalyser(() => 0.00001), dead, 1000);
+      const cancelled = vi.fn();
+      watchForDeadMic(fakeAnalyser(() => 0), cancelled, 1000)();
+      vi.advanceTimersByTime(5000);
+      expect(dead).not.toHaveBeenCalled();
+      expect(cancelled).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+  });
+});
+
+describe("Whisper transcription (stand-in server, no network)", () => {
+  const audio = new Blob([new Uint8Array([1, 2, 3])], { type: "audio/webm" });
+  const input = { audio, fileName: "speech.webm", language: "hi-IN", names: "Manuel Lopez, Manuel Lopes" };
+  const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+
+  it("sends the documented fields with the base language and returns tidy text", async () => {
+    const { transcribe } = await import("@/lib/speech/transcribe");
+    let seen: { url: string; form: FormData; auth: string } | undefined;
+    const text = await transcribe(
+      input,
+      (async (url: string, init: RequestInit) => {
+        seen = { url, form: init.body as FormData, auth: (init.headers as Record<string, string>).Authorization };
+        return json({ text: "  मैनुअल लोपेज़   को 25 डॉलर " });
+      }) as never,
+      "test-key",
+    );
+    expect(text).toBe("मैनुअल लोपेज़ को 25 डॉलर");
+    expect(seen!.url).toBe("https://api.groq.com/openai/v1/audio/transcriptions");
+    expect(seen!.auth).toBe("Bearer test-key");
+    expect(seen!.form.get("language")).toBe("hi");
+    expect(seen!.form.get("model")).toBe("whisper-large-v3");
+    expect(seen!.form.get("prompt")).toBe("Manuel Lopez, Manuel Lopes");
+    expect((seen!.form.get("file") as File).name).toBe("speech.webm");
+  });
+
+  it("lets the service detect the language when it rejects the code", async () => {
+    const { transcribe } = await import("@/lib/speech/transcribe");
+    const languages: (string | null)[] = [];
+    const text = await transcribe(
+      input,
+      (async (_u: string, init: RequestInit) => {
+        languages.push((init.body as FormData).get("language") as string | null);
+        return languages.length === 1 ? json({ error: "bad language" }, 400) : json({ text: "ok" });
+      }) as never,
+      "k",
+    );
+    expect(text).toBe("ok");
+    expect(languages).toEqual(["hi", null]);
+  });
+
+  it("reports missing key, rate limits, outages, empty text and network errors without guessing", async () => {
+    const { transcribe } = await import("@/lib/speech/transcribe");
+    await expect(transcribe(input, fetch, "")).rejects.toMatchObject({ code: "not_configured" });
+    await expect(transcribe(input, (async () => json({}, 429)) as never, "k")).rejects.toMatchObject({ code: "busy" });
+    await expect(transcribe(input, (async () => json({}, 503)) as never, "k")).rejects.toMatchObject({ code: "busy" });
+    await expect(transcribe(input, (async () => json({ text: "  " })) as never, "k")).rejects.toMatchObject({ code: "empty" });
+    await expect(transcribe(input, (async () => json({}, 401)) as never, "k")).rejects.toMatchObject({ code: "failed" });
+    await expect(transcribe(input, (async () => { throw new Error("down"); }) as never, "k")).rejects.toMatchObject({ code: "busy" });
+  });
+
+  it("the route refuses bad requests and says when no key is set, and never echoes audio", async () => {
+    const { POST } = await import("@/app/api/stt/transcribe/route");
+    const post = (form: FormData) => POST(new Request("http://x/api/stt/transcribe", { method: "POST", body: form }));
+    const bad = new FormData();
+    bad.set("language", "hi");
+    expect((await post(bad)).status).toBe(400);
+    const good = new FormData();
+    good.set("audio", audio, "speech.webm");
+    good.set("language", "hi");
+    const res = await post(good);
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: "not_configured" });
+  });
+});
+
 describe("browser speech helpers", () => {
   it("finds the prefixed constructor and handles browsers without one", () => {
     class C {}

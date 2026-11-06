@@ -27,6 +27,7 @@ const OPTIONAL: Record<string, string> = {
   DATABASE_URL: "empty → embedded PGlite (./.pglite)",
   PAYPAL_WEBHOOK_ID: "needed only to verify webhook signatures",
   SONIOX_API_KEY: "needed from Day 2 (speech)",
+  GROQ_API_KEY: "for the microphone: records until you tap stop, then Whisper writes it down",
   GEMINI_API_KEY: "needed for AI understanding and translation (free key from Google AI Studio)",
   ANTHROPIC_API_KEY: "optional alternative to Gemini",
   AG_GRID_LICENSE_KEY: "needed for AG Grid Enterprise features (Day 5)",

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MicStatus } from "@/lib/speech/useSoniox";
 
 /** The big microphone with a live ring + waveform driven by an AnalyserNode. */
@@ -16,7 +16,14 @@ export function MicButton({
 }) {
   const listening = status === "listening";
   const busy = status === "connecting" || status === "finishing";
-  const label = listening ? "Stop and check" : busy ? (status === "connecting" ? "Connecting…" : "Finishing…") : "Tap and speak";
+  const label = listening ? "Stop and check" : busy ? (status === "connecting" ? "Connecting…" : "Writing it down…") : "Tap and speak";
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    setSlow(false);
+    if (status !== "connecting") return;
+    const t = setTimeout(() => setSlow(true), 3000);
+    return () => clearTimeout(t);
+  }, [status]);
 
   return (
     <div className="flex flex-col items-center gap-5">
@@ -36,6 +43,8 @@ export function MicButton({
       <p className="text-xl font-bold" aria-live="polite">
         {label}
       </p>
+      {listening && <p className="-mt-3 text-sm text-ink-3">Take your time, pauses are fine. Tap when you’ve finished.</p>}
+      {slow && <p className="-mt-3 max-w-md text-center text-sm text-ink-3">Your computer is taking a long time to start the microphone. You can wait, or type below.</p>}
       <Waveform analyser={analyser} active={listening} />
     </div>
   );

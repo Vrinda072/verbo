@@ -1,5 +1,26 @@
 # Status
 
+## Nov 6 — microphone rebuilt after real failures
+
+Vrinda reported the mic wouldn't connect, stopped mid-sentence and missed words.
+- **Her Mac's mic was delivering no audio.** In her Chrome, with permission granted: 0 bytes from a 3-second recording,
+  and all-zero samples. `new AudioContext()` froze the page for 10 s, and reopening the mic took about 9 s. Input volume
+  was 54. It worked earlier the same day, so this looks like macOS audio or privacy rather than hardware, but the exact
+  cause is not established. **She needs to fix this on the Mac; no code can.**
+- **New default when `GROQ_API_KEY` is set:** record until the person taps stop (90 s cap), then Whisper on Groq writes it
+  down. Chrome's recognition can end by itself; this can't. Without the key the app stays on Chrome's recognition.
+- **No audio meter while recording:** the live waveform is gone from this path because creating it caused the freeze.
+- **Clear errors:** a silent mic, blocked access, a missing or busy mic, and a slow start each say what to do.
+- **Gemini's audio models rejected for speech** (tested with synthetic audio): `gemini-3.5-transcribe` mostly answered
+  503, allows 3 requests a minute, and the one answer it gave invented a sentence about noodles; `gemini-3.5-flash-lite`
+  invented words too; 3.7 and 3.8 flash timed out or hit 20 a day. Gemini still does understanding and translation.
+- **Tested in her Chrome:** connects in about 0.15 s with a 57 ms longest pause (was 10 s); dead-mic message at about 3 s;
+  a synthetic tone with a 5 s gap kept recording until tapped and uploaded a WebM file; tapping again after an error works.
+- **Not tested:** Whisper itself. No key yet, so its code has only run against a stand-in. No real voice has gone through
+  the new path, because her mic delivers nothing. Groq's page doesn't state free-tier Whisper limits or a language count.
+- **"All languages" can't be claimed.** The picker has 60 languages, all tier B. Six have written read-backs (en plus
+  machine-translated te, hi, es, pt, ar), none reviewed by a native speaker; the other 54 read back in English.
+
 ## Nov 6 — real Gemini run
 
 - **Free quota is the main constraint.** The API reported 20 requests a day on `gemini-3.6-flash`; `gemini-3.5-flash`
