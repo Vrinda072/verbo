@@ -40,6 +40,7 @@ export type ValidationResult = { ok: true; draft: ValidDraft } | { ok: false; pr
 
 const MATCH = 0.9; // name similarity needed to count as the same contact
 const LOOKALIKE = 0.85; // close enough to warn about
+const CLEAR_MARGIN = 0.02; // a spelling variant must be this much closer to one contact to pick it over the other
 
 export function resolveRecipient(spoken: string | string[], contacts: Contact[] = CONTACTS) {
   const forms = (Array.isArray(spoken) ? spoken : [spoken]).map(normalizeName).filter(Boolean);
@@ -66,7 +67,8 @@ export function validateExtraction(x: LlmExtraction, transcript: string, contact
   } else {
     const forms = [x.recipient_spoken, x.recipient_latin].filter((f): f is string => !!f?.trim());
     const { scored, matches, exact } = resolveRecipient(forms, contacts);
-    const chosen = exact.length === 1 ? exact[0] : matches.length === 1 ? matches[0] : undefined;
+    const clearlyCloser = exact.length === 0 && matches.length > 1 && matches[0].score - matches[1].score >= CLEAR_MARGIN;
+    const chosen = exact.length === 1 ? exact[0] : matches.length === 1 || clearlyCloser ? matches[0] : undefined;
     if (chosen) {
       partial.recipient = chosen.contact;
       partial.lookAlikes = scored.filter((m) => m.contact.id !== chosen.contact.id && m.score >= LOOKALIKE);

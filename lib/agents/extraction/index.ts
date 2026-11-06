@@ -25,7 +25,16 @@ export interface Understanding {
 }
 
 /** Transcript → structured fields (LLM or rules) → code validation. */
-export async function understand(input: ExtractionInput, extractor = getExtractor()): Promise<Understanding> {
+export async function understand(
+  input: ExtractionInput,
+  extractor = getExtractor(),
+  /** The contact the user tapped after an ambiguous name. Must be an exact address-book name. */
+  chosenRecipient?: string,
+): Promise<Understanding> {
   const extraction = await extractor.extract(input);
+  if (chosenRecipient) {
+    extraction.recipient_spoken = chosenRecipient;
+    extraction.recipient_latin = chosenRecipient;
+  }
   return { extractor: extractor.kind, extraction, result: validateExtraction(extraction, input.transcript) };
 }

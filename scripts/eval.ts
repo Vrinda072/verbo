@@ -93,7 +93,7 @@ Extractor: **${label}**.
 **Caveats.** The rule-based parser and these scenarios were written by the same team at the same time, so a high
 score on the offline run mainly shows the parts are consistent with each other. Risk expectations follow the
 documented weights in \`lib/risk/score.ts\`; three expectations were corrected after the first run (Nov 5) because they
-contradicted those weights. The meaningful tests still to run are the Claude extractor (\`--extractor=anthropic\`)
+contradicted those weights; two more changed on Nov 6 when the parser learned number words and name matching. The meaningful tests still to run are the Claude extractor (\`--extractor=anthropic\`)
 and real recorded speech.
 
 ## Pipeline (transcript → extraction → code validation → risk)

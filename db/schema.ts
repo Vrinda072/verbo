@@ -125,7 +125,7 @@ export const caseMessages = pgTable(
     lang: text("lang").notNull(),
     translatedText: text("translated_text"),
     translatedLang: text("translated_lang"),
-    translator: text("translator", { enum: ["anthropic", "template", "none"] }).notNull(),
+    translator: text("translator", { enum: ["anthropic", "mymemory", "template", "none"] }).notNull(),
     at: timestamp("at", { withTimezone: true }).notNull(),
   },
   (t) => [index("case_messages_case_idx").on(t.caseId)],

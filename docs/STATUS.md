@@ -1,5 +1,20 @@
 # Status
 
+## Nov 6 — free voice and translation
+
+Soniox has no credit left and no Anthropic key is set, so voice and translation now have no-cost defaults.
+- **Mic:** the browser's built-in speech recognition (`SPEECH_PROVIDER=browser`, the default). Soniox stays available
+  with `SPEECH_PROVIDER=soniox`, or automatically if the browser has no speech recognition. Chrome sends audio to its
+  own web service. Which languages work depends on the browser and cannot be queried.
+- **Translation:** Claude if `ANTHROPIC_API_KEY` is set and `MOCK=0`; otherwise MyMemory (no key, 5,000 chars/day).
+  Goes through English when a pair returns nothing (Telugu → Spanish does). Number check still applies. No email is sent to it.
+- **Offline parser for real speech:** number words (en/es/pt/hi/te/ar, typed confirmation still required), "12 dollars
+  34 cents", spelling variants of names, refuses two different amounts, recognises more foreign currencies.
+- **Ambiguous names** now show tappable contact buttons.
+- **Tested:** 102 tests; eval 48/48 and 9/9 (`docs/eval.md`, same caveats). Live MyMemory te → es. Mic code driven by a
+  **stand-in recogniser**, because the app's Browser pane blocks microphones.
+- **Not tested:** a real voice in real Chrome, including Telugu. Needs Vrinda at `http://localhost:3000/send` in Chrome.
+
 ## Day 5 — Thu Nov 5, 2026 (Case Desk + evidence)
 
 ### Done

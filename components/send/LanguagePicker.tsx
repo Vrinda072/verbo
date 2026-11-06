@@ -79,7 +79,7 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
                       WITH_TEMPLATES.has(l.code) ? "bg-evergreen-soft text-evergreen" : "bg-paper-2 text-ink-3"
                     }`}
                   >
-                    {WITH_TEMPLATES.has(l.code) ? "Read-back" : "Speech only"}
+                    {WITH_TEMPLATES.has(l.code) ? "Read-back" : "No read-back yet"}
                   </span>
                 </button>
               </li>
@@ -87,8 +87,8 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
             {!results.length && <li className="px-3 py-4 text-ink-3">No language matches “{q}”.</li>}
           </ul>
           <p className="border-t border-line px-3 pt-2 text-xs text-ink-3">
-            {LANGUAGES.length} languages for speech · {WITH_TEMPLATES.size} with a written read-back (machine-translated
-            unless marked reviewed).
+            {LANGUAGES.length} languages · {WITH_TEMPLATES.size} with a written read-back (machine-translated unless
+            marked reviewed). Which ones you can speak depends on your browser.
           </p>
         </div>
       )}
