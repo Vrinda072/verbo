@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       draftId: stored?.id ?? null,
       risk: stored ? summarizeRisk(stored.risk) : null,
       extractor: u.extractor,
+      fellBack: u.fellBack,
       ok: r.ok,
       problems: r.ok ? [] : r.problems,
       heard: { recipient: u.extraction.recipient_spoken, amount: u.extraction.amount_spoken },

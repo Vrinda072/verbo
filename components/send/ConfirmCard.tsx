@@ -6,7 +6,8 @@ import { decimalToCents } from "@/lib/agents/numbers";
 export interface UnderstandResponse {
   draftId: string | null;
   risk: { level: "low" | "medium" | "high"; hold: boolean; signals: string[] } | null;
-  extractor: "anthropic" | "rules";
+  extractor: "anthropic" | "gemini" | "rules";
+  fellBack?: boolean;
   ok: boolean;
   problems: { code: string; [k: string]: unknown }[];
   heard: { recipient: string | null; amount: string | null };
@@ -157,7 +158,7 @@ export function ConfirmCard({
           : L.machineTranslated && !L.reviewed
             ? "Read-back is machine-translated and not yet reviewed by a native speaker."
             : "Read-back reviewed."}{" "}
-        Understood by {data.extractor === "anthropic" ? "Claude (checked by code)" : "rule-based parser (offline mode)"}.
+        Understood by {data.extractor === "anthropic" ? "Claude (checked by code)" : data.extractor === "gemini" ? "Gemini AI (checked by code)" : data.fellBack ? "rule-based parser, because the AI was unavailable" : "rule-based parser (offline mode)"}.
       </p>
     </section>
   );

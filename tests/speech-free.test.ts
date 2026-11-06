@@ -117,3 +117,56 @@ describe("names by sound across scripts", () => {
     expect(phoneticKey("मैनुअल लोपेस")).toBe(phoneticKey("Manuel Lopes"));
   });
 });
+
+describe("Gemini integration (fake client, no network)", () => {
+  const good = { intent: "send_money", recipient_spoken: "किरण", recipient_latin: "Kiran", amount_spoken: "30", amount: "30", currency: "USD", pressure_cues: [], unclear: null };
+
+  it("sends a storage-off JSON request and validates the answer in code", async () => {
+    const { GeminiExtractor } = await import("@/lib/agents/extraction/gemini");
+    const { understand } = await import("@/lib/agents/extraction");
+    const reqs: { store: boolean; response_format: { mime_type: string; schema: { properties: object } } }[] = [];
+    const ex = new GeminiExtractor(async (r) => {
+      reqs.push(r as never);
+      return { output_text: JSON.stringify(good) };
+    });
+    const u = await understand({ transcript: "किरण को 30 डॉलर भेजो", language: "hi" }, ex);
+    expect(u.extractor).toBe("gemini");
+    expect(u.result.ok && u.result.draft.recipient.id).toBe("c_kiran");
+    expect(reqs[0].store).toBe(false);
+    expect(reqs[0].response_format.mime_type).toBe("application/json");
+    expect(Object.keys(reqs[0].response_format.schema.properties)).toContain("recipient_latin");
+  });
+
+  it("code still rejects an amount the model invented", async () => {
+    const { GeminiExtractor } = await import("@/lib/agents/extraction/gemini");
+    const { understand } = await import("@/lib/agents/extraction");
+    const ex = new GeminiExtractor(async () => ({ output_text: JSON.stringify({ ...good, amount: "3000" }) }));
+    const u = await understand({ transcript: "किरण को 30 डॉलर भेजो", language: "hi" }, ex);
+    expect(!u.result.ok && u.result.problems.map((p) => p.code)).toContain("amount_not_in_transcript");
+  });
+
+  it("falls back to rules on quota errors or bad answers and says so; the eval can turn that off", async () => {
+    const { GeminiExtractor } = await import("@/lib/agents/extraction/gemini");
+    const { understand } = await import("@/lib/agents/extraction");
+    const input = { transcript: "किरण को 30 डॉलर भेजो", language: "hi" };
+    for (const ex of [
+      new GeminiExtractor(async () => { throw new Error("429"); }),
+      new GeminiExtractor(async () => ({ output_text: "not json" })),
+      new GeminiExtractor(async () => ({ output_text: JSON.stringify({ amount: 5 }) })),
+    ]) {
+      const u = await understand(input, ex);
+      expect(u.extractor).toBe("rules");
+      expect(u.fellBack).toBe(true);
+    }
+    await expect(understand(input, new GeminiExtractor(async () => { throw new Error("429"); }), undefined, { fallback: false })).rejects.toThrow("429");
+  });
+
+  it("translator drops changed numbers and falls back to its backup on failure", async () => {
+    const { GeminiTranslator } = await import("@/lib/bridge/translate");
+    const backup = { kind: "mymemory" as const, translate: async () => ({ text: "backup", translator: "mymemory" as const }) };
+    const changed = new GeminiTranslator(async () => ({ output_text: JSON.stringify({ translation: "Enviei 120,34" }) }), backup);
+    expect((await changed.translate("I sent 12.34", "en", "pt")).note).toBe("numbers_changed");
+    const down = new GeminiTranslator(async () => { throw new Error("429"); }, backup);
+    expect(await down.translate("hello", "en", "pt")).toEqual({ text: "backup", translator: "mymemory" });
+  });
+});

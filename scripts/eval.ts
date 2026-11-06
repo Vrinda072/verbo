@@ -2,6 +2,7 @@
  * Runs the scripted scenarios in evals/scenarios.ts and writes docs/eval.md.
  *
  *   npm run eval                      # rules extractor (offline, deterministic)
+ *   npm run eval -- --extractor=gemini      # Gemini (needs GEMINI_API_KEY; free tier, paced 7 s per request, --pace=ms to change)
  *   npm run eval -- --extractor=anthropic   # Claude extractor (needs ANTHROPIC_API_KEY; costs a few cents)
  *
  * Numbers in docs/eval.md describe these scripted cases only — not real users or real-world accuracy.
@@ -11,11 +12,14 @@ import { writeFileSync } from "node:fs";
 import { understand, validateExtraction, type LlmExtraction } from "@/lib/agents/extraction";
 import { RulesExtractor } from "@/lib/agents/extraction/rules";
 import { AnthropicExtractor, EXTRACTION_MODEL } from "@/lib/agents/extraction/anthropic";
+import { GeminiExtractor } from "@/lib/agents/extraction/gemini";
+import { GEMINI_MODEL } from "@/lib/ai/gemini";
 import { assessRisk } from "@/lib/risk/score";
 import { GUARDS, PIPELINE, type Expect } from "@/evals/scenarios";
 
 const which = process.argv.find((a) => a.startsWith("--extractor="))?.split("=")[1] ?? "rules";
-const extractor = which === "anthropic" ? new AnthropicExtractor() : new RulesExtractor();
+const extractor = which === "anthropic" ? new AnthropicExtractor() : which === "gemini" ? new GeminiExtractor() : new RulesExtractor();
+const paceMs = Number(process.argv.find((a) => a.startsWith("--pace="))?.split("=")[1] ?? (which === "gemini" ? 7000 : 0));
 
 interface Row {
   id: string;
@@ -30,7 +34,15 @@ const fmt = (e: Expect) => (e.ok ? `${e.recipient} · ${e.cents}¢ · ${e.level}
 async function main() {
   const rows: Row[] = [];
   for (const s of PIPELINE) {
-    const u = await understand({ transcript: s.transcript, language: s.lang }, extractor);
+    if (paceMs && rows.length) await new Promise((r) => setTimeout(r, paceMs));
+    let u: Awaited<ReturnType<typeof understand>>;
+    try {
+      // No fallback: a provider error must show as an error here, not be credited to the rules parser.
+      u = await understand({ transcript: s.transcript, language: s.lang }, extractor, undefined, { fallback: false });
+    } catch (err) {
+      rows.push({ id: s.id, tags: s.tags, expected: fmt(s.expect), got: `error: ${String((err as Error).message).slice(0, 80).replace(/\|/g, "/")}`, pass: false });
+      continue;
+    }
     let got: string;
     let pass: boolean;
     if (u.result.ok) {
@@ -81,7 +93,7 @@ async function main() {
     `| Scenario | Tags | Expected | Got | |\n|---|---|---|---|---|\n` +
     rs.map((r) => `| ${r.id} | ${r.tags.join(", ")} | ${r.expected} | ${r.got} | ${r.pass ? "✅" : "❌"} |`).join("\n");
 
-  const label = which === "anthropic" ? `Claude (\`${EXTRACTION_MODEL}\`)` : "rule-based parser (offline)";
+  const label = which === "anthropic" ? `Claude (\`${EXTRACTION_MODEL}\`)` : which === "gemini" ? `Gemini (\`${GEMINI_MODEL}\`)` : "rule-based parser (offline)";
   const md = `# Evaluation — scripted scenarios
 
 **What this is:** ${PIPELINE.length + GUARDS.length} scenarios written by the Verbo team (\`evals/scenarios.ts\`),
@@ -107,7 +119,7 @@ These feed a wrong extraction straight into validation to check that code — no
 
 ${table(guardRows)}
 `;
-  writeFileSync(which === "anthropic" ? "docs/eval-anthropic.md" : "docs/eval.md", md);
+  writeFileSync(which === "rules" ? "docs/eval.md" : `docs/eval-${which}.md`, md);
   console.log(`pipeline ${p}/${rows.length} · guards ${gp}/${guardRows.length} · extractor ${which}`);
   for (const r of [...rows, ...guardRows].filter((r) => !r.pass)) console.log(`  ✘ ${r.id}: expected ${r.expected}, got ${r.got}`);
 }
