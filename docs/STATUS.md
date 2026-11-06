@@ -18,8 +18,9 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
 - **Fixed in Verbo's code:** 12 of 19 hand-written Hindi sentences failed in the parser; now 16 pass and the other 3 are
   correct refusals or questions. Names match by sound across scripts, contacts have Hindi/Telugu/Arabic first names, the
   screen shows the listening language and the payable contacts. These are sentences I wrote, not real Chrome output.
-- **Not fixed:** Chrome's own recognition quality, which Verbo can't improve. Not retested with real voice since the fix.
-  Options if it stays poor: Gemini free tier (includes a transcription model; free-tier content is used to improve
+- **Retest (Nov 6):** Vrinda reports that in Hindi in Chrome the transcript words were right and the flow worked. Telugu
+  by real voice is still unconfirmed.
+- **Limit:** Chrome's own recognition quality is outside Verbo's control. Options if it proves poor elsewhere: Gemini free tier (includes a transcription model; free-tier content is used to improve
   Google's products) or Groq Whisper (accepts webm and a spelling prompt; free limits not confirmed). Both need a key.
 - **Risk for submission:** the rules require meaningful use of AI, and without `ANTHROPIC_API_KEY` the running app uses
   only the rule-based parser and MyMemory. The Claude code paths exist but have never run live.
