@@ -2,6 +2,7 @@ import Link from "next/link";
 import { APP_NAME } from "@/lib/config";
 
 const NAV = [
+  { href: "/demo", label: "Demo" },
   { href: "/send", label: "Send" },
   { href: "/desk", label: "Case Desk" },
 ];
@@ -39,7 +40,7 @@ export function SiteHeader() {
             <Link
               key={n.href}
               href={n.href}
-              className="rounded-full px-4 py-2 text-base font-bold text-ink-2 transition-colors hover:bg-paper-2 hover:text-ink"
+              className="whitespace-nowrap rounded-full px-3 py-2 text-base font-bold text-ink-2 sm:px-4 transition-colors hover:bg-paper-2 hover:text-ink"
             >
               {n.label}
             </Link>
