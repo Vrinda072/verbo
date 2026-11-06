@@ -43,7 +43,7 @@ interface Step {
 
 const Asleep = () => (
   <div className="flex h-full items-center justify-center p-6 text-center text-ink-3">
-    <p>Manuel Lopes has no idea any of this is happening.</p>
+    <p>Manuel hasn’t been contacted yet.</p>
   </div>
 );
 
