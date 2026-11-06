@@ -152,6 +152,17 @@ body {
 }
 .v-pulse { animation: v-pulse 1.4s var(--v-ease) infinite; }
 
+/* recording bars: shows the mic is on, not how loud it is */
+@keyframes v-bar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.v-bar { animation: v-bar 900ms var(--v-ease) infinite; transform-origin: center; }
+
+/* small working indicator */
+@keyframes v-spin { to { transform: rotate(360deg); } }
+.v-spin { animation: v-spin 800ms linear infinite; }
+
 /* cards entering */
 @keyframes v-rise {
   from { transform: translateY(8px); opacity: 0; }
