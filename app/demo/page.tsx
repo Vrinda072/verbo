@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { DemoStage } from "./DemoStage";
 
-export const metadata = { title: "Watch a rescue" };
+export const metadata = { title: "Example" };
 
 export default function DemoPage() {
   return (

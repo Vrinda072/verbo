@@ -85,7 +85,7 @@ const Bubble = ({ mine, text, lang, translated }: { mine: boolean; text: string;
 
 const STEPS: Step[] = [
   {
-    title: "He says it in his own language",
+    title: "Sreenivas says the payment in Hindi",
     story: "Sreenivas speaks Hindi. He wants to pay his friend Manuel Lopez $40, so he taps the mic and says it.",
     under: "Verbo records until he taps stop, so a pause can't cut him off. Whisper writes down his words.",
     where: "sender",
@@ -103,7 +103,7 @@ const STEPS: Step[] = [
     recipient: <Asleep />,
   },
   {
-    title: "Two names sound the same",
+    title: "He chooses between two similar names",
     story: `He has two contacts: ${RIGHT} and ${WRONG}. Speech can't reliably tell them apart, so Verbo won't guess. He has to choose, and in a hurry he taps the wrong one.`,
     under: "AI only fills in fields. Code matches the name against his contacts, and a person makes the final choice.",
     where: "sender",
@@ -118,7 +118,7 @@ const STEPS: Step[] = [
     recipient: <Asleep />,
   },
   {
-    title: "Verbo warns him, in Hindi",
+    title: "Verbo reads it back in Hindi",
     story: "The read-back appears and is spoken aloud in Hindi, with big digits. He has never paid this person, and the name is nearly identical to a friend's, so the risk score is high.",
     under: "The sentence comes from a fixed template, never from AI. Code inserts the name and amount, so a model can't change what he hears.",
     where: "sender",
@@ -143,7 +143,7 @@ const STEPS: Step[] = [
     recipient: <Asleep />,
   },
   {
-    title: "The money waits",
+    title: "The payment is held for 10 minutes",
     story: "He approves on PayPal, but Verbo doesn't send it yet. For 10 minutes he can cancel, and the money never leaves.",
     under: "This is a PayPal authorization with no capture yet. Cancelling voids it.",
     where: "hold",
@@ -161,8 +161,8 @@ const STEPS: Step[] = [
     recipient: <Asleep />,
   },
   {
-    title: "He misses it, and the money goes",
-    story: "He doesn't check in time. The hold ends and $40 reaches the wrong Manuel, who speaks Portuguese. Often, this is where the story ends: two strangers, no shared language, and the money is gone.",
+    title: "The hold ends and the payment goes through",
+    story: "He doesn't check in time. The hold ends and $40 reaches the wrong Manuel, who speaks Portuguese.",
     under: "The authorization is captured and paid out with a safe-to-retry request, so it can't be sent twice.",
     where: "recipient",
     active: "both",
@@ -183,8 +183,8 @@ const STEPS: Step[] = [
     ),
   },
   {
-    title: "A kind message, in his language",
-    story: "With one tap, Sreenivas asks for it back. Manuel gets a private link in Portuguese that explains what happened, and it's clear that the decision is his.",
+    title: "Manuel gets a link in Portuguese",
+    story: "With one tap, Sreenivas asks for it back. Manuel gets a private link in Portuguese that explains what happened. The decision is his.",
     under: "Verbo can't take money from anyone's account or force a refund. It makes doing the right thing easy.",
     where: "recipient",
     active: "recipient",
@@ -210,8 +210,8 @@ const STEPS: Step[] = [
     ),
   },
   {
-    title: "Two strangers finally understand each other",
-    story: "He writes in Hindi and Manuel reads Portuguese, and the reply comes back the other way. For the first time, they can actually talk.",
+    title: "They message each other, with translation",
+    story: "He writes in Hindi and Manuel reads Portuguese, and the reply comes back the other way.",
     under: "Gemini translates, and code drops any translation where a number changed, so $40 can't become $400.",
     where: "recipient",
     active: "both",
@@ -229,7 +229,7 @@ const STEPS: Step[] = [
     ),
   },
   {
-    title: "The money comes home",
+    title: "Manuel sends the money back",
     story: "Manuel taps once and approves it himself on PayPal, and the $40 goes back to Sreenivas. Every step is recorded on the Case Desk, in an evidence packet with a SHA-256 fingerprint.",
     under: "It's a new payment that Manuel approves, followed by a payout to Sreenivas, each safe to retry.",
     where: "sender",
@@ -278,7 +278,7 @@ export function DemoStage() {
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">Two strangers. Two languages. One mistake.</h1>
+          <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">Example: a payment sent to the wrong person</h1>
           <p className="mt-2 text-sm text-ink-3">
             A scripted walkthrough with simulated people. No money moves and nothing is sent. Hindi and Portuguese are machine translations.
           </p>
@@ -292,7 +292,7 @@ export function DemoStage() {
           aria-pressed={auto}
           className="min-h-11 rounded-full border-2 border-line-strong px-5 font-bold hover:bg-paper-2"
         >
-          {auto ? "Pause" : "Play it for me"}
+          {auto ? "Pause" : "Play"}
         </button>
       </div>
 
