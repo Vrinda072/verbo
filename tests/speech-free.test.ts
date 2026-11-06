@@ -161,6 +161,90 @@ describe("Gemini integration (fake client, no network)", () => {
     await expect(understand(input, new GeminiExtractor(async () => { throw new Error("429"); }), undefined, { fallback: false })).rejects.toThrow("429");
   });
 
+  describe("free quota handling", () => {
+    const req = { model: "x", input: "hello", system_instruction: "s", store: false, response_format: { type: "text" as const, mime_type: "application/json" as const, schema: {} } };
+    const quota = () => Object.assign(new Error("429 limit: 20 requests per day. Please retry in 1h2m3s or upgrade"), { status: 429 });
+    const ok = { output_text: JSON.stringify({ a: 1 }) };
+
+    it("reads the retry time from the quota message", async () => {
+      const { retryAfterMs } = await import("@/lib/ai/gemini");
+      expect(retryAfterMs(quota().message)).toBe(3723_000);
+      expect(retryAfterMs("Please retry in 30.5s")).toBe(30_500);
+      expect(retryAfterMs("no time given")).toBe(60_000);
+    });
+
+    it("moves to the next model at quota, parks the first until its retry time, then tries it again", async () => {
+      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const calls: string[] = [];
+      let t = 0;
+      let firstFull = true;
+      const create = withModelFallback(
+        async (r) => {
+          calls.push(r.model);
+          if (r.model === "a" && firstFull) throw quota();
+          return ok;
+        },
+        ["a", "b"],
+        newFallbackState(),
+        () => t,
+      );
+      await create({ ...req, input: "1" });
+      await create({ ...req, input: "2" });
+      expect(calls).toEqual(["a", "b", "b"]);
+      firstFull = false;
+      t = 3723_001;
+      await create({ ...req, input: "3" });
+      expect(calls.at(-1)).toBe("a");
+    });
+
+    it("stops calling once every model is at quota, and reports quota", async () => {
+      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      let calls = 0;
+      const create = withModelFallback(async () => { calls++; throw quota(); }, ["a", "b"], newFallbackState(), () => 0);
+      await expect(create(req)).rejects.toMatchObject({ reason: "quota" });
+      expect(calls).toBe(2);
+      await expect(create({ ...req, input: "other" })).rejects.toMatchObject({ reason: "quota" });
+      expect(calls).toBe(2);
+    });
+
+    it("treats an overloaded model as an outage without parking it, and throws other errors unchanged", async () => {
+      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      let calls = 0;
+      const busy = withModelFallback(async () => { calls++; throw Object.assign(new Error("503"), { status: 503 }); }, ["a"], newFallbackState(), () => 0);
+      await expect(busy(req)).rejects.toMatchObject({ reason: "unavailable" });
+      await expect(busy(req)).rejects.toMatchObject({ reason: "unavailable" });
+      expect(calls).toBe(2);
+      const bad = withModelFallback(async () => { throw Object.assign(new Error("400 bad schema"), { status: 400 }); }, ["a", "b"], newFallbackState(), () => 0);
+      await expect(bad(req)).rejects.toThrow("400 bad schema");
+    });
+
+    it("reuses a good answer for the same request, but never a broken one", async () => {
+      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      let calls = 0;
+      const create = withModelFallback(async () => { calls++; return ok; }, ["a"], newFallbackState(), () => 0);
+      await create(req);
+      await create(req);
+      expect(calls).toBe(1);
+      await create({ ...req, input: "different" });
+      expect(calls).toBe(2);
+      let bad = 0;
+      const broken = withModelFallback(async () => { bad++; return { output_text: "not json" }; }, ["a"], newFallbackState(), () => 0);
+      await broken(req);
+      await broken(req);
+      expect(bad).toBe(2);
+    });
+
+    it("at full quota, understanding still works through the rules parser and says so", async () => {
+      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const { GeminiExtractor } = await import("@/lib/agents/extraction/gemini");
+      const { understand } = await import("@/lib/agents/extraction");
+      const ex = new GeminiExtractor(withModelFallback(async () => { throw quota(); }, ["a"], newFallbackState(), () => 0));
+      const u = await understand({ transcript: "किरण को 30 डॉलर भेजो", language: "hi" }, ex);
+      expect(u.fellBack).toBe(true);
+      expect(u.result.ok && u.result.draft.amount.cents).toBe(3000);
+    });
+  });
+
   it("translator drops changed numbers and falls back to its backup on failure", async () => {
     const { GeminiTranslator } = await import("@/lib/bridge/translate");
     const backup = { kind: "mymemory" as const, translate: async () => ({ text: "backup", translator: "mymemory" as const }) };
