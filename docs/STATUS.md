@@ -1,5 +1,16 @@
 # Status
 
+## Nov 6 — Gemini for the AI requirement
+
+- Added Gemini (`gemini-3.6-flash`, override with `GEMINI_MODEL`) for understanding speech and translating messages.
+  It only fills fields or translates; code validation still decides money, and invented amounts are rejected.
+- AI no longer depends on `MOCK`, which now only controls PayPal.
+- If Gemini fails (quota, network, bad answer), the rules parser and MyMemory take over and the card says so.
+- **Tested with a stand-in client only (107 tests).** Not yet run against real Gemini: needs `GEMINI_API_KEY` in `.env`.
+  Then run `npm run eval -- --extractor=gemini`, which writes `docs/eval-gemini.md`.
+- Free-tier content is used to improve Google's products; the Send page says so. Exact free limits aren't published in
+  the docs (they're shown in AI Studio), so the eval is paced at 7 s per request.
+
 ## Nov 6 — free voice and translation
 
 Soniox has no credit left and no Anthropic key is set, so voice and translation now have no-cost defaults.

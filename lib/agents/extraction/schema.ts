@@ -42,6 +42,6 @@ export interface ExtractionInput {
 }
 
 export interface Extractor {
-  readonly kind: "anthropic" | "rules";
+  readonly kind: "anthropic" | "gemini" | "rules";
   extract(input: ExtractionInput): Promise<LlmExtraction>;
 }

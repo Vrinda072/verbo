@@ -11,7 +11,7 @@ import { LlmExtraction, type ExtractionInput, type Extractor } from "./schema";
 
 export const EXTRACTION_MODEL = "claude-opus-5-5";
 
-const SYSTEM = `You read one short voice transcript from a person who wants to send money with PayPal.
+export const EXTRACTION_SYSTEM = `You read one short voice transcript from a person who wants to send money with PayPal.
 The transcript may be in any language or mix languages, and may contain speech-recognition errors.
 Fill the fields exactly as described. Rules:
 - Copy recipient_spoken and amount_spoken verbatim from the transcript; never translate or "fix" a name.
@@ -38,7 +38,7 @@ export class AnthropicExtractor implements Extractor {
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
       output_config: { effort: "low", format: betaZodOutputFormat(LlmExtraction) },
-      system: SYSTEM,
+      system: EXTRACTION_SYSTEM,
       messages: [
         {
           role: "user",
