@@ -1,8 +1,30 @@
 # Status
 
+## Nov 6 — real Gemini run
+
+- **Free quota is the main constraint.** The API reported 20 requests a day on `gemini-3.6-flash`; `gemini-3.5-flash`
+  draws on that same quota. `gemini-3.5-flash-lite` took well over 100 requests today without a limit error, but its
+  actual limit is unknown. 3.7 and 3.8 flash answered 503 (high demand) when tried; 2.5 models are closed to new users.
+- **Default order:** `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-3.6-flash`. A model at quota is skipped
+  until its stated retry time, identical requests reuse the answer, and when all are out the rules parser and MyMemory
+  take over without a network call. Answers are kept in memory only.
+- **Eval on `gemini-3.5-flash-lite`:** 51/57 on the first full run, 57/57 after fixes, guards 11/11, offline parser
+  57/57 (`docs/eval-gemini.md`, `docs/eval.md`). These are our own scripted scenarios, and the fixes were made against
+  six of them, so 57/57 is not a first-attempt score or a measure of real-world accuracy.
+  An earlier partial run on `gemini-3.6-flash` got through 19 scenarios, all passing, before its quota ran out.
+- **Money errors the run exposed, now blocked in code:** 500 rupees accepted as $500 when the model left currency empty;
+  one amount picked from "20, no wait 200". Both are also guard scenarios.
+- **Also fixed:** Lopes/Lopez resolved by the sound of what was said when romanisation blurred them; number words a model
+  declines are filled in by code and still need typing; "currency assumed" now depends on the words said, not the model.
+- **Tested in the running app (mock PayPal, typed or scripted text):** understanding in en/hi/te through `/api/understand`;
+  send → ask back → recovery chat with Gemini translating hi→pt and pt→en. 119 tests pass.
+- **Not tested:** real microphone with Gemini, the screens by eye in this session (Browser pane was hidden), and the
+  real PayPal sandbox through the app.
+- **To do by hand:** the Gemini key was pasted in chat, so rotate it before submission along with the PayPal and Soniox keys.
+
 ## Nov 6 — Gemini for the AI requirement
 
-- Added Gemini (`gemini-3.6-flash`, override with `GEMINI_MODEL`) for understanding speech and translating messages.
+- Added Gemini (superseded above: model order and test results) for understanding speech and translating messages.
   It only fills fields or translates; code validation still decides money, and invented amounts are rejected.
 - AI no longer depends on `MOCK`, which now only controls PayPal.
 - If Gemini fails (quota, network, bad answer), the rules parser and MyMemory take over and the card says so.
