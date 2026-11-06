@@ -4,24 +4,12 @@
  * when it hears more than one amount. Anything it can't read becomes null, and validation then asks the user.
  */
 import { CONTACTS, type Contact } from "@/lib/contacts";
-import { dollarsAndCents, normalizeDigits } from "@/lib/agents/numbers";
+import { spokenCurrencies } from "@/lib/agents/currency";
+import { dollarsAndCents, distinctNumerals } from "@/lib/agents/numbers";
 import { parseNumberWords } from "@/lib/agents/numberWords";
 import { phoneticKey } from "@/lib/agents/phonetic";
 import { jaroWinkler, normalizeName } from "@/lib/agents/similarity";
 import type { ExtractionInput, Extractor, LlmExtraction } from "./schema";
-
-/** Currency words. A foreign one must be caught: treating "500 rupees" as dollars would be a money error. */
-const CURRENCY_WORDS: [RegExp, string][] = [
-  [/\$|\busd\b|dollars?|bucks?|d[oó]lar(es)?|డాలర్|डॉलर|دولار/iu, "USD"],
-  [/€|\beur\b|euros?|యూరో|यूरो|يورو/iu, "EUR"],
-  [/₹|\binr\b|rupees?|rupias?|రూపాయ|रुपय|रुपए|रुपये|روپے|روبية/iu, "INR"],
-  [/£|\bgbp\b|pounds?|libras?|పౌండ్|पाउंड|جنيه/iu, "GBP"],
-  [/\bmxn\b|pesos?/iu, "MXN"],
-  [/\bbrl\b|\breais\b|\breal\b/iu, "BRL"],
-  [/\baed\b|dirhams?|درهم|दिरहम|దిర్హామ్/iu, "AED"],
-  [/\bsar\b|riyals?|ريال|रियाल|రియాల్/iu, "SAR"],
-  [/¥|\bjpy\b|\byen\b|\bcny\b|yuan/iu, "OTHER"],
-];
 
 const PAY_WORDS = /send|pay|transfer|give|env[ií]a|manda|paga|transfere|envie|pague|పంపు|పంపండి|పంపించు|ఇవ్వు|భేజ|दे|भेज|أرسل|ارسل|حول/iu;
 
@@ -67,12 +55,11 @@ function findRecipient(transcript: string, contacts: Contact[]): { spoken: strin
 }
 
 /** The one amount said, or null when there is none or several different ones. */
-function findAmount(transcript: string, lang: string): { amount: string; spoken: string } | { unclear: string } | null {
+export function findAmount(transcript: string, lang: string): { amount: string; spoken: string } | { unclear: string } | null {
   const split = dollarsAndCents(transcript);
   if (split !== null) return { amount: (split / 100).toFixed(2), spoken: String(split / 100) };
 
-  const text = normalizeDigits(transcript).replace(/(\d),(\d{3})\b/g, "$1$2");
-  const numerals = [...new Set([...text.matchAll(/\d{1,7}(?:[.,]\d{1,2})?/g)].map((m) => m[0].replace(",", ".")))];
+  const numerals = distinctNumerals(transcript);
   if (numerals.length > 1) return { unclear: "more than one amount was said" };
   if (numerals.length === 1) return { amount: numerals[0], spoken: numerals[0] };
 
@@ -88,7 +75,7 @@ export class RulesExtractor implements Extractor {
     const found = findAmount(transcript, language);
     const amount = found && "amount" in found ? found.amount : null;
     const recipient = findRecipient(transcript, this.contacts);
-    const currency = CURRENCY_WORDS.find(([re]) => re.test(transcript))?.[1] ?? null;
+    const currency = spokenCurrencies(transcript)[0] ?? null;
     return {
       intent: PAY_WORDS.test(transcript) || (amount && recipient) ? "send_money" : "other",
       recipient_spoken: recipient?.spoken ?? null,

@@ -6,7 +6,9 @@
 import { CONTACTS, type Contact } from "@/lib/contacts";
 import { money, MAX_SANDBOX_CENTS as MAX_CENTS } from "@/lib/paypal/money";
 import type { Money } from "@/lib/paypal/types";
-import { candidateCents, decimalToCents, hasDigits } from "@/lib/agents/numbers";
+import { spokenCurrencies } from "@/lib/agents/currency";
+import { candidateCents, decimalToCents, distinctNumerals, dollarsAndCents, hasDigits } from "@/lib/agents/numbers";
+import { phoneticKey } from "@/lib/agents/phonetic";
 import { jaroWinkler, normalizeName } from "@/lib/agents/similarity";
 import type { LlmExtraction } from "./schema";
 
@@ -55,6 +57,14 @@ export function resolveRecipient(spoken: string | string[], contacts: Contact[] 
   return { scored, matches, exact };
 }
 
+/** The one contact whose full name sounds exactly like this, across scripts. Lopes and Lopez stay distinct. */
+function soleContactBySound(spoken: string, contacts: Contact[]): Contact | undefined {
+  const key = phoneticKey(spoken);
+  if (!key.includes(" ")) return undefined; // one word's sound can collide with ordinary words
+  const hits = contacts.filter((c) => [c.name, ...c.aliases].some((n) => phoneticKey(n) === key));
+  return hits.length === 1 ? hits[0] : undefined;
+}
+
 export function validateExtraction(x: LlmExtraction, transcript: string, contacts: Contact[] = CONTACTS): ValidationResult {
   const problems: Problem[] = [];
   const partial: Partial<ValidDraft> = {};
@@ -68,7 +78,14 @@ export function validateExtraction(x: LlmExtraction, transcript: string, contact
     const forms = [x.recipient_spoken, x.recipient_latin].filter((f): f is string => !!f?.trim());
     const { scored, matches, exact } = resolveRecipient(forms, contacts);
     const clearlyCloser = exact.length === 0 && matches.length > 1 && matches[0].score - matches[1].score >= CLEAR_MARGIN;
-    const chosen = exact.length === 1 ? exact[0] : matches.length === 1 || clearlyCloser ? matches[0] : undefined;
+    // The model's romanisation can blur a name ("lopej" is near both Lopes and Lopez), so the words actually said come first.
+    // Only with no exact match: two exact matches mean the model's fields contradict each other, which stays a refusal.
+    const bySound = exact.length === 0 ? soleContactBySound(x.recipient_spoken, contacts) : undefined;
+    const chosen =
+      exact.length === 1 ? exact[0]
+      : bySound ? scored.find((m) => m.contact.id === bySound.id)
+      : matches.length === 1 || clearlyCloser ? matches[0]
+      : undefined;
     if (chosen) {
       partial.recipient = chosen.contact;
       partial.lookAlikes = scored.filter((m) => m.contact.id !== chosen.contact.id && m.score >= LOOKALIKE);
@@ -88,6 +105,8 @@ export function validateExtraction(x: LlmExtraction, transcript: string, contact
     else if (cents <= 0 || cents > MAX_CENTS) problems.push({ code: "amount_out_of_range", cents });
     else if (hasDigits(transcript)) {
       if (!candidateCents(transcript).has(cents)) problems.push({ code: "amount_not_in_transcript", value: x.amount });
+      // "20, no wait 200": the model picked one; only the person can say which, so ask again.
+      else if (dollarsAndCents(transcript) === null && distinctNumerals(transcript).length > 1) problems.push({ code: "missing_amount" });
       else {
         partial.amount = money(cents);
         partial.amountSource = "numerals";
@@ -99,9 +118,12 @@ export function validateExtraction(x: LlmExtraction, transcript: string, contact
   }
 
   // Currency — the sandbox demo is USD only; never silently convert.
-  const cur = x.currency?.trim().toUpperCase() || null;
-  if (cur && cur !== "USD") problems.push({ code: "currency_unsupported", currency: cur });
-  partial.currencyAssumed = cur === null;
+  // Code reads the words itself, because a model that leaves currency empty would turn "500 rupees" into $500.
+  const spoken = spokenCurrencies(transcript);
+  const modelCurrency = x.currency?.trim().toUpperCase() || null;
+  const foreign = spoken.find((c) => c !== "USD") ?? (modelCurrency && modelCurrency !== "USD" ? modelCurrency : null);
+  if (foreign) problems.push({ code: "currency_unsupported", currency: foreign });
+  partial.currencyAssumed = !spoken.includes("USD");
 
   if (problems.length) return { ok: false, problems, partial };
   return { ok: true, draft: partial as ValidDraft };

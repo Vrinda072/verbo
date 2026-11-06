@@ -10,7 +10,7 @@ import type { LlmExtraction } from "@/lib/agents/extraction/schema";
 
 export type Expect =
   | { ok: true; recipient: string; cents: number; level: "low" | "medium" | "high" }
-  | { ok: false; problem: string };
+  | { ok: false; problem: string; also?: string };
 
 export interface PipelineScenario {
   kind: "pipeline";
@@ -80,7 +80,7 @@ export const PIPELINE: PipelineScenario[] = [
   // --- things that must be refused or clarified ---
   { kind: "pipeline", id: "en-euros", lang: "en", transcript: "Send 50 euros to Manuel Lopez", expect: no("currency_unsupported"), tags: ["currency"] },
   { kind: "pipeline", id: "en-rupees", lang: "en", transcript: "Send 500 rupees to Kiran Reddy", expect: no("currency_unsupported"), tags: ["currency"] },
-  { kind: "pipeline", id: "en-unknown", lang: "en", transcript: "Send 20 dollars to Zara Khan", expect: no("missing_recipient"), tags: ["unknown"] },
+  { kind: "pipeline", id: "en-unknown", lang: "en", transcript: "Send 20 dollars to Zara Khan", expect: { ok: false, problem: "missing_recipient", also: "recipient_not_found" }, tags: ["unknown"] },
   { kind: "pipeline", id: "en-bare-manuel", lang: "en", transcript: "Send 20 dollars to Manuel", expect: no("recipient_ambiguous"), tags: ["ambiguous"] },
   { kind: "pipeline", id: "en-no-amount", lang: "en", transcript: "Send money to Manuel Lopez", expect: no("missing_amount"), tags: ["missing"] },
   { kind: "pipeline", id: "en-too-much", lang: "en", transcript: "Send 20000 dollars to Kiran Reddy", expect: no("amount_out_of_range"), tags: ["limit"] },
@@ -105,6 +105,8 @@ export const PIPELINE: PipelineScenario[] = [
 ];
 
 export const GUARDS: GuardScenario[] = [
+  { kind: "guard", id: "g-rupees-silent", transcript: "किरण रेड्डी को 500 रुपये भेजो", model: { recipient_spoken: "किरण रेड्डी", recipient_latin: "Kiran Reddy", amount: "500", currency: null }, expect: { ok: false, problem: "currency_unsupported" }, tags: ["conversion", "seen-live"] },
+  { kind: "guard", id: "g-picks-one-of-two", transcript: "Send 20 to Kiran Reddy, no wait 200", model: { recipient_spoken: "Kiran Reddy", recipient_latin: "Kiran Reddy", amount: "200" }, expect: { ok: false, problem: "missing_amount" }, tags: ["ambiguous", "seen-live"] },
   { kind: "guard", id: "g-inflated", transcript: "Send 12.34 dollars to Manuel Lopez", model: { amount: "120.34" }, expect: { ok: false, problem: "amount_not_in_transcript" }, tags: ["hallucination"] },
   { kind: "guard", id: "g-extra-zero", transcript: "Send 20 dollars to Kiran Reddy", model: { recipient_spoken: "Kiran Reddy", recipient_latin: "Kiran Reddy", amount: "200" }, expect: { ok: false, problem: "amount_not_in_transcript" }, tags: ["hallucination"] },
   { kind: "guard", id: "g-three-decimals", transcript: "Send 12.345 to Manuel Lopez", model: { amount: "12.345" }, expect: { ok: false, problem: "amount_invalid" }, tags: ["format"] },
