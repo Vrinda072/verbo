@@ -39,7 +39,7 @@ export async function understand(
   extractor = getExtractor(),
   /** The contact the user tapped after an ambiguous name. Must be an exact address-book name. */
   chosenRecipient?: string,
-  opts: { fallback?: boolean } = {},
+  opts: { fallback?: boolean; fromVoice?: boolean } = {},
 ): Promise<Understanding> {
   let used = extractor;
   let extraction: LlmExtraction;
@@ -63,5 +63,15 @@ export async function understand(
     extraction.recipient_spoken = chosenRecipient;
     extraction.recipient_latin = chosenRecipient;
   }
-  return { extractor: used.kind, extraction, result: validateExtraction(extraction, input.transcript), fellBack };
+  let result = validateExtraction(extraction, input.transcript);
+  // Speech can't reliably tell Lopez from Lopes, so a speech model must not choose who gets paid. The person taps instead.
+  if (opts.fromVoice && !chosenRecipient && result.ok && result.draft.lookAlikes.length) {
+    const { draft } = result;
+    result = {
+      ok: false,
+      partial: draft,
+      problems: [{ code: "recipient_ambiguous", candidates: [draft.recipient.name, ...draft.lookAlikes.map((m) => m.contact.name)] }],
+    };
+  }
+  return { extractor: used.kind, extraction, result, fellBack };
 }

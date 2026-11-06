@@ -55,9 +55,36 @@ describe("recording the microphone", () => {
   });
 });
 
+describe("sound-alike names from speech", () => {
+  const typedOrSpoken = { transcript: "Send 20 dollars to Manuel Lopez", language: "en" };
+
+  it("makes the person choose, when the words came from a microphone", async () => {
+    const { understand } = await import("@/lib/agents/extraction");
+    const u = await understand(typedOrSpoken, undefined, undefined, { fromVoice: true });
+    expect(u.result.ok).toBe(false);
+    const p = !u.result.ok ? u.result.problems[0] : null;
+    expect(p).toMatchObject({ code: "recipient_ambiguous" });
+    expect((p as { candidates: string[] }).candidates.sort()).toEqual(["Manuel Lopes", "Manuel Lopez"]);
+  });
+
+  it("honours the tap, and keeps the look-alike warning for the card", async () => {
+    const { understand } = await import("@/lib/agents/extraction");
+    const u = await understand(typedOrSpoken, undefined, "Manuel Lopes", { fromVoice: true });
+    expect(u.result.ok && u.result.draft.recipient.id).toBe("c_lopes");
+    expect(u.result.ok && u.result.draft.lookAlikes.map((m) => m.contact.id)).toEqual(["c_lopez"]);
+  });
+
+  it("doesn't ask when typed, or when no contact sounds alike", async () => {
+    const { understand } = await import("@/lib/agents/extraction");
+    expect((await understand(typedOrSpoken)).result.ok).toBe(true);
+    const k = await understand({ transcript: "Send 20 dollars to Kiran Reddy", language: "en" }, undefined, undefined, { fromVoice: true });
+    expect(k.result.ok).toBe(true);
+  });
+});
+
 describe("Whisper transcription (stand-in server, no network)", () => {
   const audio = new Blob([new Uint8Array([1, 2, 3])], { type: "audio/webm" });
-  const input = { audio, fileName: "speech.webm", language: "hi-IN", names: "Manuel Lopez, Manuel Lopes" };
+  const input = { audio, fileName: "speech.webm", language: "hi-IN" };
   const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 
   it("sends the documented fields with the base language and returns tidy text", async () => {
@@ -75,8 +102,8 @@ describe("Whisper transcription (stand-in server, no network)", () => {
     expect(seen!.url).toBe("https://api.groq.com/openai/v1/audio/transcriptions");
     expect(seen!.auth).toBe("Bearer test-key");
     expect(seen!.form.get("language")).toBe("hi");
-    expect(seen!.form.get("model")).toBe("whisper-large-v3");
-    expect(seen!.form.get("prompt")).toBe("Manuel Lopez, Manuel Lopes");
+    expect(seen!.form.get("model")).toBe("whisper-large-v3-turbo");
+    expect(seen!.form.get("prompt")).toBeNull();
     expect((seen!.form.get("file") as File).name).toBe("speech.webm");
   });
 

@@ -137,7 +137,7 @@ export function useSpeech(provider: SpeechProvider, language: string, terms: str
   useEffect(() => setBrowserSupported(Boolean(speechRecognitionCtor(window))), []);
   const browser = useBrowserSpeech(language);
   const soniox = useSoniox(language, terms);
-  const recorder = useRecorder(language, terms);
+  const recorder = useRecorder(language);
   if (provider === "recorder") return recorder;
   return provider === "browser" && browserSupported ? browser : soniox;
 }

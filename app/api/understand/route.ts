@@ -14,6 +14,8 @@ const Body = z.object({
   language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/),
   /** Set when the user tapped a name after an ambiguous match; only an exact contact name is honoured. */
   chosenRecipient: z.string().max(100).optional(),
+  /** The text came straight from speech, where sound-alike names can't be told apart. */
+  fromVoice: z.boolean().optional(),
 });
 
 /**
@@ -27,7 +29,7 @@ export async function POST(req: Request) {
   const { transcript, language } = parsed.data;
   const chosen = CONTACTS.find((c) => c.name === parsed.data.chosenRecipient)?.name;
   try {
-    const u = await understand({ transcript, language }, undefined, chosen);
+    const u = await understand({ transcript, language }, undefined, chosen, { fromVoice: parsed.data.fromVoice });
     const labels = labelsFor(language);
     const r = u.result;
     const draft = r.ok ? r.draft : r.partial;
