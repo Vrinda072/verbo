@@ -1,121 +1,112 @@
 import Link from "next/link";
+import { HeroCard } from "@/components/HeroCard";
 import { SiteHeader } from "@/components/SiteHeader";
+import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 
-const PARTS = [
+const ACTS = [
   {
-    n: "01",
-    title: "Send by voice",
-    body: "Speak in your own language. Verbo reads the payment back from a fixed, checked template with large digits — and waits for your clear yes.",
+    when: "Before you send",
+    title: "It catches the slip.",
+    body: "Names that sound alike make you stop and choose. First-time recipients, unusual amounts and pressure tactics get flagged. Risky payments wait 10 minutes, and until then you can cancel.",
   },
   {
-    n: "02",
-    title: "Checks before money moves",
-    body: "Look-alike names, unusual amounts, first-time recipients and pressure language are flagged. Risky payments are held for 10 minutes so you can change your mind.",
+    when: "If it still goes wrong",
+    title: "It gets you talking.",
+    body: "The other person gets a private link in their language with one button to send the money back, plus a chat translated in both directions.",
   },
   {
-    n: "03",
-    title: "Recovery across languages",
-    body: "If it went to the wrong person, they get a friendly link in their language with one button to send it back — and a translated chat.",
-  },
-  {
-    n: "04",
-    title: "Case Desk & evidence",
-    body: "Operators see every case on one desk, with a translated timeline and a signed evidence packet for each.",
+    when: "Afterwards",
+    title: "It keeps the record.",
+    body: "Each case lands on one desk, with a translated timeline and an evidence packet to hand over if you need to escalate.",
   },
 ];
 
+const PIPELINE = [
+  { who: "Whisper", does: "writes down what you said" },
+  { who: "Gemini", does: "fills in who and how much" },
+  { who: "Code", does: "checks both against what you said and your contacts" },
+  { who: "Fixed template", does: "reads it back in your language" },
+  { who: "You", does: "confirm, then approve on PayPal" },
+];
+
 export default function Home() {
+  const readbacks = LANGUAGES.filter((l) => !labelsFor(l.code).fallback).length;
   return (
     <>
       <SiteHeader />
       <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-evergreen-soft px-3 py-1 text-sm font-bold text-evergreen">
-              <span aria-hidden className="h-2 w-2 rounded-full bg-evergreen" />
-              A safety net for person-to-person payments
-            </p>
-            <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
-              Send money safely,
+            <h1 className="font-display text-5xl font-semibold leading-[1.02] tracking-tight sm:text-7xl">
+              You paid the wrong person.
               <br />
-              <span className="text-evergreen">in the language you speak.</span>
+              <span className="text-evergreen">They don’t speak your language.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-ink-2 sm:text-xl">
-              When money goes to the wrong person and nobody shares a language, it is usually gone. Verbo catches
-              the mistake before it happens — and makes it easy to put right after.
+            <p className="mt-6 max-w-xl text-xl text-ink-2">
+              Often, that money is gone. Verbo is a voice-first safety net for PayPal: it helps stop the mistake before
+              it happens, and gives two strangers a way to put it right afterwards.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/send"
+                href="/demo"
                 className="inline-flex min-h-14 items-center justify-center rounded-full bg-evergreen px-7 text-lg font-bold text-evergreen-ink shadow-v transition-transform duration-200 hover:-translate-y-0.5"
               >
-                Try sending by voice
+                Watch a rescue
               </Link>
               <Link
-                href="/desk"
-                className="inline-flex min-h-14 items-center justify-center rounded-full border-2 border-line-strong px-7 text-lg font-bold text-ink transition-colors hover:bg-paper-2"
+                href="/send"
+                className="inline-flex min-h-14 items-center justify-center rounded-full border-2 border-line-strong px-7 text-lg font-bold transition-colors hover:bg-paper-2"
               >
-                Open the Case Desk
+                Try it with your voice
               </Link>
             </div>
           </div>
-
-          {/* Illustrative confirmation card (static preview of the Send screen) */}
-          <figure aria-label="Example confirmation card" className="relative">
-            <div className="rounded-v-lg border border-line bg-card p-6 shadow-v-lg sm:p-8">
-              <p lang="te" className="text-lg text-ink-2">
-                మీరు పంపుతున్నారు
-              </p>
-              <p className="mt-1 text-sm text-ink-3">You are sending</p>
-              <p className="v-digits mt-4 text-ink">
-                $50<span className="text-ink-3">.00</span>
-              </p>
-              <div className="mt-6 rounded-v border border-line bg-paper-2 p-4">
-                <p className="text-sm text-ink-3">to</p>
-                <p className="text-2xl font-bold">Manuel Lopes</p>
-              </div>
-              <div
-                role="note"
-                className="mt-4 flex gap-3 rounded-v border border-marigold/70 bg-marigold-soft p-4 text-marigold-ink"
-              >
-                <span aria-hidden className="text-xl">⚠</span>
-                <p className="text-base">
-                  <strong>Similar name.</strong> You usually pay <strong>Manuel Lopez</strong> (with a z).
-                </p>
-              </div>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <span className="flex min-h-14 items-center justify-center rounded-full border-2 border-line-strong text-lg font-bold">
-                  Cancel
-                </span>
-                <span className="flex min-h-14 items-center justify-center rounded-full bg-evergreen text-lg font-bold text-evergreen-ink">
-                  Yes, send
-                </span>
-              </div>
-            </div>
-            <figcaption className="mt-3 text-center text-sm text-ink-3">
-              Illustration · sandbox demo with synthetic accounts
-            </figcaption>
-          </figure>
+          <HeroCard />
         </section>
 
-        <section aria-labelledby="how" className="border-t border-line py-14">
-          <h2 id="how" className="font-display text-3xl font-semibold tracking-tight">
-            How Verbo works
+        <section aria-label="What Verbo does" className="grid gap-px overflow-hidden rounded-v-lg border border-line bg-line md:grid-cols-3">
+          {ACTS.map((a) => (
+            <article key={a.when} className="bg-card p-7">
+              <p className="text-sm font-bold uppercase tracking-wider text-marigold-ink">{a.when}</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight">{a.title}</h2>
+              <p className="mt-3 text-ink-2">{a.body}</p>
+            </article>
+          ))}
+        </section>
+
+        <section aria-labelledby="money" className="py-14 sm:py-20">
+          <h2 id="money" className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+            AI helps. It never decides money.
           </h2>
-          <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PARTS.map((p) => (
-              <li key={p.n} className="rounded-v-lg border border-line bg-card p-6">
-                <span className="font-display text-lg text-marigold">{p.n}</span>
-                <h3 className="mt-2 text-xl font-bold">{p.title}</h3>
-                <p className="mt-2 text-base text-ink-2">{p.body}</p>
+          <p className="mt-3 max-w-2xl text-lg text-ink-2">
+            If a model invents an amount, code rejects it. If speech blurs Lopez and Lopes, you choose. What you hear back
+            is a fixed sentence, never model output.
+          </p>
+          <ol className="mt-8 grid gap-3 md:grid-cols-5">
+            {PIPELINE.map((p, i) => (
+              <li key={p.who} className={`rounded-v border p-4 ${i >= 2 ? "border-evergreen/40 bg-evergreen-soft" : "border-line bg-card"}`}>
+                <p className="text-lg font-bold">{p.who}</p>
+                <p className="mt-1 text-base text-ink-2">{p.does}</p>
               </li>
             ))}
           </ol>
+          <p className="mt-3 text-sm text-ink-3">Green steps involve no AI model.</p>
+        </section>
+
+        <section aria-label="Language coverage" className="grid gap-6 border-t border-line py-10 sm:grid-cols-2">
+          <p>
+            <span className="v-digits block text-evergreen">{LANGUAGES.length}</span>
+            <span className="mt-2 block text-ink-2">languages to choose from when you speak</span>
+          </p>
+          <p>
+            <span className="v-digits block text-evergreen">{readbacks}</span>
+            <span className="mt-2 block text-ink-2">with a written read-back so far. The rest read back in English.</span>
+          </p>
         </section>
 
         <footer className="border-t border-line py-8 text-sm text-ink-3">
-          Verbo is a hackathon project running on the PayPal <strong>sandbox</strong>. No real money moves. It cannot
-          force a refund — it makes returning money easy and keeps a clear record.
+          Built for the PayPal AI Hackathon. Runs on the PayPal <strong>sandbox</strong>, so no real money moves. Verbo can’t
+          force a refund: it makes returning money easy and keeps a clear record.
         </footer>
       </main>
     </>
