@@ -1,10 +1,13 @@
 "use client";
 /**
- * The microphone for the Send screen. Default: the browser's built-in speech recognition (free, no key).
- * Soniox is used when SPEECH_PROVIDER=soniox, or when the browser has no speech recognition at all.
+ * The microphone for the Send screen. "recorder": we record until the person taps stop, then Whisper writes it down.
+ * "browser": the browser's built-in recognition, which can end on its own. "soniox": needs paid credit.
+ * Falls back to Soniox when the browser has neither recording nor recognition.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSoniox, type MicStatus } from "./useSoniox";
+import { useRecorder } from "./useRecorder";
+import { DEAD_MIC_MESSAGE, watchForDeadMic } from "./recorder";
 import {
   collectTranscript,
   speechErrorMessage,
@@ -13,7 +16,7 @@ import {
   type SpeechRecognitionLike,
 } from "./browser";
 
-export type SpeechProvider = "browser" | "soniox";
+export type SpeechProvider = "recorder" | "browser" | "soniox";
 
 function useBrowserSpeech(language: string) {
   const [status, setStatus] = useState<MicStatus>("idle");
@@ -25,8 +28,11 @@ function useBrowserSpeech(language: string) {
   const ctx = useRef<AudioContext | null>(null);
   const heard = useRef("");
   const failed = useRef(false);
+  const cancelDeadCheck = useRef<(() => void) | null>(null);
 
   const stopMeter = useCallback(() => {
+    cancelDeadCheck.current?.();
+    cancelDeadCheck.current = null;
     stream.current?.getTracks().forEach((t) => t.stop());
     stream.current = null;
     void ctx.current?.close().catch(() => {});
@@ -54,6 +60,12 @@ function useBrowserSpeech(language: string) {
       node.fftSize = 1024;
       audioCtx.createMediaStreamSource(media).connect(node);
       setAnalyser(node);
+      cancelDeadCheck.current = watchForDeadMic(node, () => {
+        failed.current = true;
+        setError(DEAD_MIC_MESSAGE);
+        setStatus("error");
+        rec.current?.abort();
+      });
     } catch {
       // No waveform. Recognition reports its own permission errors.
     }
@@ -125,5 +137,7 @@ export function useSpeech(provider: SpeechProvider, language: string, terms: str
   useEffect(() => setBrowserSupported(Boolean(speechRecognitionCtor(window))), []);
   const browser = useBrowserSpeech(language);
   const soniox = useSoniox(language, terms);
+  const recorder = useRecorder(language, terms);
+  if (provider === "recorder") return recorder;
   return provider === "browser" && browserSupported ? browser : soniox;
 }

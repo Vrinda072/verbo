@@ -168,7 +168,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
             className="mx-auto w-full max-w-xl"
           >
             <label htmlFor="transcript" className="block text-sm font-bold uppercase tracking-wider text-ink-3">
-              {mic.status === "listening" ? "Hearing…" : "What you said (you can edit it)"}
+              {mic.status === "listening" ? "Listening…" : "What you said (you can edit it)"}
             </label>
             <textarea
               id="transcript"

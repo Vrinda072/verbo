@@ -14,8 +14,12 @@ export const config = {
     /** Base URL from PayPal's OpenAPI specs (servers[0]). Verbo is sandbox-only. */
     apiBase: "https://api-m.sandbox.paypal.com",
   },
-  /** Microphone: the browser's free built-in speech recognition, or Soniox (needs paid credit). */
-  speechProvider: (process.env.SPEECH_PROVIDER === "soniox" ? "soniox" : "browser") as "browser" | "soniox",
+  /** Microphone: record + Whisper when GROQ_API_KEY is set; otherwise the browser's own recognition. SPEECH_PROVIDER overrides. */
+  speechProvider: (["recorder", "browser", "soniox"].includes(process.env.SPEECH_PROVIDER ?? "")
+    ? process.env.SPEECH_PROVIDER
+    : process.env.GROQ_API_KEY
+      ? "recorder"
+      : "browser") as "recorder" | "browser" | "soniox",
   /** Risk hold window in minutes (authorization left uncaptured). */
   riskHoldMinutes: Number(process.env.RISK_HOLD_MINUTES || 10),
 } as const;
