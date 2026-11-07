@@ -1,5 +1,29 @@
 # Status
 
+## Nov 7 — Case Desk dashboard on AG Studio
+
+The AG Grid sponsor page asks for "custom widgets, theming, and layout tools, not just AG Grid or AG Charts on their
+own", plus the Studio Agent Framework. The Desk only had plain AG Grid, so it now has a Dashboard tab on AG Studio 3.1.0.
+- **Dashboard:** KPIs, data set filter, outcome and risk charts, and a case grid, all from live Desk data, themed with our
+  tokens in light and dark. It replaces the old KPI and language tiles. The master/detail grid and alerts remain as tabs.
+- **Custom widgets:** recovery by language (in each language's own script) and evidence readiness.
+- **Agent ("Ask the analyst"):** a Verbo Case analyst that delegates to Studio's built-in data, page and widget agents,
+  with two code-calculated tools, `summarise_cases` and `find_stalled_cases`. Calls go through `/api/desk/agent`, so keys
+  stay on the server: Gemini lite models first, then Groq, capped at 60 requests a minute. Its rows carry no names, and
+  none of its tools can reach PayPal.
+- **Tested live with real models:** it answered a question with the right figures (Telugu lowest at 38%, 116 stalled,
+  recomputed separately from the Desk data), refused "refund case SIM-0279", and built a chart with real data on request.
+  Its first attempt at the chart said "added" while the chart was empty, so its instructions now require both the place
+  and configure steps. That fix was tested once; models can still vary, so **rehearse any prompt before showing it live**.
+- **Found live:** Gemini 3 refuses function calls with no thought signature, which breaks on calls Studio makes itself.
+  Those now go as plain context. Free Gemini lite also returned 429s during multi-agent runs; the fallback handled them.
+- **Checks:** 144 tests pass; production build passes; a scan of the 57 browser files found none of the 5 secrets checked.
+- **Limits:** without a trial key Studio shows a watermark and console notices. AG's docs say AI features need a key that
+  includes AI, but it ran locally without one. Production behaviour is untested. Studio has a 720px minimum, so the
+  dashboard scrolls sideways inside its frame on phones. Agent-made changes are not saved across reloads.
+- **Not yet done:** the "Edit dashboard" builder was seen but not exercised, and custom widgets have no `formatShape`/`ai`
+  metadata yet, so the agent can't configure them, per AG's docs.
+
 ## Nov 7 — professional style and neutral copy
 
 Vrinda asked for nothing corny: professional and nice.
