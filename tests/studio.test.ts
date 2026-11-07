@@ -61,14 +61,14 @@ describe("case summary for the agent", () => {
     const all = summariseCases(rows);
     expect(all.dataset).toContain("simulated");
     expect([all.cases, all.open, all.resolved, all.returned]).toEqual([4, 1, 3, 2]);
-    expect(all.returnRatePercent).toBe(67);
+    expect(all.returnedOfResolvedPercent).toBe(67);
   });
 
   it("limits to one data set and gives each language its own rate", () => {
     const sim = summariseCases(rows, "Simulated");
     expect(sim.cases).toBe(3);
-    expect(sim.byLanguage.find((l) => l.language === "Portuguese")?.returnRatePercent).toBe(50);
-    expect(sim.byLanguage.find((l) => l.language === "Hindi")?.returnRatePercent).toBeNull();
+    expect(sim.byLanguage.find((l) => l.language === "Portuguese")?.returnedOfResolvedPercent).toBe(50);
+    expect(sim.byLanguage.find((l) => l.language === "Hindi")?.returnedOfResolvedPercent).toBeNull();
     expect(summariseCases(rows, "Live sandbox").cases).toBe(1);
   });
 });

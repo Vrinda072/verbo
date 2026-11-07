@@ -15,12 +15,19 @@ own", plus the Studio Agent Framework. The Desk only had plain AG Grid, so it no
   recomputed separately from the Desk data), refused "refund case SIM-0279", and built a chart with real data on request.
   Its first attempt at the chart said "added" while the chart was empty, so its instructions now require both the place
   and configure steps. That fix was tested once; models can still vary, so **rehearse any prompt before showing it live**.
+- **Misleading answer found and fixed:** it said "114 returned out of 300, giving 63%", when 63% is a share of resolved cases.
+  The field is now `returnedOfResolvedPercent` and the instructions require quoting the resolved count.
 - **Found live:** Gemini 3 refuses function calls with no thought signature, which breaks on calls Studio makes itself.
   Those now go as plain context. Free Gemini lite also returned 429s during multi-agent runs; the fallback handled them.
 - **Checks:** 144 tests pass; production build passes; a scan of the 57 browser files found none of the 5 secrets checked.
-- **Limits:** without a trial key Studio shows a watermark and console notices. AG's docs say AI features need a key that
-  includes AI, but it ran locally without one. Production behaviour is untested. Studio has a 720px minimum, so the
-  dashboard scrolls sideways inside its frame on phones. Agent-made changes are not saved across reloads.
+- **Licence:** Vrinda's AG Studio Pro trial key is in `.env` as `AG_STUDIO_LICENSE_KEY`. On the Dashboard tab, a fresh tab
+  shows no licence errors, watermarks are hidden and the agent works. **It does not cover the standalone Recovery cases and
+  alerts grids:** AG Grid reports "Invalid License Key" if given this key, so that setting stays empty and those grids log
+  "License Key Not Found" until a separate AG Grid key is added. The key deactivates Dec 19, 2026, after judging ends
+  (Dec 15). It says "evaluation only, use in production is not permitted", so ask AG Grid on the PayPal Discord whether a
+  public judging demo is fine before deploying. Deployment needs the same variable on Render.
+- **Limits:** Studio has a 720px minimum, so the dashboard scrolls sideways inside its frame on phones. Agent-made changes
+  are not saved across reloads.
 - **Not yet done:** the "Edit dashboard" builder was seen but not exercised, and custom widgets have no `formatShape`/`ai`
   metadata yet, so the agent can't configure them, per AG's docs.
 

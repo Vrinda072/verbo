@@ -85,9 +85,9 @@ export interface CaseSummary {
   resolved: number;
   returned: number;
   escalated: number;
-  /** Returned as a share of resolved cases, or null when none are resolved. */
-  returnRatePercent: number | null;
-  byLanguage: { language: string; cases: number; resolved: number; returned: number; returnRatePercent: number | null }[];
+  /** Returned as a share of resolved cases, not of all cases, or null when none are resolved. */
+  returnedOfResolvedPercent: number | null;
+  byLanguage: { language: string; cases: number; resolved: number; returned: number; returnedOfResolvedPercent: number | null }[];
 }
 
 const rate = (returned: number, resolved: number) => (resolved ? Math.round((returned / resolved) * 100) : null);
@@ -111,9 +111,9 @@ export function summariseCases(rows: StudioCaseRow[], dataset?: string): CaseSum
     resolved: add("resolved"),
     returned: add("returned"),
     escalated: add("escalated"),
-    returnRatePercent: rate(add("returned"), add("resolved")),
+    returnedOfResolvedPercent: rate(add("returned"), add("resolved")),
     byLanguage: [...languages.entries()]
-      .map(([language, l]) => ({ language, ...l, returnRatePercent: rate(l.returned, l.resolved) }))
+      .map(([language, l]) => ({ language, ...l, returnedOfResolvedPercent: rate(l.returned, l.resolved) }))
       .sort((a, b) => b.cases - a.cases),
   };
 }
