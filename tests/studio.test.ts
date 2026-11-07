@@ -8,6 +8,15 @@ const row = (over: Partial<DeskRow>): DeskRow => ({
   recipientLanguage: "pt", riskLevel: "high", openedAt: "", updatedAt: "", ageHours: 72, lastEvent: null, remindersSent: 0, messages: 2, evidence: 85, everReturned: false, ...over,
 });
 
+describe("request cap for AI routes", () => {
+  it("allows up to the limit, keeps buckets apart, and frees up after a minute", async () => {
+    const { overLimit } = await import("@/lib/rateLimit");
+    expect([overLimit("t", 2, 0), overLimit("t", 2, 1), overLimit("t", 2, 2)]).toEqual([false, false, true]);
+    expect(overLimit("other", 2, 2)).toBe(false);
+    expect(overLimit("t", 2, 60_001)).toBe(false);
+  });
+});
+
 describe("Case Desk data for AG Studio", () => {
   it("labels simulated rows, converts money and carries no personal names", () => {
     const [r] = toStudioRows([row({})]);

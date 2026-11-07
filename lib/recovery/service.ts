@@ -169,7 +169,11 @@ export async function handleReturnApproval(orderId: string, now = new Date()): P
 /** Simulated clock: reminders at 24 h, escalation at 72 h. Returns what happened. */
 export async function processTimers(now = new Date()) {
   const db = await getDb();
-  const open = await db.select().from(schema.cases).where(inArray(schema.cases.state, [...OPEN_STATES]));
+  // Live cases only: simulated demo cases keep the states they were seeded with, or the Desk's figures would drift hourly.
+  const open = await db
+    .select()
+    .from(schema.cases)
+    .where(and(inArray(schema.cases.state, [...OPEN_STATES]), eq(schema.cases.simulated, 0)));
   const done: { caseId: string; event: string }[] = [];
   for (const c of open) {
     const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, remindersSent: c.remindersSent, now });

@@ -34,6 +34,15 @@ beforeAll(async () => {
   await getDb();
 }, 30_000);
 
+describe("scheduled timers", () => {
+  it("leave simulated cases exactly as seeded", async () => {
+    const { seedDesk } = await import("@/lib/desk/seed");
+    await seedDesk();
+    const done = await processTimers(new Date(Date.now() + 365 * 24 * 3_600_000));
+    expect(done.filter((d) => d.caseId.startsWith("case_SIM"))).toEqual([]);
+  });
+});
+
 describe("recovery (mock PayPal, in-memory DB)", () => {
   it("full happy path: open → link → view → reply → return → RETURNED, sender paid back", async () => {
     const sent = await mistakenPayment();

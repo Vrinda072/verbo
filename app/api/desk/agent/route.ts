@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { log } from "@/lib/log";
+import { overLimit } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -24,17 +25,6 @@ const Body = z.object({
 });
 
 const MAX_BYTES = 2_000_000;
-const PER_MINUTE = 60;
-const g = globalThis as unknown as { __verboAgentCalls?: number[] };
-
-/** Free quotas are shared, so a public page can't be allowed to spend them freely. */
-function overLimit(now = Date.now()): boolean {
-  const recent = (g.__verboAgentCalls ?? []).filter((t) => now - t < 60_000);
-  g.__verboAgentCalls = recent;
-  if (recent.length >= PER_MINUTE) return true;
-  recent.push(now);
-  return false;
-}
 
 export async function POST(req: Request) {
   const raw = await req.text();
@@ -47,7 +37,7 @@ export async function POST(req: Request) {
   }
   const parsed = Body.safeParse(json);
   if (!parsed.success) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
-  if (overLimit()) return NextResponse.json({ error: "busy" }, { status: 429 });
+  if (overLimit("desk-agent", 60)) return NextResponse.json({ error: "busy" }, { status: 429 });
 
   const targets = TARGETS().filter((t) => t.key);
   if (!targets.length) return NextResponse.json({ error: "not_configured" }, { status: 503 });

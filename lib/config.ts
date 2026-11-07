@@ -6,7 +6,7 @@ export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME
 
 export const config = {
   appName: APP_NAME,
-  baseUrl: process.env.APP_BASE_URL || "http://localhost:3000",
+  baseUrl: process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:3000",
   /** MOCK=1 swaps PayPal / speech / LLM clients for deterministic fakes. Default ON. */
   mock: (process.env.MOCK ?? "1") !== "0",
   paypal: {
