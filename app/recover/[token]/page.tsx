@@ -39,7 +39,7 @@ export default async function RecoverPage({
     return (
       <main id="main" className="mx-auto max-w-lg px-4 py-16 text-center">
         <Logo />
-        <h1 lang={L.usedLang} dir={L.dir} className="mt-8 font-display text-3xl font-semibold">
+        <h1 lang={L.usedLang} dir={L.dir} className="mt-8 text-2xl font-semibold">
           {L.t("rc_expired")}
         </h1>
         {L.usedLang !== "en" && <p className="mt-2 text-ink-3">{labelsFor("en").t("rc_expired")}</p>}

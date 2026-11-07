@@ -1,5 +1,17 @@
 # Status
 
+## Nov 7 — professional style and neutral copy
+
+Vrinda asked for nothing corny: professional and nice.
+- **Visual style:** replaced the cream paper, serif headings and pill buttons with neutral surfaces, Inter throughout,
+  squarer controls and quieter shadows. Colours stay in the `--v-*` tokens; `CLAUDE.md` records the new direction.
+- **Copy:** homepage, walkthrough, Send and the English templates now use plain, neutral wording. Only the English
+  templates changed, so `hold_notice`, `pressure` and `rc_choice` no longer match the other five languages word for word.
+- **Checked by eye:** homepage, Send, walkthrough and Case Desk at desktop width in light and dark, except the walkthrough
+  and Send's idle screen, which were seen in dark only. Not rechecked at phone width after this restyle.
+- **Atkinson Hyperlegible was removed.** It was chosen for low-vision readers, so the accessibility pass should recheck
+  legibility with Inter.
+
 ## Nov 6 — making it feel like a product
 
 Vrinda said it felt rusty and not like a hackathon project. Deployment, sandbox and other submission work are deferred at

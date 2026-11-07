@@ -71,11 +71,11 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                 <circle cx="24" cy="24" r="22" fill="var(--v-evergreen-soft)" />
                 <path d="M14 25l7 7 13-15" fill="none" stroke="var(--v-evergreen)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <h1 className="mt-3 font-display text-3xl font-semibold text-evergreen">{L.t("rc_returned", { sender: v.senderName })}</h1>
+              <h1 className="mt-3 text-2xl font-semibold text-evergreen">{L.t("rc_returned", { sender: v.senderName })}</h1>
             </div>
           ) : (
             <>
-              <h1 className="font-display text-3xl font-semibold leading-tight">{L.t("rc_title")}</h1>
+              <h1 className="text-2xl font-semibold leading-tight">{L.t("rc_title")}</h1>
               <p className="mt-3 text-xl text-ink-2">{L.t("rc_body", { sender: v.senderName, amount: amount.localized })}</p>
               <p dir="ltr" className="v-digits mt-6 text-center" aria-hidden>
                 ${whole}
@@ -93,7 +93,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                 type="button"
                 onClick={() => act("return")}
                 disabled={busy !== null || Boolean(returning && v.returnState !== "CREATED")}
-                className="mt-6 min-h-16 w-full rounded-full bg-evergreen px-8 text-xl font-bold text-evergreen-ink shadow-v transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                className="mt-6 min-h-16 w-full rounded-v bg-evergreen px-8 text-xl font-bold text-evergreen-ink shadow-v transition-transform hover:opacity-90 disabled:opacity-60"
               >
                 {busy === "return" ? "…" : L.t("rc_return")}
               </button>
@@ -155,9 +155,9 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
               onChange={(e) => setDraft(e.target.value)}
               placeholder={L.t("rc_placeholder")}
               maxLength={1000}
-              className="min-h-12 flex-1 rounded-full border-2 border-line bg-card px-5 outline-none focus:border-sky"
+              className="min-h-12 flex-1 rounded-v border-2 border-line bg-card px-5 outline-none focus:border-sky"
             />
-            <button type="submit" disabled={!draft.trim() || busy !== null} className="min-h-12 rounded-full bg-ink px-5 font-bold text-paper disabled:opacity-40">
+            <button type="submit" disabled={!draft.trim() || busy !== null} className="min-h-12 rounded-v bg-ink px-5 font-bold text-paper disabled:opacity-40">
               {L.t("rc_send")}
             </button>
           </form>

@@ -1,7 +1,7 @@
 # Evaluation — scripted scenarios
 
 **What this is:** 68 scenarios written by the Verbo team (`evals/scenarios.ts`),
-run by `npm run eval` on 2026-11-06. They check that Verbo behaves the way we intended on cases we chose.
+run by `npm run eval` on 2026-11-07. They check that Verbo behaves the way we intended on cases we chose.
 **What this is not:** a measure of real-world accuracy. No real users, no real voice audio, no fraud data.
 
 Extractor: **rule-based parser (offline)**.

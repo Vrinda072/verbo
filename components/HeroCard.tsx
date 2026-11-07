@@ -37,8 +37,8 @@ export function HeroCard() {
           {L.t("lookalike", VARS)}
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3" lang={L.usedLang} dir={L.dir}>
-          <span className="flex min-h-14 items-center justify-center rounded-full border-2 border-line-strong px-3 text-center font-bold">{L.t("cancel")}</span>
-          <span className="flex min-h-14 items-center justify-center rounded-full bg-evergreen px-3 text-center font-bold text-evergreen-ink">{L.t("confirm")}</span>
+          <span className="flex min-h-14 items-center justify-center rounded-v border-2 border-line-strong px-3 text-center font-bold">{L.t("cancel")}</span>
+          <span className="flex min-h-14 items-center justify-center rounded-v bg-evergreen px-3 text-center font-bold text-evergreen-ink">{L.t("confirm")}</span>
         </div>
       </div>
       <figcaption className="mt-3 text-center text-sm text-ink-3">Example with simulated people. Translations are machine-made and not yet reviewed.</figcaption>

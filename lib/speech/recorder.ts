@@ -48,13 +48,13 @@ export function micErrorMessage(errorName: string): string {
 export function transcribeErrorMessage(code: string | undefined): string {
   switch (code) {
     case "empty":
-      return "I didn’t catch any words. Tap the microphone and try again.";
+      return "No speech was detected. Please try again.";
     case "busy":
       return "The speech service is busy. Wait a moment and try again.";
     case "not_configured":
-      return "Speech isn’t set up on this server yet.";
+      return "Speech is not configured on this server.";
     default:
-      return "Your words couldn’t be written down just now.";
+      return "Transcription failed. Please try again or type the payment.";
   }
 }
 

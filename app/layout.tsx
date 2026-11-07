@@ -1,39 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible, Fraunces } from "next/font/google";
+import { Inter } from "next/font/google";
 import { APP_NAME } from "@/lib/config";
 import "./globals.css";
 
-/** Atkinson Hyperlegible: designed for low-vision readers — fits Verbo's audience. */
-const atkinson = Atkinson_Hyperlegible({
+/** Inter: clear at small sizes, with distinct numerals for amounts. Other scripts fall back to Noto or system fonts. */
+const inter = Inter({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "700"],
-  variable: "--font-atkinson",
-  display: "swap",
-});
-
-/** Fraunces: warm display serif for headings and the big confirmation digits. */
-const fraunces = Fraunces({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-fraunces",
+  variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: { default: `${APP_NAME} — send safely, in your language`, template: `%s · ${APP_NAME}` },
+  title: { default: `${APP_NAME}: voice payments with safety checks`, template: `%s · ${APP_NAME}` },
   description:
-    "A voice-first safety net for person-to-person payments: speak in your language, catch look-alike recipients, and recover mistaken payments across language barriers.",
+    "Voice payments on PayPal with read-back in the sender's language, recipient and risk checks, and recovery for payments sent to the wrong person.",
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf7f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#16140f" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f7f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c1117" },
   ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${atkinson.variable} ${fraunces.variable}`}>
+    <html lang="en" className={inter.variable}>
       <body className="min-h-dvh bg-paper text-ink antialiased">
         <a
           href="#main"

@@ -1,44 +1,43 @@
 @import "tailwindcss";
 
 /*
- * Verbo design tokens — direction: "warm paper & ink".
- * Calm, trustworthy, human: cream paper, deep ink, a steady evergreen for "safe / confirm",
- * marigold for warmth and attention, terracotta for danger. Large type by default.
- * Use these tokens (or their Tailwind aliases below) everywhere. No ad-hoc hex in components.
+ * Verbo design tokens. Direction: clean, professional fintech. Neutral surfaces, one restrained green for
+ * "safe / confirm", amber for attention, red for danger. Use these tokens (or their Tailwind aliases below)
+ * everywhere. No ad-hoc hex in components.
  */
 :root {
-  /* colour — surfaces */
-  --v-paper: #fbf7f0;
-  --v-paper-2: #f4ede1;
-  --v-card: #fffdf9;
-  --v-line: #e4d9c7;
-  --v-line-strong: #c9b99f;
-  /* colour — text */
-  --v-ink: #1d1a16;
-  --v-ink-2: #4a443b;
-  --v-ink-3: #6f665a; /* ≥4.5:1 on paper */
-  /* colour — brand & semantic */
-  --v-evergreen: #1e5a4b;
+  /* colour: surfaces */
+  --v-paper: #f6f7f9;
+  --v-paper-2: #eef0f3;
+  --v-card: #ffffff;
+  --v-line: #e1e4e9;
+  --v-line-strong: #c4cad2;
+  /* colour: text */
+  --v-ink: #101828;
+  --v-ink-2: #344054;
+  --v-ink-3: #596477; /* >=4.5:1 on paper */
+  /* colour: brand & semantic */
+  --v-evergreen: #0b6b5a;
   --v-evergreen-ink: #ffffff;
-  --v-evergreen-soft: #dcebe4;
-  --v-marigold: #e3a03a;
-  --v-marigold-ink: #2a1c05;
-  --v-marigold-soft: #fbecd2;
-  --v-terracotta: #a8432c;
-  --v-terracotta-soft: #f6dfd7;
-  --v-sky: #2f5f8a;
-  --v-sky-soft: #dfe9f2;
-  --v-focus: #2f5f8a;
+  --v-evergreen-soft: #e3f3ef;
+  --v-marigold: #b54708;
+  --v-marigold-ink: #7a2e0e;
+  --v-marigold-soft: #fef4e6;
+  --v-terracotta: #b42318;
+  --v-terracotta-soft: #fdecea;
+  --v-sky: #175cd3;
+  --v-sky-soft: #eaf1fd;
+  --v-focus: #175cd3;
 
-  /* type scale (1.25 major third, base 18px for readability) */
-  --v-text-xs: 0.875rem;
-  --v-text-sm: 1rem;
-  --v-text-base: 1.125rem;
-  --v-text-lg: 1.375rem;
-  --v-text-xl: 1.75rem;
-  --v-text-2xl: 2.25rem;
-  --v-text-3xl: 3rem;
-  --v-text-digits: 4.5rem; /* confirmation amounts */
+  /* type scale */
+  --v-text-xs: 0.8125rem;
+  --v-text-sm: 0.9375rem;
+  --v-text-base: 1.0625rem;
+  --v-text-lg: 1.25rem;
+  --v-text-xl: 1.5rem;
+  --v-text-2xl: 2rem;
+  --v-text-3xl: 2.5rem;
+  --v-text-digits: 3.5rem; /* confirmation amounts */
 
   /* spacing (4px grid) */
   --v-space-1: 0.25rem;
@@ -51,39 +50,39 @@
   --v-space-16: 4rem;
 
   /* radius & elevation */
-  --v-radius-sm: 8px;
-  --v-radius: 14px;
-  --v-radius-lg: 22px;
+  --v-radius-sm: 6px;
+  --v-radius: 8px;
+  --v-radius-lg: 12px;
   --v-radius-pill: 999px;
-  --v-shadow: 0 1px 2px rgb(60 40 10 / 0.06), 0 8px 24px -12px rgb(60 40 10 / 0.18);
-  --v-shadow-lg: 0 2px 4px rgb(60 40 10 / 0.06), 0 24px 48px -20px rgb(60 40 10 / 0.28);
+  --v-shadow: 0 1px 2px rgb(16 24 40 / 0.06);
+  --v-shadow-lg: 0 1px 3px rgb(16 24 40 / 0.08), 0 8px 24px -8px rgb(16 24 40 / 0.12);
 
   /* motion */
   --v-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --v-dur: 220ms;
+  --v-dur: 200ms;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --v-paper: #16140f;
-    --v-paper-2: #1e1b15;
-    --v-card: #221f18;
-    --v-line: #39332a;
-    --v-line-strong: #51483b;
-    --v-ink: #f5efe4;
-    --v-ink-2: #d6cdbd;
-    --v-ink-3: #ab9f8c;
-    --v-evergreen: #5fb59b;
-    --v-evergreen-ink: #0d1f19;
-    --v-evergreen-soft: #1c3a31;
-    --v-marigold: #f0b555;
-    --v-marigold-soft: #3a2d15;
-    --v-marigold-ink: #fbe6c2;
-    --v-terracotta: #e07a62;
-    --v-terracotta-soft: #3b211a;
-    --v-sky: #8cb7dd;
-    --v-sky-soft: #1d2b38;
-    --v-focus: #8cb7dd;
+    --v-paper: #0c1117;
+    --v-paper-2: #131a22;
+    --v-card: #151c25;
+    --v-line: #25303c;
+    --v-line-strong: #3a4756;
+    --v-ink: #f2f5f8;
+    --v-ink-2: #cdd5df;
+    --v-ink-3: #98a4b3;
+    --v-evergreen: #3ec6a6;
+    --v-evergreen-ink: #06251d;
+    --v-evergreen-soft: #0f2f29;
+    --v-marigold: #f5a94a;
+    --v-marigold-soft: #33240f;
+    --v-marigold-ink: #fcdcae;
+    --v-terracotta: #f47f72;
+    --v-terracotta-soft: #36191a;
+    --v-sky: #84adf5;
+    --v-sky-soft: #15233a;
+    --v-focus: #84adf5;
   }
 }
 
@@ -107,8 +106,8 @@
   --color-sky: var(--v-sky);
   --color-sky-soft: var(--v-sky-soft);
 
-  --font-sans: var(--font-atkinson), "Noto Sans", system-ui, sans-serif;
-  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter), "Noto Sans", system-ui, sans-serif;
+  --font-display: var(--font-inter), "Noto Sans", system-ui, sans-serif;
 
   --text-digits: var(--v-text-digits);
   --radius-v: var(--v-radius);
@@ -128,6 +127,7 @@ body {
   font-family: var(--font-sans);
   font-size: var(--v-text-base);
   line-height: 1.55;
+  font-feature-settings: "tnum" 0, "cv11" 1;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -141,8 +141,9 @@ body {
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums lining-nums;
   font-size: var(--v-text-digits);
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 /* listening ring around the mic */

@@ -47,7 +47,7 @@ export default async function PayPalReturn({ searchParams }: { searchParams: Pro
       ) : (
         <EmptyState
           eyebrow="Sandbox"
-          title="Thank you — approval received"
+          title="Approval received"
           body="You can close this tab and go back to Verbo. Nothing more is needed here."
         />
       )}
