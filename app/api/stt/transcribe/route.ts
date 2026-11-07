@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { log } from "@/lib/log";
+import { overLimit } from "@/lib/rateLimit";
 import { TranscribeFailed, transcribe } from "@/lib/speech/transcribe";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid_request" }, { status: 400 });
   }
   if (!audio.size || audio.size > MAX_BYTES) return NextResponse.json({ error: "invalid_request" }, { status: 413 });
+  if (overLimit("transcribe", 15)) return NextResponse.json({ error: "busy" }, { status: 503 });
   try {
     const text = await transcribe({ audio, fileName: audio.name, language });
     return NextResponse.json({ text });

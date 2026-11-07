@@ -1,5 +1,24 @@
 # Status
 
+## Nov 7 — ready to deploy on Render
+
+- **Added:** `render.yaml` (web, Postgres, hourly reminders and escalations) and `docs/DEPLOY.md`. **Not deployed yet:** it
+  needs Vrinda's Render account, and secrets are entered in Render's dashboard.
+- **Why paid plans:** Render's free Postgres expires after 30 days, before judging ends on Dec 15; its free web service
+  sleeps after 15 idle minutes. Prices were not confirmed against the $50 credit.
+- **Rehearsal:** the blueprint passes Render's schema with 0 errors. The production build ran locally, then `next start`
+  against a throwaway in-memory database over the Postgres protocol using the real node-postgres driver: migrations, seed,
+  mock-money send, recovery link, translated message, evidence, agent route and the hourly job. This was PGlite's socket
+  server, not an actual Render Postgres.
+- **Bug caught by the rehearsal:** the hourly job escalated simulated cases, which would have changed the Desk's figures
+  within an hour. Timers now apply to live cases only, with a test.
+- **Added:** request caps on the public AI routes: transcribe 15, understand 30 and agent 60 a minute, shared across
+  visitors. Over the limit, people see the "busy" message.
+- **Deliberately starts with `MOCK=1`:** real sandbox hold and recovery have not yet run through the app. Mock payments live in
+  the web process's memory, so a restart during a mock payment loses it.
+- **Open:** whether the AG Studio trial's "use in production is not permitted" allows a public judging demo. Ask AG Grid on
+  the PayPal Discord. Render Workflows is not used, and only one sponsor prize can be won.
+
 ## Nov 7 — Case Desk dashboard on AG Studio
 
 The AG Grid sponsor page asks for "custom widgets, theming, and layout tools, not just AG Grid or AG Charts on their

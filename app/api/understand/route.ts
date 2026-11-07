@@ -5,6 +5,7 @@ import { ExtractionFailed } from "@/lib/agents/extraction/anthropic";
 import { formatAmount, labelsFor } from "@/lib/bridge/readback";
 import { CONTACTS } from "@/lib/contacts";
 import { log } from "@/lib/log";
+import { overLimit } from "@/lib/rateLimit";
 import { createDraft, summarizeRisk } from "@/lib/transfers/service";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
+  if (overLimit("understand", 30)) return NextResponse.json({ error: "busy" }, { status: 503 });
   const { transcript, language } = parsed.data;
   const chosen = CONTACTS.find((c) => c.name === parsed.data.chosenRecipient)?.name;
   try {
