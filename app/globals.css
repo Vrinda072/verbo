@@ -153,6 +153,23 @@ body {
 }
 .v-pulse { animation: v-pulse 1.4s var(--v-ease) infinite; }
 
+/* AG Studio charts use Verbo's colours. Source: AG Studio theming docs, CSS variables --ag-chart-palette-fills-N-color. */
+.v-studio > div {
+  height: 100%; /* Studio's wrapper otherwise stays at its 600px minimum */
+}
+.v-studio {
+  --ag-chart-palette-fills-1-color: var(--v-evergreen);
+  --ag-chart-palette-fills-2-color: var(--v-sky);
+  --ag-chart-palette-fills-3-color: var(--v-marigold);
+  --ag-chart-palette-fills-4-color: var(--v-terracotta);
+  --ag-chart-palette-fills-5-color: var(--v-ink-3);
+  --ag-chart-palette-strokes-1-color: var(--v-evergreen);
+  --ag-chart-palette-strokes-2-color: var(--v-sky);
+  --ag-chart-palette-strokes-3-color: var(--v-marigold);
+  --ag-chart-palette-strokes-4-color: var(--v-terracotta);
+  --ag-chart-palette-strokes-5-color: var(--v-ink-3);
+}
+
 /* recording bars: shows the mic is on, not how loud it is */
 @keyframes v-bar {
   0%, 100% { transform: scaleY(0.25); }

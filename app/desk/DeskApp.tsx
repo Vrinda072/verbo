@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AgGridReact, type CustomCellRendererProps } from "ag-grid-react";
 import type { ColDef, GetRowIdParams } from "ag-grid-community";
@@ -9,8 +10,12 @@ import { CaseDetail } from "./CaseDetail";
 
 registerGrid();
 
-const OPEN = new Set(["OPENED", "LINK_SENT", "VIEWED", "REPLIED"]);
-const RESOLVED = new Set(["RETURNED", "REFUSED", "ESCALATED", "CLOSED"]);
+// Studio needs the browser, so it isn't server-rendered.
+const StudioDashboard = dynamic(() => import("./studio/StudioDashboard"), {
+  ssr: false,
+  loading: () => <p className="py-20 text-center text-ink-3">Loading dashboard…</p>,
+});
+
 const lang = (c: string) => LANGUAGES.find((l) => l.code === c);
 const usd = (c: number) => `$${(c / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -71,8 +76,7 @@ function LangPair({ data }: CustomCellRendererProps<DeskRow>) {
 export function DeskApp() {
   const [rows, setRows] = useState<DeskRow[] | null>(null);
   const [alerts, setAlerts] = useState<AlertRow[]>([]);
-  const [tab, setTab] = useState<"cases" | "alerts">("cases");
-  const [langFilter, setLangFilter] = useState<string | null>(null);
+  const [tab, setTab] = useState<"dashboard" | "cases" | "alerts">("dashboard");
   const [scope, setScope] = useState<"all" | "live" | "sim">("all");
   const [quick, setQuick] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -81,8 +85,9 @@ export function DeskApp() {
     try {
       const r = await fetch("/api/desk", { cache: "no-store" });
       const j = await r.json();
-      setRows(j.rows);
-      setAlerts(j.alerts);
+      // Keep the same arrays when nothing changed, so the dashboard and grids don't redraw on every poll.
+      setRows((old) => (JSON.stringify(old) === JSON.stringify(j.rows) ? old : j.rows));
+      setAlerts((old) => (JSON.stringify(old) === JSON.stringify(j.alerts) ? old : j.alerts));
     } catch {
       setError("Couldn’t load cases.");
     }
@@ -98,35 +103,9 @@ export function DeskApp() {
     () => (rows ?? []).filter((r) => (scope === "all" ? true : scope === "live" ? !r.simulated : r.simulated)),
     [rows, scope],
   );
-  const visible = useMemo(() => (langFilter ? scoped.filter((r) => r.recipientLanguage === langFilter) : scoped), [scoped, langFilter]);
 
-  const kpi = useMemo(() => {
-    const resolved = scoped.filter((r) => RESOLVED.has(r.state));
-    const returned = scoped.filter((r) => r.everReturned);
-    const ev = [...scoped.map((r) => r.evidence)].sort((a, b) => a - b);
-    return {
-      total: scoped.length,
-      open: scoped.filter((r) => OPEN.has(r.state)).length,
-      returned: returned.length,
-      escalated: scoped.filter((r) => r.state === "ESCALATED").length,
-      returnShare: resolved.length ? Math.round((returned.length / resolved.length) * 100) : null,
-      medianEvidence: ev.length ? ev[Math.floor(ev.length / 2)] : null,
-      live: (rows ?? []).filter((r) => !r.simulated).length,
-      sim: (rows ?? []).filter((r) => r.simulated).length,
-    };
-  }, [scoped, rows]);
-
-  const tiles = useMemo(() => {
-    const by = new Map<string, { n: number; ret: number; res: number }>();
-    for (const r of scoped) {
-      const t = by.get(r.recipientLanguage) ?? { n: 0, ret: 0, res: 0 };
-      t.n++;
-      if (r.everReturned) t.ret++;
-      if (RESOLVED.has(r.state)) t.res++;
-      by.set(r.recipientLanguage, t);
-    }
-    return [...by.entries()].sort((a, b) => b[1].n - a[1].n).slice(0, 10);
-  }, [scoped]);
+  const live = (rows ?? []).filter((r) => !r.simulated).length;
+  const sim = (rows ?? []).length - live;
 
   const columns = useMemo<ColDef<DeskRow>[]>(
     () => [
@@ -167,8 +146,8 @@ export function DeskApp() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Case Desk</h1>
           <p className="mt-1 text-ink-2">
-            {kpi.live} live sandbox case{kpi.live === 1 ? "" : "s"} ·{" "}
-            <strong className="text-marigold-ink">{kpi.sim} simulated cases (synthetic data, for demonstration)</strong>
+            {live} live sandbox case{live === 1 ? "" : "s"} ·{" "}
+            <strong className="text-marigold-ink">{sim} simulated cases (synthetic data, for demonstration)</strong>
           </p>
         </div>
         <div role="group" aria-label="Which cases" className="flex rounded-full border-2 border-line bg-card p-1">
@@ -186,59 +165,12 @@ export function DeskApp() {
         </div>
       </div>
 
-      {/* KPI tiles */}
-      <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Kpi label="Cases" value={kpi.total} />
-        <Kpi label="Open" value={kpi.open} tone="sky" />
-        <Kpi label="Returned" value={kpi.returned} tone="evergreen" hint={kpi.returnShare != null ? `${kpi.returnShare}% of resolved` : undefined} />
-        <Kpi label="Escalated" value={kpi.escalated} tone="terracotta" />
-        <Kpi label="Median evidence" value={kpi.medianEvidence ?? "—"} hint="out of 100" />
-      </div>
-      {scope !== "live" && <p className="mt-2 text-xs text-ink-3">Figures that include simulated cases describe synthetic data, not real outcomes.</p>}
-
-      {/* Language tiles */}
-      <section aria-labelledby="lang-tiles" className="mt-6">
-        <div className="flex items-center justify-between">
-          <h2 id="lang-tiles" className="text-sm font-bold uppercase tracking-wider text-ink-3">
-            Recipient languages
-          </h2>
-          {langFilter && (
-            <button type="button" onClick={() => setLangFilter(null)} className="text-sm font-bold text-sky underline">
-              Clear filter
-            </button>
-          )}
-        </div>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
-          {tiles.map(([code, t]) => {
-            const L = lang(code);
-            const active = langFilter === code;
-            return (
-              <button
-                key={code}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setLangFilter(active ? null : code)}
-                className={`rounded-v border p-3 text-left transition-colors ${active ? "border-evergreen bg-evergreen-soft" : "border-line bg-card hover:bg-paper-2"}`}
-              >
-                <span lang={code} dir={L?.dir} className="block text-lg font-bold">
-                  {L?.nativeName ?? code}
-                </span>
-                <span className="block text-xs text-ink-3">{L?.englishName}</span>
-                <span className="mt-1 block text-sm">
-                  <strong className="tabular-nums">{t.n}</strong> cases
-                  {t.res ? <span className="text-ink-3"> · {Math.round((t.ret / t.res) * 100)}% returned</span> : null}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Tabs */}
-      <div role="tablist" aria-label="Desk views" className="mt-8 flex gap-2 border-b border-line">
+      <div role="tablist" aria-label="Desk views" className="mt-8 flex flex-wrap items-end gap-x-2 border-b border-line">
         {(
           [
-            ["cases", `Recovery cases (${visible.length})`],
+            ["dashboard", "Dashboard"],
+            ["cases", `Recovery cases (${scoped.length})`],
             ["alerts", `Pre-send alerts (${alerts.length})`],
           ] as const
         ).map(([id, label]) => (
@@ -247,12 +179,12 @@ export function DeskApp() {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={`-mb-px border-b-4 px-4 py-2 font-bold ${tab === id ? "border-evergreen text-ink" : "border-transparent text-ink-3"}`}
+            className={`-mb-px whitespace-nowrap border-b-4 px-3 py-2 font-bold sm:px-4 ${tab === id ? "border-evergreen text-ink" : "border-transparent text-ink-3"}`}
           >
             {label}
           </button>
         ))}
-        <label className="ml-auto self-center">
+        <label className={`ml-auto self-center ${tab === "dashboard" ? "invisible" : ""}`}>
           <span className="sr-only">Search cases</span>
           <input
             value={quick}
@@ -265,11 +197,13 @@ export function DeskApp() {
 
       {error && <p role="alert" className="mt-4 text-terracotta">{error}</p>}
 
-      <div className="mt-4 h-[640px]">
-        {tab === "cases" ? (
+      {tab === "dashboard" && <div className="mt-4">{rows ? <StudioDashboard key={scope} rows={scoped} /> : <p className="py-20 text-center text-ink-3">Loading cases…</p>}</div>}
+
+      <div className={`mt-4 h-[640px] ${tab === "dashboard" ? "hidden" : ""}`}>
+        {tab === "dashboard" ? null : tab === "cases" ? (
           <AgGridReact<DeskRow>
             theme={verboGridTheme}
-            rowData={rows ? visible : undefined}
+            rowData={rows ? scoped : undefined}
             loading={!rows}
             columnDefs={columns}
             defaultColDef={{ flex: 1, sortable: true, resizable: true, filter: true }}
@@ -304,15 +238,4 @@ function StatePillRisk({ value }: { value?: string }) {
   if (!value) return null;
   const s = value === "high" ? "bg-terracotta-soft text-terracotta" : value === "medium" ? "bg-marigold-soft text-marigold-ink" : "bg-evergreen-soft text-evergreen";
   return <span className={`rounded-v px-2.5 py-0.5 text-xs font-bold ${s}`}>{value}</span>;
-}
-
-function Kpi({ label, value, hint, tone }: { label: string; value: number | string; hint?: string; tone?: "sky" | "evergreen" | "terracotta" }) {
-  const c = tone === "sky" ? "text-sky" : tone === "evergreen" ? "text-evergreen" : tone === "terracotta" ? "text-terracotta" : "text-ink";
-  return (
-    <div className="rounded-v-lg border border-line bg-card p-4 shadow-v">
-      <p className="text-xs font-bold uppercase tracking-wider text-ink-3">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold tabular-nums ${c}`}>{value}</p>
-      {hint && <p className="text-xs text-ink-3">{hint}</p>}
-    </div>
-  );
 }

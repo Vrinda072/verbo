@@ -30,6 +30,7 @@
     "ag-grid-community": "^36.3.0",
     "ag-grid-enterprise": "^36.3.0",
     "ag-grid-react": "^36.3.0",
+    "ag-studio-react": "^3.1.0",
     "drizzle-orm": "^0.45.4",
     "next": "15.5.29",
     "pdf-lib": "^1.17.1",

@@ -30,7 +30,8 @@ const OPTIONAL: Record<string, string> = {
   GROQ_API_KEY: "for the microphone: records until you tap stop, then Whisper writes it down",
   GEMINI_API_KEY: "needed for AI understanding and translation (free key from Google AI Studio)",
   ANTHROPIC_API_KEY: "optional alternative to Gemini",
-  AG_GRID_LICENSE_KEY: "needed for AG Grid Enterprise features (Day 5)",
+  AG_GRID_LICENSE_KEY: "removes the AG Grid watermark",
+  AG_STUDIO_LICENSE_KEY: "removes the AG Studio watermark",
 };
 
 let missingRequired = 0;
