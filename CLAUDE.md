@@ -41,5 +41,5 @@ docs/        STRATEGY, STATUS, language-coverage, eval
 - `npm run money-loop` — sandbox Order→authorize→capture→payout, void path, return path
 
 ## Design system
-Tokens in `app/globals.css` (`--v-*`). Direction: "warm paper & ink" — calm, trustworthy, human.
+Tokens in `app/globals.css` (`--v-*`). Direction: clean, professional fintech. Copy is plain and neutral, with no dramatic or story-style lines.
 Use tokens only; no ad-hoc hex values in components.

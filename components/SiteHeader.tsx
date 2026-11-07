@@ -10,9 +10,8 @@ const NAV = [
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <svg aria-hidden viewBox="0 0 32 32" className="h-8 w-8">
-        <rect width="32" height="32" rx="10" fill="var(--v-evergreen)" />
-        {/* a speech bubble that is also a "V" / check */}
+      <svg aria-hidden viewBox="0 0 32 32" className="h-7 w-7">
+        <rect width="32" height="32" rx="7" fill="var(--v-evergreen)" />
         <path
           d="M9 10.5l7 11 7-11"
           fill="none"
@@ -21,9 +20,8 @@ export function Logo({ className = "" }: { className?: string }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="24.5" cy="24.5" r="3" fill="var(--v-marigold)" />
       </svg>
-      <span className="font-display text-2xl font-semibold tracking-tight">{APP_NAME}</span>
+      <span className="text-xl font-semibold tracking-tight">{APP_NAME}</span>
     </span>
   );
 }
@@ -40,12 +38,12 @@ export function SiteHeader() {
             <Link
               key={n.href}
               href={n.href}
-              className="whitespace-nowrap rounded-full px-3 py-2 text-base font-bold text-ink-2 sm:px-4 transition-colors hover:bg-paper-2 hover:text-ink"
+              className="whitespace-nowrap rounded-v px-3 py-2 text-base font-bold text-ink-2 sm:px-4 transition-colors hover:bg-paper-2 hover:text-ink"
             >
               {n.label}
             </Link>
           ))}
-          <span className="ml-2 hidden rounded-full border border-marigold/60 bg-marigold-soft px-3 py-1 text-xs font-bold uppercase tracking-wider text-marigold-ink sm:inline">
+          <span className="ml-2 hidden rounded-v border border-line-strong px-2 py-0.5 text-xs font-semibold text-ink-2 sm:inline">
             Sandbox
           </span>
         </nav>

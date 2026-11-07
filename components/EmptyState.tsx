@@ -15,12 +15,12 @@ export function EmptyState({
   return (
     <div className="mx-auto max-w-xl rounded-v-lg border border-dashed border-line-strong bg-card px-6 py-12 text-center sm:px-10">
       {eyebrow && <p className="text-sm font-bold uppercase tracking-wider text-marigold">{eyebrow}</p>}
-      <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">{title}</h1>
       <p className="mt-3 text-lg text-ink-2">{body}</p>
       {action && (
         <Link
           href={action.href}
-          className="mt-6 inline-flex min-h-12 items-center rounded-full bg-evergreen px-6 font-bold text-evergreen-ink"
+          className="mt-6 inline-flex min-h-12 items-center rounded-v bg-evergreen px-6 font-bold text-evergreen-ink"
         >
           {action.label}
         </Link>

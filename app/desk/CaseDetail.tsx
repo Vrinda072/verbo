@@ -110,10 +110,10 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
           ))}
         </ul>
         <div className="mt-3 flex flex-wrap gap-2">
-          <a className="rounded-full bg-ink px-4 py-2 text-sm font-bold text-paper" href={`/api/desk/cases/${row.id}/evidence?format=pdf`}>
+          <a className="rounded-v bg-ink px-4 py-2 text-sm font-bold text-paper" href={`/api/desk/cases/${row.id}/evidence?format=pdf`}>
             Evidence PDF
           </a>
-          <a className="rounded-full border-2 border-line-strong px-4 py-2 text-sm font-bold" href={`/api/desk/cases/${row.id}/evidence?format=json`}>
+          <a className="rounded-v border-2 border-line-strong px-4 py-2 text-sm font-bold" href={`/api/desk/cases/${row.id}/evidence?format=json`}>
             JSON
           </a>
         </div>
@@ -127,7 +127,7 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
               type="button"
               disabled={busy !== null}
               onClick={() => act(a.action)}
-              className={`rounded-full px-4 py-2 text-sm font-bold disabled:opacity-50 ${
+              className={`rounded-v px-4 py-2 text-sm font-bold disabled:opacity-50 ${
                 a.action === "escalate" ? "bg-terracotta-soft text-terracotta" : "bg-evergreen-soft text-evergreen"
               }`}
             >

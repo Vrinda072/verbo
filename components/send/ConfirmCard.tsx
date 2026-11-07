@@ -64,13 +64,13 @@ export function ConfirmCard({
       className="v-rise mx-auto w-full max-w-xl rounded-v-lg border border-line bg-card p-6 shadow-v-lg sm:p-8"
     >
       <div lang={L.usedLang} dir={L.dir}>
-        <h2 id="confirm-title" className="font-display text-2xl font-semibold">
+        <h2 id="confirm-title" className="text-xl font-semibold">
           {L.t("title")}
         </h2>
         <p className="mt-2 text-xl text-ink-2">{L.t("readback", vars)}</p>
       </div>
       {voice.available && (
-        <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong px-4 text-sm font-bold hover:bg-paper-2">
+        <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-v border border-line-strong px-4 text-sm font-bold hover:bg-paper-2">
           <SpeakerIcon />
           {voice.speaking ? "Speaking…" : "Hear it again"}
         </button>
@@ -155,14 +155,14 @@ export function ConfirmCard({
           type="button"
           disabled={busy || !typedOk}
           onClick={() => onConfirm(needsTyped ? typedCents ?? undefined : undefined)}
-          className="min-h-14 rounded-full bg-evergreen px-6 text-lg font-bold text-evergreen-ink shadow-v transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-50"
+          className="min-h-14 rounded-v bg-evergreen px-6 text-lg font-bold text-evergreen-ink shadow-v transition-transform hover:opacity-90 disabled:translate-y-0 disabled:opacity-50"
         >
           <span lang={L.usedLang}>{busy ? "…" : L.t("confirm")}</span>
         </button>
-        <button type="button" onClick={onEdit} disabled={busy} className="min-h-14 rounded-full border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
+        <button type="button" onClick={onEdit} disabled={busy} className="min-h-14 rounded-v border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
           <span lang={L.usedLang}>{L.t("edit")}</span>
         </button>
-        <button type="button" onClick={onCancel} disabled={busy} className="min-h-14 rounded-full px-6 font-bold text-terracotta hover:bg-terracotta-soft">
+        <button type="button" onClick={onCancel} disabled={busy} className="min-h-14 rounded-v px-6 font-bold text-terracotta hover:bg-terracotta-soft">
           <span lang={L.usedLang}>{L.t("cancel")}</span>
         </button>
       </div>

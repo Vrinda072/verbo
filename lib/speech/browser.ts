@@ -65,7 +65,7 @@ export function speechErrorMessage(error: string): string | null {
     case "aborted":
       return null;
     case "no-speech":
-      return "I didn’t hear anything. Tap the microphone and try again.";
+      return "No speech was detected. Please try again.";
     case "audio-capture":
       return "No working microphone was found.";
     case "not-allowed":

@@ -11,14 +11,14 @@ import { Stepper } from "@/components/send/Stepper";
 type Phase = "input" | "understanding" | "review" | "creating" | "created" | "cancelled";
 
 const PROBLEM_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
-  not_a_payment: () => "That didn’t sound like a payment. Try: “Send 20 dollars to Manuel Lopez”.",
-  missing_recipient: () => "I couldn’t find a contact’s name in that. Say a full name from the list, or tap one.",
+  not_a_payment: () => "This doesn’t look like a payment. For example: “Send 20 dollars to Manuel Lopez”.",
+  missing_recipient: () => "No contact name was found. Say a full name from your contacts.",
   recipient_not_found: (p) => `“${p.spoken}” isn’t in your contacts. Check the name.`,
-  recipient_ambiguous: () => "These names sound alike, so Verbo won’t guess. Tap the right person:",
-  missing_amount: () => "How much? Say or type the amount.",
+  recipient_ambiguous: () => "Two contacts have similar names. Select the recipient:",
+  missing_amount: () => "Please say or enter one amount.",
   amount_invalid: () => "The amount wasn’t clear. Use digits, e.g. 12.50.",
   amount_out_of_range: () => "This demo only sends between $0.01 and $10,000.",
-  amount_not_in_transcript: () => "The amount didn’t match what you said, so Verbo stopped. Please say it again.",
+  amount_not_in_transcript: () => "The amount doesn’t match the transcript. Please try again.",
   currency_unsupported: (p) => `This demo sends US dollars only. Verbo won’t convert ${p.currency} for you.`,
 };
 
@@ -122,7 +122,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">Send by voice</h1>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Send a payment</h1>
           <div className="mt-4">
             <Stepper current={step} />
           </div>
@@ -140,7 +140,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                 ) : (
                   <>
                     <p className="mb-6 text-lg">
-                      Say who and how much, in{" "}
+                      Say the recipient and amount in{" "}
                       <strong lang={lang} dir={langInfo?.dir}>
                         {langInfo?.nativeName ?? lang}
                       </strong>
@@ -154,7 +154,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
 
             {(mic.status === "unavailable" || mic.status === "error") && (
               <p role="status" className="rounded-v border border-marigold/70 bg-marigold-soft p-4 text-center text-marigold-ink">
-                {mic.error ?? "Your browser doesn’t support speech recognition. Chrome, Edge and Safari do."} You can also type — everything else works the same.
+                {mic.error ?? "Your browser doesn’t support recording. Chrome, Edge and Safari do."} You can also type the payment.
               </p>
             )}
 
@@ -177,41 +177,41 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                   onChange={(e) => mic.setTranscript(e.target.value)}
                   placeholder={EXAMPLES[lang] ?? EXAMPLES.en}
                   aria-live="polite"
-                  className="mt-2 w-full resize-none rounded-v-lg border-2 border-line bg-card px-5 py-4 text-2xl leading-snug outline-none focus:border-sky"
+                  className="mt-2 w-full resize-none rounded-v border border-line-strong bg-card px-4 py-3 text-lg leading-snug outline-none focus:border-sky"
                 />
                 <div className="mt-3 flex justify-end">
                   <button
                     type="submit"
                     disabled={!mic.transcript.trim() || phase === "understanding" || mic.status === "listening"}
-                    className="min-h-12 shrink-0 rounded-full bg-ink px-6 font-bold text-paper disabled:opacity-40"
+                    className="min-h-12 shrink-0 rounded-v bg-ink px-6 font-bold text-paper disabled:opacity-40"
                   >
                     {phase === "understanding" ? "Checking…" : "Check"}
                   </button>
                 </div>
               </form>
             ) : (
-              <button type="button" onClick={() => setTyping(true)} className="justify-self-center rounded-full px-4 py-2 font-bold text-ink-2 underline underline-offset-4 hover:text-ink">
-                Prefer to type?
+              <button type="button" onClick={() => setTyping(true)} className="justify-self-center rounded-v px-4 py-2 font-bold text-ink-2 underline underline-offset-4 hover:text-ink">
+                Type instead
               </button>
             )}
 
           {result && !result.ok && (
             <div role="alert" className="mx-auto w-full max-w-xl rounded-v-lg border border-terracotta/50 bg-terracotta-soft p-5">
-              <p className="font-bold text-terracotta">Nothing was sent. Verbo needs a bit more:</p>
+              <p className="font-bold text-terracotta">Nothing was sent. More information is needed:</p>
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 {result.problems.map((p, i) => (
                   <li key={i}>
                     {PROBLEM_TEXT[p.code]?.(p) ?? p.code}
                     {(p.code === "recipient_not_found" || p.code === "missing_recipient") && (
                       <span className="mt-2 block">
-                        <span className="block">Or tap who you meant:</span>
+                        <span className="block">Or select a recipient:</span>
                         <span className="mt-2 flex flex-wrap gap-2">
                           {CONTACTS.map((c) => (
                             <button
                               key={c.id}
                               type="button"
                               onClick={() => void check(mic.transcript.trim(), c.name)}
-                              className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                              className="min-h-12 rounded-v border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
                             >
                               {c.name}
                             </button>
@@ -226,7 +226,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                             key={name}
                             type="button"
                             onClick={() => void check(mic.transcript.trim(), name)}
-                            className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                            className="min-h-12 rounded-v border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
                           >
                             {name}
                           </button>
@@ -248,9 +248,9 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           <aside className="grid gap-6">
             <section aria-labelledby="try-title" className="rounded-v-lg border border-line bg-paper-2 p-6">
               <h2 id="try-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
-                Try saying
+                Example
               </h2>
-              <p lang={lang} dir={langInfo?.dir} className="mt-3 font-display text-2xl leading-snug">
+              <p lang={lang} dir={langInfo?.dir} className="mt-3 text-lg font-medium leading-snug">
                 “{EXAMPLES[lang] ?? EXAMPLES.en}”
               </p>
               {lang !== "en" && EXAMPLES[lang] && <p className="mt-2 text-sm text-ink-3">“{EXAMPLES.en}”</p>}
@@ -309,7 +309,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       {phase === "created" && created && result?.recipient && result.amount && (
         <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg border border-line bg-card p-8 text-center shadow-v-lg">
           <p className="text-sm font-bold uppercase tracking-wider text-evergreen">Confirmed</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold">
+          <h2 className="mt-2 text-2xl font-semibold">
             One last step on PayPal: approve ${result.amount.digits} to {result.recipient.name}
           </h2>
           <p className="mt-3 text-ink-2">
@@ -319,7 +319,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           </p>
           <a
             href={created.approveUrl ?? `/send/t/${created.id}`}
-            className="mt-6 inline-flex min-h-14 items-center rounded-full bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v"
+            className="mt-6 inline-flex min-h-14 items-center rounded-v bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v"
           >
             Approve on PayPal
           </a>
@@ -333,7 +333,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
 }
 
 function Working({ stage }: { stage: 0 | 1 }) {
-  const lines = ["Writing down your words", "Checking the name, amount and risk"];
+  const lines = ["Transcribing", "Checking recipient, amount and risk"];
   return (
     <div role="status" className="mx-auto flex max-w-sm flex-col gap-4 py-10 text-left">
       {lines.map((line, i) => (
@@ -348,7 +348,7 @@ function Working({ stage }: { stage: 0 | 1 }) {
           {line}
         </p>
       ))}
-      <p className="text-ink-3">Nothing moves until you confirm.</p>
+      <p className="text-ink-3">No money moves until you confirm.</p>
     </div>
   );
 }
@@ -356,9 +356,9 @@ function Working({ stage }: { stage: 0 | 1 }) {
 function Done({ title, body, onAgain }: { title: string; body: string; onAgain: () => void }) {
   return (
     <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg border border-line bg-card p-8 text-center shadow-v">
-      <h2 className="font-display text-3xl font-semibold">{title}</h2>
+      <h2 className="text-2xl font-semibold">{title}</h2>
       <p className="mt-2 text-ink-2">{body}</p>
-      <button type="button" onClick={onAgain} className="mt-6 min-h-12 rounded-full bg-evergreen px-6 font-bold text-evergreen-ink">
+      <button type="button" onClick={onAgain} className="mt-6 min-h-12 rounded-v bg-evergreen px-6 font-bold text-evergreen-ink">
         Start again
       </button>
     </div>

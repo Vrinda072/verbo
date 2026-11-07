@@ -74,7 +74,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
           type="button"
           onClick={open}
           disabled={busy}
-          className="min-h-14 w-full rounded-full border-2 border-terracotta/60 px-6 text-lg font-bold text-terracotta hover:bg-terracotta-soft disabled:opacity-60"
+          className="min-h-14 w-full rounded-v border-2 border-terracotta/60 px-6 text-lg font-bold text-terracotta hover:bg-terracotta-soft disabled:opacity-60"
         >
           <span lang={L.usedLang}>{busy ? "…" : L.t("ask_back")}</span>
         </button>
@@ -154,9 +154,9 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder={L.t("rc_placeholder")}
-          className="min-h-12 flex-1 rounded-full border-2 border-line bg-card px-5 outline-none focus:border-sky"
+          className="min-h-12 flex-1 rounded-v border-2 border-line bg-card px-5 outline-none focus:border-sky"
         />
-        <button type="submit" disabled={!draft.trim() || busy} className="min-h-12 rounded-full bg-ink px-5 font-bold text-paper disabled:opacity-40">
+        <button type="submit" disabled={!draft.trim() || busy} className="min-h-12 rounded-v bg-ink px-5 font-bold text-paper disabled:opacity-40">
           <span lang={L.usedLang}>{L.t("rc_send")}</span>
         </button>
       </form>

@@ -27,7 +27,7 @@ const STATE_STYLE: Record<string, string> = {
 
 function StatePill({ value }: CustomCellRendererProps<DeskRow, string>) {
   if (!value) return null;
-  return <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${STATE_STYLE[value] ?? ""}`}>{value.replace("_", " ").toLowerCase()}</span>;
+  return <span className={`rounded-v px-2.5 py-0.5 text-xs font-bold ${STATE_STYLE[value] ?? ""}`}>{value.replace("_", " ").toLowerCase()}</span>;
 }
 
 function EvidenceMeter({ value }: CustomCellRendererProps<DeskRow, number>) {
@@ -165,7 +165,7 @@ export function DeskApp() {
     <div className="mx-auto max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight">Case Desk</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Case Desk</h1>
           <p className="mt-1 text-ink-2">
             {kpi.live} live sandbox case{kpi.live === 1 ? "" : "s"} ·{" "}
             <strong className="text-marigold-ink">{kpi.sim} simulated cases (synthetic data, for demonstration)</strong>
@@ -178,7 +178,7 @@ export function DeskApp() {
               type="button"
               aria-pressed={scope === s}
               onClick={() => setScope(s)}
-              className={`rounded-full px-4 py-1.5 text-sm font-bold ${scope === s ? "bg-ink text-paper" : "text-ink-2"}`}
+              className={`rounded-v px-4 py-1.5 text-sm font-bold ${scope === s ? "bg-ink text-paper" : "text-ink-2"}`}
             >
               {s === "all" ? "All" : s === "live" ? "Live" : "Simulated"}
             </button>
@@ -258,7 +258,7 @@ export function DeskApp() {
             value={quick}
             onChange={(e) => setQuick(e.target.value)}
             placeholder="Search names, ids…"
-            className="mb-1 w-44 rounded-full border-2 border-line bg-card px-4 py-1.5 text-sm outline-none focus:border-sky sm:w-64"
+            className="mb-1 w-44 rounded-v border-2 border-line bg-card px-4 py-1.5 text-sm outline-none focus:border-sky sm:w-64"
           />
         </label>
       </div>
@@ -303,7 +303,7 @@ export function DeskApp() {
 function StatePillRisk({ value }: { value?: string }) {
   if (!value) return null;
   const s = value === "high" ? "bg-terracotta-soft text-terracotta" : value === "medium" ? "bg-marigold-soft text-marigold-ink" : "bg-evergreen-soft text-evergreen";
-  return <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${s}`}>{value}</span>;
+  return <span className={`rounded-v px-2.5 py-0.5 text-xs font-bold ${s}`}>{value}</span>;
 }
 
 function Kpi({ label, value, hint, tone }: { label: string; value: number | string; hint?: string; tone?: "sky" | "evergreen" | "terracotta" }) {
@@ -311,7 +311,7 @@ function Kpi({ label, value, hint, tone }: { label: string; value: number | stri
   return (
     <div className="rounded-v-lg border border-line bg-card p-4 shadow-v">
       <p className="text-xs font-bold uppercase tracking-wider text-ink-3">{label}</p>
-      <p className={`mt-1 font-display text-4xl font-semibold tabular-nums ${c}`}>{value}</p>
+      <p className={`mt-1 text-3xl font-semibold tabular-nums ${c}`}>{value}</p>
       {hint && <p className="text-xs text-ink-3">{hint}</p>}
     </div>
   );

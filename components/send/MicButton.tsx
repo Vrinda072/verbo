@@ -16,7 +16,7 @@ export function MicButton({
 }) {
   const listening = status === "listening";
   const busy = status === "connecting" || status === "finishing";
-  const label = listening ? "Stop and check" : busy ? (status === "connecting" ? "Connecting…" : "Writing it down…") : "Tap and speak";
+  const label = listening ? "Stop recording" : busy ? (status === "connecting" ? "Connecting…" : "Transcribing…") : "Start recording";
   const [slow, setSlow] = useState(false);
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
@@ -40,29 +40,29 @@ export function MicButton({
         disabled={busy}
         aria-pressed={listening}
         aria-label={label}
-        className={`relative grid h-36 w-36 place-items-center rounded-full shadow-v-lg transition-transform duration-200 focus-visible:outline-offset-8 disabled:opacity-70 sm:h-44 sm:w-44 ${
-          listening ? "bg-terracotta text-paper" : "bg-evergreen text-evergreen-ink hover:scale-[1.03]"
+        className={`relative grid h-28 w-28 place-items-center rounded-full shadow-v transition-colors duration-200 focus-visible:outline-offset-8 disabled:opacity-70 ${
+          listening ? "bg-terracotta text-paper" : "bg-evergreen text-evergreen-ink hover:opacity-90"
         }`}
       >
         {listening && <span aria-hidden className="v-pulse absolute inset-0 rounded-full border-4 border-terracotta" />}
         {listening ? <StopIcon /> : <MicIcon />}
       </button>
-      <p className="text-xl font-bold" aria-live="polite">
+      <p className="text-lg font-semibold" aria-live="polite">
         {label}
       </p>
       {listening && (
         <div className="-mt-2 flex flex-col items-center gap-2">
           <div className="flex items-center gap-3">
             <Bars />
-            <span className="font-display text-2xl tabular-nums" aria-hidden>
+            <span className="text-xl font-semibold tabular-nums" aria-hidden>
               {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
             </span>
             <Bars />
           </div>
-          <p className="text-sm text-ink-3">Take your time, pauses are fine. Tap when you’ve finished.</p>
+          <p className="text-sm text-ink-3">Recording. Stop when you have finished.</p>
         </div>
       )}
-      {slow && <p className="-mt-3 max-w-md text-center text-sm text-ink-3">Your computer is taking a long time to start the microphone. You can wait, or type below.</p>}
+      {slow && <p className="-mt-3 max-w-md text-center text-sm text-ink-3">The microphone is taking longer than usual to start. You can wait or type instead.</p>}
       {analyser && <Waveform analyser={analyser} active={listening} />}
     </div>
   );
@@ -112,7 +112,7 @@ function Waveform({ analyser, active }: { analyser: AnalyserNode | null; active:
 
 function MicIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-16 w-16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <svg viewBox="0 0 24 24" className="h-12 w-12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
       <rect x="9" y="3" width="6" height="11" rx="3" />
       <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
     </svg>
@@ -120,7 +120,7 @@ function MicIcon() {
 }
 function StopIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-14 w-14" fill="currentColor">
+    <svg viewBox="0 0 24 24" className="h-10 w-10" fill="currentColor">
       <rect x="6" y="6" width="12" height="12" rx="2.5" />
     </svg>
   );

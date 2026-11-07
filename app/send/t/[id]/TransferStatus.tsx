@@ -76,9 +76,9 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
 
       {t.state === "CREATED" && (
         <>
-          <h1 className="mt-3 font-display text-3xl font-semibold">Waiting for your approval on PayPal</h1>
+          <h1 className="mt-3 text-2xl font-semibold">Waiting for your approval on PayPal</h1>
           {t.approveUrl && (
-            <a href={t.approveUrl} className="mt-6 inline-flex min-h-14 items-center rounded-full bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v">
+            <a href={t.approveUrl} className="mt-6 inline-flex min-h-14 items-center rounded-v bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v">
               Approve on PayPal
             </a>
           )}
@@ -88,7 +88,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
 
       {t.state === "ON_HOLD" && (
         <>
-          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 font-display text-3xl font-semibold text-terracotta">
+          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold text-terracotta">
             {L.t("hold_title")}
           </h1>
           <p className="v-digits mt-6 tabular-nums" role="timer" aria-label={`${mm} minutes ${ss} seconds left`}>
@@ -109,7 +109,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
             type="button"
             onClick={cancel}
             disabled={busy}
-            className="mt-6 min-h-16 w-full rounded-full bg-terracotta px-8 text-xl font-bold text-paper shadow-v disabled:opacity-60"
+            className="mt-6 min-h-16 w-full rounded-v bg-terracotta px-8 text-xl font-bold text-paper shadow-v disabled:opacity-60"
           >
             <span lang={L.usedLang}>{busy ? "…" : L.t("cancel_hold")}</span>
           </button>
@@ -119,7 +119,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
 
       {SENDING.has(t.state) && (
         <>
-          <h1 className="mt-3 font-display text-3xl font-semibold">Sending…</h1>
+          <h1 className="mt-3 text-2xl font-semibold">Sending…</h1>
           <p className="mt-2 text-ink-2">PayPal is moving the money. This usually takes under a minute in the sandbox.</p>
         </>
       )}
@@ -127,7 +127,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
       {t.state === "COMPLETED" && (
         <>
           <Check />
-          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 font-display text-3xl font-semibold text-evergreen">
+          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold text-evergreen">
             {L.t("sent", { recipient: t.recipientName })}
           </h1>
           {showEnglish && <p className="mt-1 text-ink-3">{en.t("sent", { recipient: t.recipientName })}</p>}
@@ -137,7 +137,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
 
       {(t.state === "VOIDED" || t.state === "CANCELLED") && (
         <>
-          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 font-display text-3xl font-semibold">
+          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold">
             {L.t("cancelled")}
           </h1>
           {showEnglish && <p className="mt-1 text-ink-3">{en.t("cancelled")}</p>}
@@ -145,7 +145,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
       )}
 
       {t.state === "PAYOUT_FAILED" && (
-        <h1 className="mt-3 font-display text-3xl font-semibold text-terracotta">PayPal couldn’t deliver the payout. Verbo will retry.</h1>
+        <h1 className="mt-3 text-2xl font-semibold text-terracotta">PayPal couldn’t deliver the payout. Verbo will retry.</h1>
       )}
 
       {error && (
@@ -155,7 +155,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
       )}
 
       {done && (
-        <Link href="/send" className="mt-8 inline-flex min-h-12 items-center rounded-full border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
+        <Link href="/send" className="mt-8 inline-flex min-h-12 items-center rounded-v border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
           Send another
         </Link>
       )}
