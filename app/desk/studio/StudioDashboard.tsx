@@ -39,6 +39,7 @@ const INSTRUCTIONS = [
   "For counts, return rates and languages, call summarise_cases. For cases needing attention, call find_stalled_cases. Quote those results and stop.",
   "Use the data agent only for a question those two tools cannot answer.",
   "To add a widget, do both steps: delegate to the page agent to place it, then delegate to the widget agent with that widget's id and type to connect its data and title. A placed widget is empty until the second step is done, so never say it is ready before then.",
+  "The return rate is a share of resolved cases, not of all cases. Always say so and quote the resolved count, for example: 114 returned of 182 resolved cases (63%). Open cases are not counted in it.",
   "Keep answers to a few short sentences or a short list.",
 ].join("\n");
 
