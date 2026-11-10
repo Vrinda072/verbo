@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Figtree } from "next/font/google";
 import { APP_NAME } from "@/lib/config";
 import "./globals.css";
 
-/** Inter: clear at small sizes, with distinct numerals for amounts. Other scripts fall back to Noto or system fonts. */
-const inter = Inter({
+/** Figtree: a clean geometric sans with clear numerals. Other scripts fall back to Noto. */
+const figtree = Figtree({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-inter",
+  variable: "--font-figtree",
   display: "swap",
 });
 
@@ -17,15 +17,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f7f9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c1117" },
-  ],
+  themeColor: "#001c64",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={figtree.variable}>
       <body className="min-h-dvh bg-paper text-ink antialiased">
         <a
           href="#main"

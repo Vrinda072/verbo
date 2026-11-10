@@ -57,7 +57,7 @@ function LanguageRecovery(params: any) {
               {l.native}
             </span>
             <span aria-hidden className="h-2 overflow-hidden rounded-full bg-line">
-              <span className="block h-full rounded-full bg-evergreen" style={{ width: `${share ?? 0}%` }} />
+              <span className="block h-full rounded-full bg-brand" style={{ width: `${share ?? 0}%` }} />
             </span>
             <span className="whitespace-nowrap tabular-nums text-ink-3">
               {share == null ? "none resolved" : `${share}% returned`} · {l.cases}
@@ -70,7 +70,7 @@ function LanguageRecovery(params: any) {
 }
 
 const BAND_ORDER = ["Ready", "Partial", "Weak"];
-const BAND_STYLE: Record<string, string> = { Ready: "bg-evergreen", Partial: "bg-marigold", Weak: "bg-terracotta" };
+const BAND_STYLE: Record<string, string> = { Ready: "bg-brand", Partial: "bg-marigold", Weak: "bg-terracotta" };
 
 function EvidenceReadiness(params: any) {
   const rows = useRows(params);

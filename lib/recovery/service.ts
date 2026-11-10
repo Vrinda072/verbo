@@ -15,7 +15,7 @@ import { getTransfer, getTransferByOrder, insertTransfer, type StoredTransfer } 
 import { step, tick, TransferError } from "@/lib/transfers/service";
 import { getTranslator } from "@/lib/bridge/translate";
 import { signRecoveryToken, verifyRecoveryToken } from "./token";
-import { dueTimerEvent, nextCaseState, OPEN_STATES, type CaseEvent, type CaseState } from "./state";
+import { dueTimerEvent, ESCALATE_AFTER_H, nextCaseState, OPEN_STATES, type CaseEvent, type CaseState } from "./state";
 import { log } from "@/lib/log";
 
 type CaseRow = typeof schema.cases.$inferSelect;
@@ -176,7 +176,7 @@ export async function processTimers(now = new Date()) {
     .where(and(inArray(schema.cases.state, [...OPEN_STATES]), eq(schema.cases.simulated, 0)));
   const done: { caseId: string; event: string }[] = [];
   for (const c of open) {
-    const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, remindersSent: c.remindersSent, now });
+    const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, escalateAt: c.escalateAt, remindersSent: c.remindersSent, now });
     if (!ev) continue;
     try {
       await applyEvent(c, ev, "system", {
@@ -190,6 +190,34 @@ export async function processTimers(now = new Date()) {
     }
   }
   return done;
+}
+
+export class DeadlineError extends Error {
+  constructor(public code: "not_found" | "not_open" | "out_of_range") {
+    super(code);
+  }
+}
+
+export const MAX_DEADLINE_DAYS = 14;
+
+/** Move the escalation deadline. Recorded on the immutable timeline, so it appears in the evidence packet. */
+export async function moveDeadline(caseId: string, at: Date, now = new Date()) {
+  const db = await getDb();
+  const c = await loadCase(caseId);
+  if (!c) throw new DeadlineError("not_found");
+  if (!OPEN_STATES.has(c.state as CaseState) || !c.linkSentAt) throw new DeadlineError("not_open");
+  if (at <= now || at.getTime() > now.getTime() + MAX_DEADLINE_DAYS * 86_400_000) throw new DeadlineError("out_of_range");
+  const previous = c.escalateAt ?? new Date(c.linkSentAt.getTime() + ESCALATE_AFTER_H * 3_600_000);
+  await db.update(schema.cases).set({ escalateAt: at, updatedAt: now }).where(eq(schema.cases.id, caseId));
+  await db.insert(schema.caseEvents).values({
+    caseId,
+    event: "DEADLINE_MOVED",
+    fromState: c.state,
+    toState: c.state,
+    actor: "operator",
+    at: now,
+    data: { from: previous.toISOString(), to: at.toISOString() },
+  });
 }
 
 export async function caseDetail(caseId: string) {

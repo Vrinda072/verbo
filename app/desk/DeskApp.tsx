@@ -11,6 +11,10 @@ import { CaseDetail } from "./CaseDetail";
 registerGrid();
 
 // Studio needs the browser, so it isn't server-rendered.
+const DeadlineTimeline = dynamic(() => import("./timeline/DeadlineTimeline"), {
+  ssr: false,
+  loading: () => <p className="text-ink-3">Loading timeline…</p>,
+});
 const StudioDashboard = dynamic(() => import("./studio/StudioDashboard"), {
   ssr: false,
   loading: () => <p className="py-20 text-center text-ink-3">Loading dashboard…</p>,
@@ -23,7 +27,7 @@ const STATE_STYLE: Record<string, string> = {
   LINK_SENT: "bg-sky-soft text-sky",
   VIEWED: "bg-sky-soft text-sky",
   REPLIED: "bg-marigold-soft text-marigold-ink",
-  RETURNED: "bg-evergreen-soft text-evergreen",
+  RETURNED: "bg-brand-soft text-brand",
   REFUSED: "bg-paper-2 text-ink-2",
   ESCALATED: "bg-terracotta-soft text-terracotta",
   CLOSED: "bg-paper-2 text-ink-3",
@@ -32,12 +36,12 @@ const STATE_STYLE: Record<string, string> = {
 
 function StatePill({ value }: CustomCellRendererProps<DeskRow, string>) {
   if (!value) return null;
-  return <span className={`rounded-v px-2.5 py-0.5 text-xs font-bold ${STATE_STYLE[value] ?? ""}`}>{value.replace("_", " ").toLowerCase()}</span>;
+  return <span className={`rounded-v px-2.5 py-0.5 text-xs font-semibold ${STATE_STYLE[value] ?? ""}`}>{value.replace("_", " ").toLowerCase()}</span>;
 }
 
 function EvidenceMeter({ value }: CustomCellRendererProps<DeskRow, number>) {
   if (value == null) return null;
-  const tone = value >= 80 ? "bg-evergreen" : value >= 50 ? "bg-marigold" : "bg-terracotta";
+  const tone = value >= 80 ? "bg-brand" : value >= 50 ? "bg-marigold" : "bg-terracotta";
   return (
     <span className="flex h-full items-center gap-2" aria-label={`Evidence ${value} of 100`}>
       <span className="h-2 w-20 overflow-hidden rounded-full bg-line">
@@ -54,9 +58,9 @@ function CaseCell({ data }: CustomCellRendererProps<DeskRow>) {
     <span className="flex items-center gap-2">
       <span className="font-mono">{data.shortId}</span>
       {data.simulated ? (
-        <span className="rounded bg-paper-2 px-1.5 text-[11px] font-bold uppercase text-ink-3">sim</span>
+        <span className="rounded bg-paper-2 px-1.5 text-[11px] font-semibold uppercase text-ink-3">sim</span>
       ) : (
-        <span className="rounded bg-evergreen-soft px-1.5 text-[11px] font-bold uppercase text-evergreen">live</span>
+        <span className="rounded bg-brand-soft px-1.5 text-[11px] font-semibold uppercase text-brand">live</span>
       )}
     </span>
   );
@@ -76,7 +80,7 @@ function LangPair({ data }: CustomCellRendererProps<DeskRow>) {
 export function DeskApp() {
   const [rows, setRows] = useState<DeskRow[] | null>(null);
   const [alerts, setAlerts] = useState<AlertRow[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "cases" | "alerts">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "timeline" | "cases" | "alerts">("dashboard");
   const [scope, setScope] = useState<"all" | "live" | "sim">("all");
   const [quick, setQuick] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -157,7 +161,7 @@ export function DeskApp() {
               type="button"
               aria-pressed={scope === s}
               onClick={() => setScope(s)}
-              className={`rounded-v px-4 py-1.5 text-sm font-bold ${scope === s ? "bg-ink text-paper" : "text-ink-2"}`}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold ${scope === s ? "bg-ink text-paper" : "text-ink-2"}`}
             >
               {s === "all" ? "All" : s === "live" ? "Live" : "Simulated"}
             </button>
@@ -170,6 +174,7 @@ export function DeskApp() {
         {(
           [
             ["dashboard", "Dashboard"],
+            ["timeline", "Deadlines"],
             ["cases", `Recovery cases (${scoped.length})`],
             ["alerts", `Pre-send alerts (${alerts.length})`],
           ] as const
@@ -179,12 +184,12 @@ export function DeskApp() {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={`-mb-px whitespace-nowrap border-b-4 px-3 py-2 font-bold sm:px-4 ${tab === id ? "border-evergreen text-ink" : "border-transparent text-ink-3"}`}
+            className={`-mb-px whitespace-nowrap border-b-4 px-3 py-2 font-semibold sm:px-4 ${tab === id ? "border-brand text-ink" : "border-transparent text-ink-3"}`}
           >
             {label}
           </button>
         ))}
-        <label className={`ml-auto self-center ${tab === "dashboard" ? "invisible" : ""}`}>
+        <label className={`ml-auto self-center ${tab === "dashboard" || tab === "timeline" ? "invisible" : ""}`}>
           <span className="sr-only">Search cases</span>
           <input
             value={quick}
@@ -199,8 +204,10 @@ export function DeskApp() {
 
       {tab === "dashboard" && <div className="mt-4">{rows ? <StudioDashboard key={scope} rows={scoped} /> : <p className="py-20 text-center text-ink-3">Loading cases…</p>}</div>}
 
-      <div className={`mt-4 h-[640px] ${tab === "dashboard" ? "hidden" : ""}`}>
-        {tab === "dashboard" ? null : tab === "cases" ? (
+      {tab === "timeline" && <div className="mt-4 h-[640px]">{rows ? <DeadlineTimeline key={scope} rows={scoped} /> : null}</div>}
+
+      <div className={`mt-4 h-[640px] ${tab === "dashboard" || tab === "timeline" ? "hidden" : ""}`}>
+        {tab === "dashboard" || tab === "timeline" ? null : tab === "cases" ? (
           <AgGridReact<DeskRow>
             theme={verboGridTheme}
             rowData={rows ? scoped : undefined}
@@ -236,6 +243,6 @@ export function DeskApp() {
 
 function StatePillRisk({ value }: { value?: string }) {
   if (!value) return null;
-  const s = value === "high" ? "bg-terracotta-soft text-terracotta" : value === "medium" ? "bg-marigold-soft text-marigold-ink" : "bg-evergreen-soft text-evergreen";
-  return <span className={`rounded-v px-2.5 py-0.5 text-xs font-bold ${s}`}>{value}</span>;
+  const s = value === "high" ? "bg-terracotta-soft text-terracotta" : value === "medium" ? "bg-marigold-soft text-marigold-ink" : "bg-brand-soft text-brand";
+  return <span className={`rounded-v px-2.5 py-0.5 text-xs font-semibold ${s}`}>{value}</span>;
 }

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
+import { MoneyPath, type PathTone } from "@/components/MoneyPath";
 import { SenderCase } from "./SenderCase";
 
 export interface TransferView {
@@ -55,7 +56,15 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
   const remaining = t.holdUntil ? Math.max(0, Date.parse(t.holdUntil) - (now + skew.current)) : 0;
   const mm = String(Math.floor(remaining / 60000)).padStart(2, "0");
   const ss = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
-  const amount = (t.cents / 100).toFixed(2);
+
+  const path: { at: 0 | 1 | 2; tone: PathTone } =
+    t.state === "COMPLETED"
+      ? { at: 2, tone: "away" }
+      : t.state === "ON_HOLD"
+        ? { at: 1, tone: "hold" }
+        : SENDING.has(t.state)
+          ? { at: 1, tone: "moving" }
+          : { at: 0, tone: "safe" };
 
   async function cancel() {
     setBusy(true);
@@ -69,16 +78,14 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
   }
 
   return (
-    <section aria-live="polite" className="v-rise mx-auto max-w-xl rounded-v-lg border border-line bg-card p-6 text-center shadow-v-lg sm:p-10">
-      <p className="text-sm font-bold uppercase tracking-wider text-ink-3">
-        ${amount} → {t.recipientName}
-      </p>
+    <section aria-live="polite" className="v-rise mx-auto max-w-xl rounded-v-lg bg-card p-6 text-center shadow-v-lg sm:p-10">
+      <MoneyPath stops={["You", "Safety hold", t.recipientName]} at={path.at} amount={`$${Math.round(t.cents / 100)}`} tone={path.tone} />
 
       {t.state === "CREATED" && (
         <>
           <h1 className="mt-3 text-2xl font-semibold">Waiting for your approval on PayPal</h1>
           {t.approveUrl && (
-            <a href={t.approveUrl} className="mt-6 inline-flex min-h-14 items-center rounded-v bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v">
+            <a href={t.approveUrl} className="mt-6 inline-flex min-h-14 items-center rounded-full bg-brand px-8 text-lg font-semibold text-brand-ink shadow-v">
               Approve on PayPal
             </a>
           )}
@@ -88,19 +95,17 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
 
       {t.state === "ON_HOLD" && (
         <>
-          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold text-terracotta">
+          <h1 lang={L.usedLang} dir={L.dir} className="mt-5 text-2xl font-semibold">
             {L.t("hold_title")}
           </h1>
-          <p className="v-digits mt-6 tabular-nums" role="timer" aria-label={`${mm} minutes ${ss} seconds left`}>
-            {mm}:{ss}
-          </p>
-          <p lang={L.usedLang} dir={L.dir} className="mt-4 text-lg font-bold">
+          <HoldRing fraction={remaining / (t.holdMinutes * 60000)} label={`${mm}:${ss}`} srLabel={`${mm} minutes ${ss} seconds left`} />
+          <p lang={L.usedLang} dir={L.dir} className="mt-4 text-lg font-semibold">
             {L.t("hold_notice", { minutes: String(t.holdMinutes) })}
           </p>
           {showEnglish && <p className="mt-1 text-sm text-ink-3">{en.t("hold_notice", { minutes: String(t.holdMinutes) })}</p>}
           <ul className="mt-5 space-y-2 text-left">
             {t.risk?.signals.map((s) => (
-              <li key={s} className="rounded-v border border-marigold/60 bg-marigold-soft px-4 py-3 text-marigold-ink">
+              <li key={s} className="rounded-v bg-marigold-soft px-4 py-3 text-marigold-ink">
                 {SIGNAL_TEXT[s] ?? s}
               </li>
             ))}
@@ -109,7 +114,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
             type="button"
             onClick={cancel}
             disabled={busy}
-            className="mt-6 min-h-16 w-full rounded-v bg-terracotta px-8 text-xl font-bold text-paper shadow-v disabled:opacity-60"
+            className="mt-6 min-h-16 w-full rounded-full bg-terracotta px-8 text-xl font-semibold text-paper shadow-v disabled:opacity-60"
           >
             <span lang={L.usedLang}>{busy ? "…" : L.t("cancel_hold")}</span>
           </button>
@@ -127,7 +132,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
       {t.state === "COMPLETED" && (
         <>
           <Check />
-          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold text-evergreen">
+          <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold text-success">
             {L.t("sent", { recipient: t.recipientName })}
           </h1>
           {showEnglish && <p className="mt-1 text-ink-3">{en.t("sent", { recipient: t.recipientName })}</p>}
@@ -155,7 +160,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
       )}
 
       {done && (
-        <Link href="/send" className="mt-8 inline-flex min-h-12 items-center rounded-v border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
+        <Link href="/send" className="mt-8 inline-flex min-h-12 items-center rounded-full border-2 border-line-strong px-6 font-semibold hover:bg-paper-2">
           Send another
         </Link>
       )}
@@ -174,7 +179,7 @@ const SIGNAL_TEXT: Record<string, string> = {
 
 function CancelButton({ label, lang, onClick, busy }: { label: string; lang: string; onClick: () => void; busy: boolean }) {
   return (
-    <button type="button" onClick={onClick} disabled={busy} className="mt-4 block w-full font-bold text-terracotta underline">
+    <button type="button" onClick={onClick} disabled={busy} className="mt-4 block w-full font-semibold text-terracotta underline">
       <span lang={lang}>{label}</span>
     </button>
   );
@@ -182,9 +187,22 @@ function CancelButton({ label, lang, onClick, busy }: { label: string; lang: str
 
 function Check() {
   return (
-    <svg aria-hidden viewBox="0 0 48 48" className="mx-auto h-16 w-16">
-      <circle cx="24" cy="24" r="22" fill="var(--v-evergreen-soft)" />
-      <path d="M14 25l7 7 13-15" fill="none" stroke="var(--v-evergreen)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    <svg aria-hidden viewBox="0 0 48 48" className="mx-auto mt-6 h-16 w-16">
+      <circle cx="24" cy="24" r="22" fill="var(--v-success-soft)" />
+      <path d="M14 25l7 7 13-15" fill="none" stroke="var(--v-success)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+function HoldRing({ fraction, label, srLabel }: { fraction: number; label: string; srLabel: string }) {
+  const c = 2 * Math.PI * 54;
+  return (
+    <div className="relative mx-auto mt-5 h-44 w-44" role="timer" aria-label={srLabel}>
+      <svg aria-hidden viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--v-line)" strokeWidth="7" />
+        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--v-marigold)" strokeWidth="7" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - Math.min(1, fraction))} className="transition-[stroke-dashoffset] duration-300" />
+      </svg>
+      <span className="absolute inset-0 grid place-items-center text-4xl font-medium tabular-nums">{label}</span>
+    </div>
   );
 }

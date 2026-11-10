@@ -25,7 +25,7 @@ export interface Translator {
   translate(text: string, from: string, to: string): Promise<Translation>;
 }
 
-const numbersOf = (s: string) => (normalizeDigits(s).match(/\d+(?:[.,]\d+)?/g) ?? []).map((n) => n.replace(",", ".")).sort();
+export const numbersOf = (s: string) => (normalizeDigits(s).match(/\d+(?:[.,]\d+)?/g) ?? []).map((n) => n.replace(",", ".")).sort();
 
 /** True if every number in `original` appears in `translated` (after digit normalisation). */
 export function numbersPreserved(original: string, translated: string): boolean {

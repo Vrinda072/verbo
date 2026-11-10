@@ -58,32 +58,32 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
   return (
     <div className="grid gap-6 bg-paper-2 p-5 text-[15px] lg:grid-cols-[1.2fr_1fr_0.9fr]">
       <section aria-label="Timeline">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-ink-3">Timeline</h4>
+        <h4 className="text-xs font-semibold text-ink-3">Timeline</h4>
         <ol className="mt-2 space-y-1.5 border-l-2 border-line pl-3">
           {p.caseTimeline.map((e, i) => (
             <li key={i}>
-              <span className="font-bold">{e.event.replace(/_/g, " ").toLowerCase()}</span>
+              <span className="font-semibold">{e.event.replace(/_/g, " ").toLowerCase()}</span>
               <span className="text-ink-3"> · {e.actor} · {new Date(e.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>
             </li>
           ))}
         </ol>
         {p.instruction && (
           <p className="mt-3 rounded-v bg-card p-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-ink-3">Said ({langName(p.instruction.language)})</span>
+            <span className="text-xs font-semibold text-ink-3">Said ({langName(p.instruction.language)})</span>
             <span lang={p.instruction.language} className="mt-1 block">“{p.instruction.transcript}”</span>
           </p>
         )}
       </section>
 
       <section aria-label="Conversation">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-ink-3">
+        <h4 className="text-xs font-semibold text-ink-3">
           Conversation · {langName(row.senderLanguage)} ↔ {langName(row.recipientLanguage)}
         </h4>
         {p.conversation.length ? (
           <ol className="mt-2 space-y-2">
             {p.conversation.map((m, i) => (
               <li key={i} className="rounded-v bg-card p-3">
-                <p className="text-xs font-bold text-ink-3">{m.author}</p>
+                <p className="text-xs font-semibold text-ink-3">{m.author}</p>
                 <p lang={m.lang}>{m.text}</p>
                 {m.translation ? (
                   <p lang={m.translation.lang} className="mt-1 border-t border-line pt-1 text-ink-2">
@@ -101,7 +101,7 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
       </section>
 
       <section aria-label="Evidence and actions">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-ink-3">Evidence {p.evidence.score}/100</h4>
+        <h4 className="text-xs font-semibold text-ink-3">Evidence {p.evidence.score}/100</h4>
         <ul className="mt-2 space-y-1">
           {d.items.map((i) => (
             <li key={i.key} className={p.evidence.facts[i.key] ? "" : "text-ink-3"}>
@@ -110,10 +110,10 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
           ))}
         </ul>
         <div className="mt-3 flex flex-wrap gap-2">
-          <a className="rounded-v bg-ink px-4 py-2 text-sm font-bold text-paper" href={`/api/desk/cases/${row.id}/evidence?format=pdf`}>
+          <a className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-paper" href={`/api/desk/cases/${row.id}/evidence?format=pdf`}>
             Evidence PDF
           </a>
-          <a className="rounded-v border-2 border-line-strong px-4 py-2 text-sm font-bold" href={`/api/desk/cases/${row.id}/evidence?format=json`}>
+          <a className="rounded-full border-2 border-line-strong px-4 py-2 text-sm font-semibold" href={`/api/desk/cases/${row.id}/evidence?format=json`}>
             JSON
           </a>
         </div>
@@ -127,8 +127,8 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
               type="button"
               disabled={busy !== null}
               onClick={() => act(a.action)}
-              className={`rounded-v px-4 py-2 text-sm font-bold disabled:opacity-50 ${
-                a.action === "escalate" ? "bg-terracotta-soft text-terracotta" : "bg-evergreen-soft text-evergreen"
+              className={`rounded-v px-4 py-2 text-sm font-semibold disabled:opacity-50 ${
+                a.action === "escalate" ? "bg-terracotta-soft text-terracotta" : "bg-brand-soft text-brand"
               }`}
             >
               {busy === a.action ? "…" : a.label}

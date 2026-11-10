@@ -28,7 +28,7 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-12 items-center gap-3 rounded-v border-2 border-line-strong bg-card px-5 font-bold text-ink transition-colors hover:bg-paper-2"
+        className="inline-flex min-h-12 items-center gap-3 rounded-full border-2 border-line-strong bg-card px-5 font-semibold text-ink transition-colors hover:bg-paper-2"
       >
         <span aria-hidden className="text-ink-3">
           <GlobeIcon />
@@ -65,18 +65,18 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
                     setQ("");
                   }}
                   className={`flex w-full items-center justify-between gap-3 rounded-v px-3 py-2.5 text-left hover:bg-paper-2 ${
-                    l.code === value ? "bg-evergreen-soft" : ""
+                    l.code === value ? "bg-brand-soft" : ""
                   }`}
                 >
                   <span>
-                    <span lang={l.code} dir={l.dir} className="block font-bold">
+                    <span lang={l.code} dir={l.dir} className="block font-semibold">
                       {l.nativeName}
                     </span>
                     <span className="block text-sm text-ink-3">{l.englishName}</span>
                   </span>
                   <span
-                    className={`shrink-0 rounded-v px-2 py-0.5 text-xs font-bold ${
-                      WITH_TEMPLATES.has(l.code) ? "bg-evergreen-soft text-evergreen" : "bg-paper-2 text-ink-3"
+                    className={`shrink-0 rounded-v px-2 py-0.5 text-xs font-semibold ${
+                      WITH_TEMPLATES.has(l.code) ? "bg-brand-soft text-brand" : "bg-paper-2 text-ink-3"
                     }`}
                   >
                     {WITH_TEMPLATES.has(l.code) ? "Read-back" : "No read-back yet"}

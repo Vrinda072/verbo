@@ -1,5 +1,31 @@
 # Status
 
+## Nov 10 — recovery coach
+
+- **Added:** after a wrong payment, Gemini drafts up to 3 messages in the sender's language, and new ones after each reply. The sender
+  picks, edits and sends. Code drops drafts with links, contact details, or any number other than the case amount.
+- **Fallback:** a fixed English message in English. In other languages no suggestion is shown if the model is unavailable.
+- **Limit:** 20 coach requests a minute, shared across visitors. Drafts are not back-translated for accuracy or tone.
+
+## Nov 10 — PayPal-style redesign
+
+- **New look:** account-style home and shell, navy bar, soft cards and pill buttons, Figtree type, light theme only. The logo stays
+  Verbo's own, and the footer says this is not a PayPal product.
+- **New on screen:** money path (where the funds are, from real payment state), letter-level comparison of similar names, a hold
+  countdown ring, and a walkthrough that plays by itself.
+- **Local demo:** `/demo` had no bug. The dev server had been stopped.
+
+## Nov 10 — sponsor tools
+
+- **Bryntum:** Deadlines tab in the Case Desk. Dragging a bar moves `cases.escalate_at` and logs `DEADLINE_MOVED`.
+- **APIMatic:** order creation uses PayPal's generated Server SDK, confirmed on the sandbox including idempotency. The Context
+  Plugin isn't installed, because the installer needs the `claude` command. See `docs/apimatic.md`.
+- **Not verified:** authorize, capture and void through the real sandbox still need a person to approve as the buyer.
+- **Bryntum CSS:** served from `public/bryntum` (copied on install). The CSS bundler turns one of its rules into a page-wide margin.
+- **Dropped:** a voice shopping agent using Channel3 was built and removed before commit, because it pulled away from the recovery
+  story and could not add to the prize total. AG Grid remains the sponsor prize target.
+- **Prizes:** the rules allow one sponsor prize per project, plus one grand or honorable mention prize.
+
 ## Nov 7 — ready to deploy on Render
 
 - **Added:** `render.yaml` (web, Postgres, hourly reminders and escalations) and `docs/DEPLOY.md`. **Not deployed yet:** it

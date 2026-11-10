@@ -1,4 +1,5 @@
 "use client";
+import { NameDiff } from "@/components/NameDiff";
 import { useEffect, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";
@@ -61,37 +62,58 @@ export function ConfirmCard({
   return (
     <section
       aria-labelledby="confirm-title"
-      className="v-rise mx-auto w-full max-w-xl rounded-v-lg border border-line bg-card p-6 shadow-v-lg sm:p-8"
+      className="v-rise mx-auto w-full max-w-xl rounded-v-lg bg-card p-6 shadow-v-lg sm:p-8"
     >
-      <div lang={L.usedLang} dir={L.dir}>
-        <h2 id="confirm-title" className="text-xl font-semibold">
-          {L.t("title")}
-        </h2>
-        <p className="mt-2 text-xl text-ink-2">{L.t("readback", vars)}</p>
-      </div>
-      {voice.available && (
-        <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-v border border-line-strong px-4 text-sm font-bold hover:bg-paper-2">
-          <SpeakerIcon />
-          {voice.speaking ? "Speaking…" : "Hear it again"}
-        </button>
-      )}
-      {showEnglish && <p className="mt-1 text-sm text-ink-3">{en.t("readback", vars)}</p>}
-
-      <p className="v-digits mt-6 text-ink" aria-label={`${data.amount.currency} ${data.amount.digits}`}>
-        ${whole}
-        <span className="text-ink-3">.{frac}</span>
-      </p>
-      <p className="text-sm font-bold uppercase tracking-wider text-ink-3">{data.amount.currency}</p>
-
-      <div className="mt-5 rounded-v border border-line bg-paper-2 p-4">
-        <p className="text-sm text-ink-3">to</p>
-        <p className="text-3xl font-bold">{data.recipient.name}</p>
+      <div className="text-center">
+        <span aria-hidden className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-navy text-2xl font-semibold text-navy-ink">
+          {data.recipient.name[0]}
+        </span>
+        <p className="mt-3 text-2xl font-semibold">{data.recipient.name}</p>
         {data.heard.recipient && data.heard.recipient !== data.recipient.name && (
-          <p className="mt-1 text-sm text-ink-3">
+          <p className="text-sm text-ink-3">
             You said: <span lang={L.usedLang}>“{data.heard.recipient}”</span>
           </p>
         )}
+        <p className="v-digits mt-5" aria-label={`${data.amount.currency} ${data.amount.digits}`}>
+          ${whole}
+          <span className="text-ink-3">.{frac}</span>
+        </p>
+        <p className="mt-1 text-sm text-ink-3">{data.amount.currency}</p>
       </div>
+
+      <div className="mt-5 rounded-v bg-paper p-4">
+        <div lang={L.usedLang} dir={L.dir}>
+          <h2 id="confirm-title" className="text-sm text-ink-3">
+            {L.t("title")}
+          </h2>
+          <p className="mt-1 text-xl font-medium leading-snug">{L.t("readback", vars)}</p>
+        </div>
+        {showEnglish && <p className="mt-1 text-sm text-ink-3">{en.t("readback", vars)}</p>}
+        {voice.available && (
+          <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-card px-4 text-sm font-medium text-brand shadow-v">
+            <SpeakerIcon />
+            {voice.speaking ? "Speaking…" : "Hear it again"}
+          </button>
+        )}
+      </div>
+
+      {data.lookAlikes.length > 0 && (
+        <div className="mt-4 rounded-v border border-marigold/50 p-4">
+          <p className="text-sm font-medium text-ink-2">Compare the names</p>
+          <ul className="mt-2 space-y-1.5 text-xl">
+            <li className="flex items-baseline justify-between gap-3">
+              <NameDiff name={data.recipient.name} other={data.lookAlikes[0].name} className="font-medium" />
+              <span className="text-sm text-ink-3">Paying now</span>
+            </li>
+            {data.lookAlikes.map((o) => (
+              <li key={o.id} className="flex items-baseline justify-between gap-3">
+                <NameDiff name={o.name} other={data.recipient.name} />
+                <span className="text-sm text-ink-3">Also in contacts</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-4 space-y-3">
         {data.lookAlikes.map((o) => (
@@ -122,9 +144,9 @@ export function ConfirmCard({
       </div>
 
       {data.risk?.hold && (
-        <div className="mt-4 rounded-v border-2 border-terracotta/60 bg-terracotta-soft p-4">
-          <p className="text-sm font-bold uppercase tracking-wider text-terracotta">Safety hold</p>
-          <p lang={L.usedLang} dir={L.dir} className="mt-1 font-bold">
+        <div className="mt-4 rounded-v bg-marigold-soft p-4 text-marigold-ink">
+          <p className="text-sm font-semibold">Safety hold</p>
+          <p lang={L.usedLang} dir={L.dir} className="mt-1 font-semibold">
             {L.t("hold_notice", { minutes: String(holdMinutes) })}
           </p>
           {showEnglish && <p className="mt-1 text-sm opacity-80">{en.t("hold_notice", { minutes: String(holdMinutes) })}</p>}
@@ -133,7 +155,7 @@ export function ConfirmCard({
 
       {needsTyped && (
         <div className="mt-5">
-          <label htmlFor="typed-amount" className="block font-bold" lang={L.usedLang} dir={L.dir}>
+          <label htmlFor="typed-amount" className="block font-semibold" lang={L.usedLang} dir={L.dir}>
             {L.t("typed_amount")}
           </label>
           <input
@@ -143,26 +165,26 @@ export function ConfirmCard({
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
             aria-invalid={typed !== "" && !typedOk}
-            className="mt-2 w-full rounded-v border-2 border-line-strong bg-paper px-4 py-3 text-2xl font-bold tabular-nums outline-none focus:border-sky"
+            className="mt-2 w-full rounded-full border-2 border-line-strong bg-paper px-4 py-3 text-2xl font-semibold tabular-nums outline-none focus:border-sky"
             placeholder="0.00"
           />
-          {typed !== "" && !typedOk && <p className="mt-1 text-sm font-bold text-terracotta">That doesn’t match the amount above.</p>}
+          {typed !== "" && !typedOk && <p className="mt-1 text-sm font-semibold text-terracotta">That doesn’t match the amount above.</p>}
         </div>
       )}
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+      <div className="mt-6 grid gap-2 sm:grid-cols-2">
         <button
           type="button"
           disabled={busy || !typedOk}
           onClick={() => onConfirm(needsTyped ? typedCents ?? undefined : undefined)}
-          className="min-h-14 rounded-v bg-evergreen px-6 text-lg font-bold text-evergreen-ink shadow-v transition-transform hover:opacity-90 disabled:translate-y-0 disabled:opacity-50"
+          className="min-h-14 sm:col-span-2 rounded-full bg-brand px-6 text-lg font-semibold text-brand-ink shadow-v transition-transform hover:opacity-90 disabled:translate-y-0 disabled:opacity-50"
         >
           <span lang={L.usedLang}>{busy ? "…" : L.t("confirm")}</span>
         </button>
-        <button type="button" onClick={onEdit} disabled={busy} className="min-h-14 rounded-v border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
+        <button type="button" onClick={onEdit} disabled={busy} className="min-h-12 rounded-full px-6 font-semibold text-brand hover:bg-brand-soft">
           <span lang={L.usedLang}>{L.t("edit")}</span>
         </button>
-        <button type="button" onClick={onCancel} disabled={busy} className="min-h-14 rounded-v px-6 font-bold text-terracotta hover:bg-terracotta-soft">
+        <button type="button" onClick={onCancel} disabled={busy} className="min-h-12 rounded-full px-6 font-semibold text-terracotta hover:bg-terracotta-soft">
           <span lang={L.usedLang}>{L.t("cancel")}</span>
         </button>
       </div>
@@ -205,14 +227,14 @@ function Notice({
   lang: string;
   dir: "ltr" | "rtl";
 }) {
-  const cls = tone === "warn" ? "border-marigold/70 bg-marigold-soft text-marigold-ink" : "border-sky/40 bg-sky-soft text-ink";
+  const cls = tone === "warn" ? "bg-marigold-soft text-marigold-ink" : "bg-sky-soft text-ink";
   return (
-    <div role="note" className={`flex gap-3 rounded-v border p-4 ${cls}`}>
-      <span aria-hidden className="mt-0.5 font-bold">
+    <div role="note" className={`flex gap-3 rounded-v p-4 ${cls}`}>
+      <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-card text-sm font-semibold">
         {tone === "warn" ? "!" : "i"}
       </span>
       <div>
-        <p lang={lang} dir={dir} className="font-bold">
+        <p lang={lang} dir={dir} className="font-medium">
           {children}
         </p>
         {english && <p className="mt-1 text-sm opacity-80">{english}</p>}
