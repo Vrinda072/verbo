@@ -94,7 +94,14 @@ export async function createTransferFromDraft(args: { draftId: string; nonce: st
     description: `Verbo transfer to ${contact.name} (sandbox)`,
   });
   if (pp.kind === "mock") t.approveUrl = `${config.baseUrl}/paypal/return?token=${t.orderId}`;
-  await insertTransfer(t, { kind: "send", draftId: draft.id, recipientId: contact.id, language: draft.language, risk: draft.risk });
+  try {
+    await insertTransfer(t, { kind: "send", draftId: draft.id, recipientId: contact.id, language: draft.language, risk: draft.risk });
+  } catch (err) {
+    // A simultaneous request for this nonce won the insert. PayPal's idempotency gave both the same order, so use its record.
+    const winner = await getTransfer(id);
+    if (winner) return winner;
+    throw err;
+  }
   log.info("transfer created", { id, orderId: t.orderId, risk: draft.risk.level });
   return (await getTransfer(id))!;
 }

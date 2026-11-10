@@ -18,7 +18,7 @@ export function registerGrid() {
 
 /** "Warm paper & ink" grid theme, built only from Verbo's design tokens so it follows light/dark mode. */
 export const verboGridTheme = themeQuartz.withParams({
-  accentColor: "var(--v-evergreen)",
+  accentColor: "var(--v-brand)",
   backgroundColor: "var(--v-card)",
   foregroundColor: "var(--v-ink)",
   borderColor: "var(--v-line)",
@@ -27,9 +27,9 @@ export const verboGridTheme = themeQuartz.withParams({
   headerTextColor: "var(--v-ink-2)",
   headerFontWeight: 600,
   oddRowBackgroundColor: "var(--v-paper)",
-  rowHoverColor: "var(--v-marigold-soft)",
-  selectedRowBackgroundColor: "var(--v-evergreen-soft)",
-  fontFamily: "var(--font-inter), system-ui, sans-serif",
+  rowHoverColor: "var(--v-brand-soft)",
+  selectedRowBackgroundColor: "var(--v-brand-soft)",
+  fontFamily: "var(--font-figtree), system-ui, sans-serif",
   fontSize: 15,
   spacing: 7,
   wrapperBorderRadius: 14,

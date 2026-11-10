@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { MoneyPath, type PathTone } from "@/components/MoneyPath";
+import { NameDiff } from "@/components/NameDiff";
 import { labelsFor } from "@/lib/bridge/readback";
 
 /**
@@ -59,21 +61,21 @@ const Pt = ({ children, className = "" }: { children: ReactNode; className?: str
 );
 
 const Warn = ({ children }: { children: ReactNode }) => (
-  <p className="rounded-v border border-marigold/70 bg-marigold-soft p-3 text-sm font-bold text-marigold-ink">{children}</p>
+  <p className="rounded-v bg-marigold-soft p-3 text-sm font-semibold text-marigold-ink">{children}</p>
 );
 
 const PhoneButton = ({ children, tone = "plain", selected = false }: { children: ReactNode; tone?: "go" | "plain"; selected?: boolean }) => (
   <div
-    className={`flex min-h-12 items-center justify-center rounded-v px-4 text-center font-bold ${
-      tone === "go" ? "bg-evergreen text-evergreen-ink" : "border-2 border-line-strong"
-    } ${selected ? "ring-4 ring-marigold" : ""}`}
+    className={`flex min-h-12 items-center justify-center rounded-full px-4 text-center font-semibold ${
+      tone === "go" ? "bg-brand text-brand-ink" : "border-2 border-line-strong"
+    } ${selected ? "ring-4 ring-signal" : ""}`}
   >
     {children}
   </div>
 );
 
 const Bubble = ({ mine, text, lang, translated }: { mine: boolean; text: string; lang: string; translated: boolean }) => (
-  <div className={`max-w-[88%] rounded-v p-3 text-sm ${mine ? "self-end bg-evergreen-soft" : "self-start bg-paper-2"}`}>
+  <div className={`max-w-[88%] rounded-v p-3 text-sm ${mine ? "self-end bg-brand text-brand-ink" : "self-start bg-paper-2"}`}>
     <p lang={lang}>{text}</p>
     {translated && (
       <p className="mt-1 text-xs text-ink-3" lang={lang}>
@@ -111,8 +113,8 @@ const STEPS: Step[] = [
     sender: (
       <div className="flex h-full flex-col justify-center gap-3 p-5">
         <p className="font-semibold">Two contacts have similar names. Select the recipient:</p>
-        <PhoneButton>{RIGHT}</PhoneButton>
-        <PhoneButton selected>{WRONG}</PhoneButton>
+        <PhoneButton><NameDiff name={RIGHT} other={WRONG} /></PhoneButton>
+        <PhoneButton selected><NameDiff name={WRONG} other={RIGHT} /></PhoneButton>
       </div>
     ),
     recipient: <Asleep />,
@@ -125,7 +127,7 @@ const STEPS: Step[] = [
     active: "sender",
     sender: (
       <div className="flex h-full flex-col gap-3 p-5">
-        <Hi className="text-lg font-bold">{hi.t("readback", { amount: AMOUNT, recipient: WRONG })}</Hi>
+        <Hi className="text-lg font-semibold">{hi.t("readback", { amount: AMOUNT, recipient: WRONG })}</Hi>
         <p className="v-digits !text-5xl">$40<span className="text-ink-3">.00</span></p>
         <Warn>
           <Hi>{hi.t("lookalike", { other: RIGHT })}</Hi>
@@ -150,7 +152,7 @@ const STEPS: Step[] = [
     active: "sender",
     sender: (
       <div className="flex h-full flex-col items-center justify-center gap-4 p-5 text-center">
-        <Hi className="text-xl font-bold">{hi.t("hold_title")}</Hi>
+        <Hi className="text-xl font-semibold">{hi.t("hold_title")}</Hi>
         <p className="v-digits !text-5xl tabular-nums">10:00</p>
         <Hi className="text-sm text-ink-2">{hi.t("hold_notice", { minutes: "10" })}</Hi>
         <PhoneButton>
@@ -168,7 +170,7 @@ const STEPS: Step[] = [
     active: "both",
     sender: (
       <div className="flex h-full flex-col justify-center gap-4 p-5">
-        <Hi className="font-bold">{hi.t("sent", { recipient: WRONG })}</Hi>
+        <Hi className="font-semibold">{hi.t("sent", { recipient: WRONG })}</Hi>
         <PhoneButton tone="go" selected>
           <Hi>{hi.t("ask_back")}</Hi>
         </PhoneButton>
@@ -177,7 +179,7 @@ const STEPS: Step[] = [
     recipient: (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-5 text-center">
         <p className="text-sm text-ink-3">PayPal</p>
-        <p className="v-digits !text-5xl text-evergreen">+$40</p>
+        <p className="v-digits !text-5xl text-success">+$40</p>
         <p className="text-ink-2">from Sreenivas</p>
       </div>
     ),
@@ -185,12 +187,16 @@ const STEPS: Step[] = [
   {
     title: "Recovery request",
     story: "Sreenivas requests the money back. Manuel receives a private link in Portuguese that explains what happened. The decision is his.",
-    under: "Verbo cannot take money from an account or force a refund. Any return is voluntary.",
+    under: "AI drafts a polite request for him to edit. Code rejects any draft with a link or a wrong amount. Verbo cannot force a refund, so any return is voluntary.",
     where: "recipient",
     active: "recipient",
     sender: (
-      <div className="flex h-full items-center p-5">
-        <Hi className="font-bold">{hi.t("case_sent", { recipient: WRONG })}</Hi>
+      <div className="flex h-full flex-col justify-center gap-4 p-5">
+        <Hi className="font-semibold">{hi.t("case_sent", { recipient: WRONG })}</Hi>
+        <div className="rounded-v bg-paper p-3">
+          <p className="text-xs text-ink-3">Suggested by AI</p>
+          <Hi className="mt-1 block text-sm">{CHAT[0].hi}</Hi>
+        </div>
       </div>
     ),
     recipient: (
@@ -236,25 +242,29 @@ const STEPS: Step[] = [
     active: "both",
     sender: (
       <div className="flex h-full flex-col items-center justify-center gap-3 p-5 text-center">
-        <p className="v-digits !text-5xl text-evergreen">+$40</p>
-        <Hi className="text-lg font-bold">{hi.t("returned_sender", { recipient: WRONG })}</Hi>
+        <p className="v-digits !text-5xl text-success">+$40</p>
+        <Hi className="text-lg font-semibold">{hi.t("returned_sender", { recipient: WRONG })}</Hi>
       </div>
     ),
     recipient: (
       <div className="flex h-full items-center p-5 text-center">
-        <Pt className="text-lg font-bold">{pt.t("rc_returned", { sender: SENDER })}</Pt>
+        <Pt className="text-lg font-semibold">{pt.t("rc_returned", { sender: SENDER })}</Pt>
       </div>
     ),
   },
 ];
 
-const AUTO_MS = 7000;
+const AUTO_MS = 6500;
 
 export function DemoStage() {
   const [i, setI] = useState(0);
   const [auto, setAuto] = useState(false);
   const step = STEPS[i];
   const last = i === STEPS.length - 1;
+
+  useEffect(() => {
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) setAuto(true);
+  }, []);
 
   const go = useCallback((n: number) => setI(Math.max(0, Math.min(STEPS.length - 1, n))), []);
 
@@ -276,12 +286,10 @@ export function DemoStage() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Product walkthrough</h1>
-          <p className="mt-2 text-sm text-ink-3">
-            A payment sent to the wrong person, from start to finish. Scripted with simulated people. No money moves. Hindi and Portuguese are machine translations.
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-semibold tracking-tight">How a wrong payment gets recovered</h1>
+          <p className="mt-1 text-sm text-ink-3">Scripted with simulated people. No money moves. Hindi and Portuguese are machine translations.</p>
         </div>
         <button
           type="button"
@@ -290,31 +298,61 @@ export function DemoStage() {
             setAuto((a) => !a);
           }}
           aria-pressed={auto}
-          className="min-h-11 rounded-v border-2 border-line-strong px-5 font-bold hover:bg-paper-2"
+          className="min-h-11 rounded-full bg-navy px-6 font-semibold text-navy-ink"
         >
-          {auto ? "Pause" : "Play"}
+          {auto ? "Pause" : last ? "Replay" : "Play"}
         </button>
       </div>
 
-      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,19rem)]">
+      <ol className="mt-5 flex gap-1.5" aria-label="Jump to a step">
+        {STEPS.map((s, n) => (
+          <li key={s.title} className="flex-1">
+            <button
+              type="button"
+              onClick={() => {
+                setAuto(false);
+                go(n);
+              }}
+              aria-label={`Step ${n + 1}: ${s.title}`}
+              aria-current={n === i ? "step" : undefined}
+              className="block w-full py-2"
+            >
+              <span className="block h-1.5 overflow-hidden rounded-full bg-line-strong">
+                {n < i && <span className="block h-full w-full bg-brand" />}
+                {n === i &&
+                  (auto ? (
+                    <span key={`${i}-play`} className="v-fill block h-full bg-brand" style={{ animationDuration: `${AUTO_MS}ms` }} />
+                  ) : (
+                    <span className="block h-full w-full bg-brand" />
+                  ))}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-4 grid items-stretch gap-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,19rem)]">
         <Phone who="Sreenivas" speaks="Hindi" dim={step.active === "recipient"} hideOnSmall={step.active === "recipient"}>
           <div key={i} className="v-rise h-full">{step.sender}</div>
         </Phone>
 
         <section aria-live="polite" className="order-first flex flex-col gap-5 lg:order-none lg:px-2">
           <div key={i} className="v-rise">
-            <p className="text-sm font-bold uppercase tracking-wider text-ink-3">
+            <p className="text-sm font-semibold text-ink-3">
               Step {i + 1} of {STEPS.length}
             </p>
             <h2 className="mt-1 text-2xl font-semibold leading-tight tracking-tight">{step.title}</h2>
             <p className="mt-3 text-ink-2">{step.story}</p>
-            <p className="mt-4 rounded-v border border-line bg-paper-2 p-4 text-base">
-              <strong>How it works: </strong>
+            <p className="mt-4 rounded-v bg-paper-2 p-4 text-base">
+              <span className="font-semibold">How it works: </span>
               {step.under}
             </p>
           </div>
 
-          <MoneyTrack where={step.where} />
+          <div className="rounded-v-lg bg-card p-5 shadow-v-lg">
+            <p className="mb-2 text-sm text-ink-3">Where the money is</p>
+            <MoneyPath stops={[SENDER, "Safety hold", WRONG]} at={WHERE[step.where]} amount="$40" tone={TONE[step.where]} />
+          </div>
 
           <div className="mt-auto">
             <div className="flex items-center gap-3">
@@ -322,12 +360,12 @@ export function DemoStage() {
                 type="button"
                 onClick={() => go(i - 1)}
                 disabled={i === 0}
-                className="min-h-12 rounded-v border-2 border-line-strong px-5 font-bold hover:bg-paper-2 disabled:opacity-40"
+                className="min-h-12 rounded-full border-2 border-line-strong px-5 font-semibold hover:bg-paper-2 disabled:opacity-40"
               >
                 Back
               </button>
               {last ? (
-                <Link href="/send" className="flex min-h-12 flex-1 items-center justify-center rounded-v bg-evergreen px-6 font-bold text-evergreen-ink shadow-v">
+                <Link href="/send" className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-brand px-6 font-semibold text-brand-ink shadow-v">
                   Try it
                 </Link>
               ) : (
@@ -337,35 +375,17 @@ export function DemoStage() {
                     setAuto(false);
                     go(i + 1);
                   }}
-                  className="min-h-12 flex-1 rounded-v bg-evergreen px-6 font-bold text-evergreen-ink shadow-v transition-transform hover:opacity-90"
+                  className="min-h-12 flex-1 rounded-full bg-brand px-6 font-semibold text-brand-ink shadow-v transition-transform hover:opacity-90"
                 >
                   Next
                 </button>
               )}
             </div>
             {last && (
-              <Link href="/desk" className="mt-3 block text-center font-bold text-ink-2 underline underline-offset-4 hover:text-ink">
+              <Link href="/desk" className="mt-3 block text-center font-semibold text-ink-2 underline underline-offset-4 hover:text-ink">
                 Open the Case Desk
               </Link>
             )}
-            <ol className="mt-4 flex justify-center gap-1" aria-label="Jump to a step">
-              {STEPS.map((s, n) => (
-                <li key={s.title}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuto(false);
-                      go(n);
-                    }}
-                    aria-label={`Step ${n + 1}: ${s.title}`}
-                    aria-current={n === i ? "step" : undefined}
-                    className="grid h-8 w-8 place-items-center"
-                  >
-                    <span className={`block h-2 rounded-full transition-all ${n === i ? "w-6 bg-evergreen" : n < i ? "w-2 bg-evergreen/50" : "w-2 bg-line-strong"}`} />
-                  </button>
-                </li>
-              ))}
-            </ol>
           </div>
         </section>
 
@@ -381,47 +401,16 @@ function Phone({ who, speaks, dim, hideOnSmall, children }: { who: string; speak
   return (
     <figure className={`${hideOnSmall ? "hidden lg:block" : ""} transition-opacity duration-300 ${dim ? "lg:opacity-55" : ""}`}>
       <figcaption className="mb-2 flex items-baseline justify-between gap-2 px-2">
-        <span className="whitespace-nowrap font-bold">{who}</span>
+        <span className="whitespace-nowrap font-semibold">{who}</span>
         <span className="whitespace-nowrap text-sm text-ink-3">{speaks}, simulated</span>
       </figcaption>
-      <div className="h-[32rem] overflow-hidden rounded-[2.25rem] border-[6px] border-ink bg-card shadow-v-lg">{children}</div>
+      <div className="flex h-[32rem] flex-col overflow-hidden rounded-[2.25rem] border-[6px] border-navy bg-card shadow-v-lg">
+        <div className="bg-navy px-5 pb-2.5 pt-3 text-center text-sm font-medium text-navy-ink">Verbo</div>
+        <div className="min-h-0 flex-1">{children}</div>
+      </div>
     </figure>
   );
 }
 
-const STOPS: { id: Where; label: string; x: string }[] = [
-  { id: "sender", label: "Sreenivas", x: "0%" },
-  { id: "hold", label: "On hold", x: "50%" },
-  { id: "recipient", label: "Manuel Lopes", x: "100%" },
-];
-
-/** Location of funds right now, the thing people most want to know. */
-function MoneyTrack({ where }: { where: Where }) {
-  const here = STOPS.find((s) => s.id === where)!;
-  return (
-    <div aria-label={`The $40 is with: ${here.label}`} role="img" className="rounded-v-lg border border-line bg-card p-5">
-      <p className="text-sm font-bold uppercase tracking-wider text-ink-3">Location of funds</p>
-      <div className="relative mx-7 mt-6 h-1 rounded-full bg-line-strong">
-        {STOPS.map((s) => (
-          <span key={s.id} aria-hidden className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-line-strong" style={{ left: s.x }} />
-        ))}
-        <span
-          aria-hidden
-          className={`absolute top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full font-bold shadow-v transition-all duration-700 ${
-            where === "recipient" ? "bg-terracotta text-paper" : where === "hold" ? "bg-marigold text-marigold-ink" : "bg-evergreen text-evergreen-ink"
-          }`}
-          style={{ left: here.x, transitionTimingFunction: "var(--v-ease)" }}
-        >
-          $40
-        </span>
-      </div>
-      <div className="mt-7 flex justify-between text-sm font-bold">
-        {STOPS.map((s) => (
-          <span key={s.id} className={s.id === where ? "text-ink" : "text-ink-3"}>
-            {s.label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
+const WHERE: Record<Where, 0 | 1 | 2> = { sender: 0, hold: 1, recipient: 2 };
+const TONE: Record<Where, PathTone> = { sender: "safe", hold: "hold", recipient: "away" };

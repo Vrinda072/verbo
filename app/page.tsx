@@ -1,32 +1,33 @@
 import Link from "next/link";
-import { HeroCard } from "@/components/HeroCard";
+import { ReadbackTicker } from "@/components/ReadbackTicker";
 import { SiteHeader } from "@/components/SiteHeader";
 import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 
-const ACTS = [
-  {
-    when: "Before sending",
-    title: "Payment checks",
-    body: "Similar recipient names require an explicit choice. First-time recipients, unusual amounts and urgent language are flagged, and high-risk payments are held for 10 minutes so they can be cancelled.",
-  },
-  {
-    when: "After sending",
-    title: "Recovery",
-    body: "The recipient receives a private link in their language with an option to return the money, and both people can exchange translated messages. The recipient approves any return on PayPal.",
-  },
-  {
-    when: "For operators",
-    title: "Case Desk",
-    body: "All recovery cases in one view, with a translated timeline and a downloadable evidence packet for each case.",
-  },
+const ACTIVITY = [
+  { name: "Manuel Lopes", note: "Returned after a wrong payment", amount: "+$40.00", status: "Recovered", tone: "bg-success-soft text-success" },
+  { name: "Ana Souza", note: "Cancelled during the safety hold", amount: "$120.00", status: "Cancelled", tone: "bg-paper-2 text-ink-2" },
+  { name: "Lakshmi Rao", note: "Read back in Telugu", amount: "-$25.00", status: "Completed", tone: "bg-brand-soft text-brand" },
+  { name: "Kiran Reddy", note: "Similar name check passed", amount: "-$60.00", status: "Completed", tone: "bg-brand-soft text-brand" },
 ];
 
-const PIPELINE = [
-  { who: "Whisper", does: "Converts speech to text" },
-  { who: "Gemini", does: "Extracts the recipient and amount" },
-  { who: "Validation", does: "Checks both against the transcript and contacts" },
-  { who: "Read-back", does: "Fixed template in the sender’s language" },
-  { who: "Sender", does: "Confirms, then approves on PayPal" },
+const ACTIONS = [
+  { href: "/send", label: "Send by voice", icon: "M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3" },
+  { href: "/demo", label: "See a recovery", icon: "M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" },
+  { href: "/desk", label: "Case Desk", icon: "M4 6h16M4 12h16M4 18h10" },
+];
+
+const ADDS = [
+  { title: "Before sending", body: "Similar names are compared letter by letter. First-time recipients, unusual amounts and pressured speech are flagged." },
+  { title: "During the hold", body: "Risky payments are authorized on PayPal and held for 10 minutes. Cancelling voids the authorization, so nothing moves." },
+  { title: "After a mistake", body: "AI drafts a polite request for you to edit. The recipient gets a private page in their language and can return the money." },
+];
+
+const PIPELINE: [string, string, boolean][] = [
+  ["Whisper", "Speech to text", true],
+  ["Gemini", "Finds recipient and amount", true],
+  ["Code", "Checks both against what was said", false],
+  ["Template", "Reads it back in your language", false],
+  ["You", "Confirm, then approve on PayPal", false],
 ];
 
 export default function Home() {
@@ -34,77 +35,112 @@ export default function Home() {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-              Voice payments on PayPal, with safety checks in the sender’s language
-            </h1>
-            <p className="mt-5 max-w-xl text-lg text-ink-2">
-              Verbo lets people send payments by speaking. It reads each payment back before it goes, flags risky ones, and
-              supports recovery when money reaches the wrong person, including across languages.
+      <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        <h1 className="text-3xl font-semibold tracking-tight">Hello, Sreenivas</h1>
+        <p className="mt-1 text-ink-3">Simulated account on the PayPal sandbox</p>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+          <section aria-labelledby="voice" className="rounded-v-lg bg-navy p-6 text-navy-ink sm:p-8">
+            <h2 id="voice" className="max-w-md text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              Say who to pay and how much, in your language
+            </h2>
+            <p className="mt-3 max-w-lg text-navy-ink/80">
+              Verbo reads the payment back before it goes, holds risky ones, and helps recover money sent to the wrong person.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/demo"
-                className="inline-flex min-h-14 items-center justify-center rounded-v bg-evergreen px-7 text-lg font-bold text-evergreen-ink shadow-v transition-opacity duration-200 hover:opacity-90"
-              >
-                View demo
-              </Link>
-              <Link
-                href="/send"
-                className="inline-flex min-h-14 items-center justify-center rounded-v border-2 border-line-strong px-7 text-lg font-bold transition-colors hover:bg-paper-2"
-              >
-                Try it
-              </Link>
+            <div className="mt-6">
+              <ReadbackTicker />
             </div>
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <Link href="/send" className="inline-flex min-h-13 items-center gap-2 rounded-full bg-white px-7 py-3 text-lg font-semibold text-navy hover:bg-signal">
+                <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <rect x="9" y="3" width="6" height="11" rx="3" />
+                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+                </svg>
+                Start speaking
+              </Link>
+              <p className="text-sm text-navy-ink/75">
+                {LANGUAGES.length} languages for voice · {readbacks} with written read-back
+              </p>
+            </div>
+          </section>
+
+          <div className="grid content-start gap-5">
+            <section aria-labelledby="balance" className="rounded-v-lg bg-card p-6 shadow-v-lg">
+              <h2 id="balance" className="text-ink-2">Sandbox balance</h2>
+              <p className="v-digits mt-2 !text-5xl">
+                $2,480<span className="text-ink-3">.50</span>
+              </p>
+              <p className="mt-2 text-sm text-ink-3">Simulated. No real money.</p>
+            </section>
+            <nav aria-label="Quick actions" className="grid grid-cols-3 gap-2 rounded-v-lg bg-card p-4 shadow-v-lg">
+              {ACTIONS.map((a) => (
+                <Link key={a.href} href={a.href} className="group grid justify-items-center gap-2 rounded-v py-2 text-center text-sm font-medium">
+                  <span className="grid h-13 w-13 place-items-center rounded-full bg-brand text-brand-ink transition-transform group-hover:scale-105">
+                    <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d={a.icon} />
+                    </svg>
+                  </span>
+                  {a.label}
+                </Link>
+              ))}
+            </nav>
           </div>
-          <HeroCard />
-        </section>
+        </div>
 
-        <section aria-label="What Verbo does" className="grid gap-px overflow-hidden rounded-v-lg border border-line bg-line md:grid-cols-3">
-          {ACTS.map((a) => (
-            <article key={a.when} className="bg-card p-7">
-              <p className="text-sm font-semibold text-ink-3">{a.when}</p>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight">{a.title}</h2>
-              <p className="mt-3 text-ink-2">{a.body}</p>
-            </article>
-          ))}
-        </section>
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+          <section aria-labelledby="activity" className="rounded-v-lg bg-card p-6 shadow-v-lg">
+            <div className="flex items-baseline justify-between">
+              <h2 id="activity" className="text-xl font-semibold">Recent activity</h2>
+              <span className="text-sm text-ink-3">Simulated</span>
+            </div>
+            <ul className="mt-2 divide-y divide-line">
+              {ACTIVITY.map((a) => (
+                <li key={a.name} className="flex items-center gap-3 py-3.5">
+                  <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper-2 font-semibold text-ink-2">
+                    {a.name[0]}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{a.name}</p>
+                    <p className="truncate text-sm text-ink-3">{a.note}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium tabular-nums">{a.amount}</p>
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${a.tone}`}>{a.status}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-        <section aria-labelledby="money" className="py-12 sm:py-16">
-          <h2 id="money" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            How payments are checked
-          </h2>
-          <p className="mt-3 max-w-2xl text-lg text-ink-2">
-            AI models transcribe and extract, but they do not decide. Code validates the recipient and amount against what was
-            said, and the read-back is a fixed template rather than model output.
-          </p>
-          <ol className="mt-8 grid gap-3 md:grid-cols-5">
-            {PIPELINE.map((p, i) => (
-              <li key={p.who} className={`rounded-v border p-4 ${i >= 2 ? "border-evergreen/40 bg-evergreen-soft" : "border-line bg-card"}`}>
-                <p className="text-lg font-bold">{p.who}</p>
-                <p className="mt-1 text-base text-ink-2">{p.does}</p>
+          <section aria-labelledby="adds" className="rounded-v-lg bg-card p-6 shadow-v-lg">
+            <h2 id="adds" className="text-xl font-semibold">What Verbo adds to a payment</h2>
+            <dl className="mt-3 grid gap-4">
+              {ADDS.map((a) => (
+                <div key={a.title}>
+                  <dt className="font-medium">{a.title}</dt>
+                  <dd className="mt-0.5 text-sm text-ink-2">{a.body}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        </div>
+
+        <section aria-labelledby="ai" className="mt-5 rounded-v-lg bg-card p-6 shadow-v-lg">
+          <h2 id="ai" className="text-xl font-semibold">How AI is used in a payment</h2>
+          <ol className="mt-4 grid gap-4 sm:grid-cols-5">
+            {PIPELINE.map(([who, does, ai]) => (
+              <li key={who} className={`border-t-[3px] pt-3 ${ai ? "border-signal" : "border-navy"}`}>
+                <p className="font-semibold">{who}</p>
+                <p className="mt-0.5 text-sm text-ink-2">{does}</p>
               </li>
             ))}
           </ol>
-          <p className="mt-3 text-sm text-ink-3">Highlighted steps do not use an AI model.</p>
+          <p className="mt-4 text-sm text-ink-3">Light blue steps use AI. Dark blue steps do not.</p>
         </section>
 
-        <section aria-label="Language coverage" className="grid gap-6 border-t border-line py-10 sm:grid-cols-2">
-          <p>
-            <span className="v-digits block">{LANGUAGES.length}</span>
-            <span className="mt-2 block text-ink-2">languages available for voice input</span>
-          </p>
-          <p>
-            <span className="v-digits block">{readbacks}</span>
-            <span className="mt-2 block text-ink-2">with a written read-back. Others read back in English.</span>
-          </p>
-        </section>
-
-        <footer className="border-t border-line py-8 text-sm text-ink-3">
-          Built for the PayPal AI Hackathon. Runs on the PayPal <strong>sandbox</strong>, so no real money moves. Verbo cannot
-          force a refund. It supports voluntary returns and keeps a record.
+        <footer className="mt-8 text-sm text-ink-3">
+          Verbo is an independent hackathon project that runs on the PayPal sandbox. It is not a PayPal product, and no real money moves.
+          It cannot force a refund; returns are voluntary.
         </footer>
       </main>
     </>

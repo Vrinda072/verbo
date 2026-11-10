@@ -5,6 +5,7 @@ import { LANGUAGES } from "@/lib/bridge/readback";
 import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { MicButton } from "@/components/send/MicButton";
+import { NameDiff } from "@/components/NameDiff";
 import { ConfirmCard, type UnderstandResponse } from "@/components/send/ConfirmCard";
 import { Stepper } from "@/components/send/Stepper";
 
@@ -134,7 +135,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.25fr_0.75fr]">
           <div className="grid gap-6">
             {mic.status !== "unavailable" && (
-              <section aria-label="Microphone" className="rounded-v-lg border border-line bg-card px-6 py-10 text-center shadow-v sm:py-12">
+              <section aria-label="Microphone" className="rounded-v-lg bg-card px-6 py-10 text-center shadow-v sm:py-12">
                 {working ? (
                   <Working stage={phase === "understanding" ? 1 : 0} />
                 ) : (
@@ -165,7 +166,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                   if (mic.transcript.trim()) void check(mic.transcript.trim());
                 }}
               >
-                <label htmlFor="transcript" className="block text-sm font-bold uppercase tracking-wider text-ink-3">
+                <label htmlFor="transcript" className="block text-sm font-semibold text-ink-3">
                   What you said (you can edit it)
                 </label>
                 <textarea
@@ -183,21 +184,21 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                   <button
                     type="submit"
                     disabled={!mic.transcript.trim() || phase === "understanding" || mic.status === "listening"}
-                    className="min-h-12 shrink-0 rounded-v bg-ink px-6 font-bold text-paper disabled:opacity-40"
+                    className="min-h-12 shrink-0 rounded-full bg-brand px-6 font-semibold text-paper disabled:opacity-40"
                   >
                     {phase === "understanding" ? "Checking…" : "Check"}
                   </button>
                 </div>
               </form>
             ) : (
-              <button type="button" onClick={() => setTyping(true)} className="justify-self-center rounded-v px-4 py-2 font-bold text-ink-2 underline underline-offset-4 hover:text-ink">
+              <button type="button" onClick={() => setTyping(true)} className="justify-self-center rounded-v px-4 py-2 font-semibold text-ink-2 underline underline-offset-4 hover:text-ink">
                 Type instead
               </button>
             )}
 
           {result && !result.ok && (
             <div role="alert" className="mx-auto w-full max-w-xl rounded-v-lg border border-terracotta/50 bg-terracotta-soft p-5">
-              <p className="font-bold text-terracotta">Nothing was sent. More information is needed:</p>
+              <p className="font-semibold text-terracotta">Nothing was sent. More information is needed:</p>
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 {result.problems.map((p, i) => (
                   <li key={i}>
@@ -211,7 +212,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                               key={c.id}
                               type="button"
                               onClick={() => void check(mic.transcript.trim(), c.name)}
-                              className="min-h-12 rounded-v border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                              className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-semibold hover:bg-paper-2"
                             >
                               {c.name}
                             </button>
@@ -226,9 +227,9 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                             key={name}
                             type="button"
                             onClick={() => void check(mic.transcript.trim(), name)}
-                            className="min-h-12 rounded-v border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                            className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-semibold hover:bg-paper-2"
                           >
-                            {name}
+                            <NameDiff name={name} other={(p.candidates as string[]).find((x) => x !== name) ?? name} />
                           </button>
                         ))}
                       </span>
@@ -246,17 +247,17 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           </div>
 
           <aside className="grid gap-6">
-            <section aria-labelledby="try-title" className="rounded-v-lg border border-line bg-paper-2 p-6">
-              <h2 id="try-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
+            <section aria-labelledby="try-title" className="rounded-v-lg bg-navy p-6 text-navy-ink">
+              <h2 id="try-title" className="text-sm text-navy-ink/75">
                 Example
               </h2>
               <p lang={lang} dir={langInfo?.dir} className="mt-3 text-lg font-medium leading-snug">
                 “{EXAMPLES[lang] ?? EXAMPLES.en}”
               </p>
-              {lang !== "en" && EXAMPLES[lang] && <p className="mt-2 text-sm text-ink-3">“{EXAMPLES.en}”</p>}
+              {lang !== "en" && EXAMPLES[lang] && <p className="mt-2 text-sm text-navy-ink/75">“{EXAMPLES.en}”</p>}
             </section>
-            <section aria-labelledby="contacts-title" className="rounded-v-lg border border-line bg-card p-6">
-              <h2 id="contacts-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
+            <section aria-labelledby="contacts-title" className="rounded-v-lg bg-card p-6">
+              <h2 id="contacts-title" className="text-sm font-semibold text-ink-3">
                 People you can pay (simulated)
               </h2>
               <ul className="mt-3 grid gap-2">
@@ -268,9 +269,9 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                         setTyping(true);
                         mic.setTranscript(`${mic.transcript} ${c.name}`.trim());
                       }}
-                      className="flex min-h-11 w-full items-center gap-3 rounded-v px-2 text-left font-bold hover:bg-paper-2"
+                      className="flex min-h-11 w-full items-center gap-3 rounded-full px-2 text-left font-semibold hover:bg-paper-2"
                     >
-                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-evergreen-soft text-sm text-evergreen">
+                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft text-sm text-brand">
                         {c.name[0]}
                       </span>
                       {c.name}
@@ -307,8 +308,8 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       )}
 
       {phase === "created" && created && result?.recipient && result.amount && (
-        <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg border border-line bg-card p-8 text-center shadow-v-lg">
-          <p className="text-sm font-bold uppercase tracking-wider text-evergreen">Confirmed</p>
+        <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg bg-card p-8 text-center shadow-v-lg">
+          <p className="text-sm font-semibold text-brand">Confirmed</p>
           <h2 className="mt-2 text-2xl font-semibold">
             One last step on PayPal: approve ${result.amount.digits} to {result.recipient.name}
           </h2>
@@ -319,7 +320,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           </p>
           <a
             href={created.approveUrl ?? `/send/t/${created.id}`}
-            className="mt-6 inline-flex min-h-14 items-center rounded-v bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v"
+            className="mt-6 inline-flex min-h-14 items-center rounded-full bg-brand px-8 text-lg font-semibold text-brand-ink shadow-v"
           >
             Approve on PayPal
           </a>
@@ -337,11 +338,11 @@ function Working({ stage }: { stage: 0 | 1 }) {
   return (
     <div role="status" className="mx-auto flex max-w-sm flex-col gap-4 py-10 text-left">
       {lines.map((line, i) => (
-        <p key={line} className={`flex items-center gap-3 text-xl font-bold ${i > stage ? "text-ink-3" : ""}`}>
+        <p key={line} className={`flex items-center gap-3 text-xl font-semibold ${i > stage ? "text-ink-3" : ""}`}>
           {i < stage ? (
-            <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-evergreen text-sm text-evergreen-ink">✓</span>
+            <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-brand text-sm text-brand-ink">✓</span>
           ) : i === stage ? (
-            <span aria-hidden className="v-spin h-7 w-7 rounded-full border-4 border-line-strong border-t-evergreen" />
+            <span aria-hidden className="v-spin h-7 w-7 rounded-full border-4 border-line-strong border-t-brand" />
           ) : (
             <span aria-hidden className="h-7 w-7 rounded-full border-2 border-line-strong" />
           )}
@@ -355,10 +356,10 @@ function Working({ stage }: { stage: 0 | 1 }) {
 
 function Done({ title, body, onAgain }: { title: string; body: string; onAgain: () => void }) {
   return (
-    <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg border border-line bg-card p-8 text-center shadow-v">
+    <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg bg-card p-8 text-center shadow-v">
       <h2 className="text-2xl font-semibold">{title}</h2>
       <p className="mt-2 text-ink-2">{body}</p>
-      <button type="button" onClick={onAgain} className="mt-6 min-h-12 rounded-v bg-evergreen px-6 font-bold text-evergreen-ink">
+      <button type="button" onClick={onAgain} className="mt-6 min-h-12 rounded-full bg-brand px-6 font-semibold text-brand-ink">
         Start again
       </button>
     </div>

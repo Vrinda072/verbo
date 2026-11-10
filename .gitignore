@@ -45,3 +45,6 @@ next-env.d.ts
 docs/private/
 /.pglite/
 /out-evidence/
+
+# copied from node_modules on install
+/public/bryntum
