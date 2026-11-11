@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CONTACTS } from "@/lib/contacts";
-import { LANGUAGES } from "@/lib/bridge/readback";
+import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
+import { ANSWER_MS, matchChoice, MAX_FOLLOW_UPS, mergeAnswer, nextQuestion, questionParts, questionText, SPEECH_TIMEOUT_MS, type Question } from "@/lib/speech/clarify";
+import { useReadAloud } from "@/lib/speech/useReadAloud";
 import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { MicButton } from "@/components/send/MicButton";
@@ -44,6 +46,17 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
   const langInfo = LANGUAGES.find((l) => l.code === lang);
   const heardByVoice = useRef("");
   const [typing, setTyping] = useState(false);
+  const [question, setQuestion] = useState<Question | null>(null);
+  const followUps = useRef(0);
+  const chosenName = useRef<string | undefined>(undefined);
+  // What has been understood so far. A failed answer is left out, so "banana" can't muddle the next attempt.
+  const base = useRef("");
+  const askedKind = useRef<Question["kind"] | null>(null);
+  const L = labelsFor(lang);
+  const questionLine = question ? questionText(question, L) : "";
+  const voice = useReadAloud(questionLine, L.usedLang, question ? questionParts(question) : undefined);
+  const micStatus = useRef(mic.status);
+  micStatus.current = mic.status;
   const step = phase === "created" ? 2 : phase === "review" || phase === "creating" ? 1 : 0;
   const working = phase === "understanding" || mic.status === "finishing";
 
@@ -56,13 +69,81 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
   // When the mic finishes, check what was said.
   useEffect(() => {
     if (mic.status === "done" && mic.transcript) {
+      if (question) {
+        void answer(question, mic.transcript);
+        return;
+      }
       heardByVoice.current = mic.transcript;
+      base.current = mic.transcript;
+      followUps.current = 0;
+      chosenName.current = undefined;
       void check(mic.transcript);
     }
+    if (mic.status === "error") setQuestion(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mic.status]);
 
-  async function check(text: string, chosenRecipient?: string) {
+  // Ask aloud, then listen. Without a voice for this language the question stays on screen and the person taps the mic.
+  useEffect(() => {
+    if (!question) return;
+    let done = false;
+    const listen = () => {
+      if (done || micStatus.current === "listening" || micStatus.current === "connecting") return;
+      done = true;
+      void mic.start();
+    };
+    if (new URLSearchParams(window.location.search).has("quiet")) {
+      const t = setTimeout(listen, 400);
+      return () => clearTimeout(t);
+    }
+    if (!voice.available) return;
+    void voice.play(listen);
+    const t = setTimeout(listen, SPEECH_TIMEOUT_MS);
+    return () => {
+      done = true;
+      clearTimeout(t);
+    };
+    // Once per question.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question]);
+
+  // A follow-up answer is short, so recording ends by itself. The person doesn't need to touch the screen.
+  useEffect(() => {
+    if (!question || mic.status !== "listening") return;
+    const t = setTimeout(() => mic.stop(), ANSWER_MS[question.kind]);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question, mic.status]);
+
+  function ask(q: Question | null) {
+    if (q && followUps.current < MAX_FOLLOW_UPS) {
+      followUps.current += 1;
+      setQuestion({ ...q });
+    } else setQuestion(null);
+  }
+
+  function answer(q: Question, said: string) {
+    const original = base.current;
+    if (q.kind === "which") {
+      heardByVoice.current = original;
+      mic.setTranscript(original);
+      const pick = matchChoice(said);
+      if (!pick) return ask(q); // Unclear: ask again rather than guess.
+      setQuestion(null);
+      chosenName.current = pick === 1 ? q.a : q.b;
+      return check(original);
+    }
+    setQuestion(null);
+    const merged = mergeAnswer(original, said);
+    heardByVoice.current = merged;
+    askedKind.current = q.kind;
+    mic.setTranscript(merged);
+    return check(merged);
+  }
+
+  async function check(text: string, tapped?: string) {
+    const chosenRecipient = tapped ?? chosenName.current;
+    if (tapped) chosenName.current = tapped;
     setError(null);
     setPhase("understanding");
     try {
@@ -76,6 +157,10 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       setResult(data);
       setNonce(crypto.randomUUID());
       setPhase(data.ok ? "review" : "input");
+      const next = !data.ok && text === heardByVoice.current ? nextQuestion(data.problems) : null;
+      if (askedKind.current && next?.kind !== askedKind.current) base.current = text;
+      askedKind.current = null;
+      ask(next);
     } catch {
       setError("Verbo couldn’t check that just now. Nothing was sent. Please try again.");
       setPhase("input");
@@ -114,6 +199,9 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
     setError(null);
     mic.setTranscript("");
     setTyping(false);
+    setQuestion(null);
+    followUps.current = 0;
+    chosenName.current = undefined;
     setPhase("input");
   }
 
@@ -140,6 +228,14 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                   <Working stage={phase === "understanding" ? 1 : 0} />
                 ) : (
                   <>
+                    {question ? (
+                      <div role="status" className="mb-6">
+                        <p className="text-sm text-ink-3">{voice.speaking ? "Verbo is asking" : "Answer out loud, or tap the microphone"}</p>
+                        <p lang={L.usedLang} dir={L.dir} className="mx-auto mt-1 max-w-lg text-2xl font-medium leading-snug">
+                          {questionLine}
+                        </p>
+                      </div>
+                    ) : (
                     <p className="mb-6 text-lg">
                       Say the recipient and amount in{" "}
                       <strong lang={lang} dir={langInfo?.dir}>
@@ -147,6 +243,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                       </strong>
                       {langInfo && langInfo.nativeName !== langInfo.englishName && <span className="text-ink-3"> ({langInfo.englishName})</span>}
                     </p>
+                    )}
                     <MicButton status={mic.status} analyser={mic.analyser} onStart={mic.start} onStop={mic.stop} />
                   </>
                 )}
@@ -196,7 +293,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
               </button>
             )}
 
-          {result && !result.ok && (
+          {result && !result.ok && (!question || question.kind === "which") && (
             <div role="alert" className="mx-auto w-full max-w-xl rounded-v-lg border border-terracotta/50 bg-terracotta-soft p-5">
               <p className="font-semibold text-terracotta">Nothing was sent. More information is needed:</p>
               <ul className="mt-2 list-disc space-y-1 pl-5">
@@ -222,13 +319,14 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                     )}
                     {p.code === "recipient_ambiguous" && (
                       <span className="mt-2 flex flex-wrap gap-2">
-                        {(p.candidates as string[]).map((name) => (
+                        {(p.candidates as string[]).map((name, n) => (
                           <button
                             key={name}
                             type="button"
                             onClick={() => void check(mic.transcript.trim(), name)}
                             className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-semibold hover:bg-paper-2"
                           >
+                            <span className="mr-2 text-ink-3">{n + 1}</span>
                             <NameDiff name={name} other={(p.candidates as string[]).find((x) => x !== name) ?? name} />
                           </button>
                         ))}

@@ -107,7 +107,7 @@ const STEPS: Step[] = [
   {
     title: "Recipient selection",
     story: "He has two contacts with similar names, Manuel Lopez and Manuel Lopes. Speech recognition cannot reliably distinguish them, so he must select one. In this example he selects the wrong contact.",
-    under: "The model only fills in fields. Code matches the name against contacts, and the sender makes the final choice.",
+    under: "Verbo asks aloud and he answers by saying one or two, because speech recognition cannot separate these names. Code matches his answer.",
     where: "sender",
     active: "sender",
     sender: (

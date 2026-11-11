@@ -22,7 +22,8 @@
     "eval": "tsx scripts/eval.ts",
     "release-holds": "tsx scripts/release-holds.ts",
     "recovery-tick": "tsx scripts/recovery-tick.ts",
-    "e2e-recovery": "tsx scripts/e2e-recovery.ts"
+    "e2e-recovery": "tsx scripts/e2e-recovery.ts",
+    "voice-samples": "tsx scripts/voice-samples.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",

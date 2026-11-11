@@ -11,7 +11,8 @@ export type TemplateKey =
   | "unusual_amount" | "pressure" | "hold_title" | "hold_notice" | "cancel_hold" | "sent" | "cancelled"
   | "rc_title" | "rc_body" | "rc_choice" | "rc_return" | "rc_keep" | "rc_chat" | "rc_placeholder" | "rc_send"
   | "rc_returned" | "rc_refused" | "rc_untranslated" | "rc_translated" | "rc_expired"
-  | "ask_back" | "case_sent" | "returned_sender";
+  | "ask_back" | "case_sent" | "returned_sender" | "ask_which" | "ask_amount" | "ask_recipient"
+  | "ask_same_sound" | "ask_option_known" | "ask_option_new" | "word_one" | "word_two";
 
 interface TemplateEntry {
   source: "authored" | "machine" | "native";
@@ -23,6 +24,9 @@ const TEMPLATES = templatesFile.templates as Record<string, TemplateEntry>;
 export const TEMPLATE_KEYS = templatesFile.keys as TemplateKey[];
 export const PLACEHOLDERS: Partial<Record<TemplateKey, string[]>> = {
   readback: ["amount", "recipient"],
+  ask_which: ["a", "b"],
+  ask_option_known: ["n", "name", "letter"],
+  ask_option_new: ["n", "name", "letter"],
   lookalike: ["other"],
   hold_notice: ["minutes"],
   sent: ["recipient"],

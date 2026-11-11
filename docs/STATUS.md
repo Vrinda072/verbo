@@ -1,5 +1,20 @@
 # Status
 
+## Nov 10 — spoken follow-ups on Send
+
+- **Added:** when a voice request is missing the name or amount, or matches two similar contacts, Verbo asks aloud and listens. Answers
+  to similar names are "one" or "two", matched by code. Up to 3 follow-ups per payment, then the on-screen controls take over.
+- **Voice:** ElevenLabs (`eleven_v4_turbo`) when `ELEVENLABS_API_KEY` is set, otherwise browser speech. `/api/tts` only voices fixed
+  templates with contact names and a formatted amount, caches clips in memory, and allows 30 requests a minute. Without a key or
+  on any failure, the browser voice is used, and without that the question appears on screen.
+- **Sound-alike names:** the question tells them apart by the letter that differs and whether the sender has paid them before,
+  both from code and the address book ("Say one for Manuel Lopez, spelled with the letter Z, who you have paid before").
+  River's audio, transcribed back with Whisper, came through with Z and S in en, es, pt and ar; Hindi and Telugu audio was
+  complete but Whisper stopped early, so those two are not confirmed by ear.
+- **Unchanged:** the payment is always confirmed by tap, then approved on PayPal.
+- **Not verified:** a real microphone. The flow was tested with simulated recordings and transcripts. New question templates in hi, te, es,
+  pt and ar are machine-written and need native review.
+
 ## Nov 10 — recovery coach
 
 - **Added:** after a wrong payment, Gemini drafts up to 3 messages in the sender's language, and new ones after each reply. The sender

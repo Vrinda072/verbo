@@ -48,3 +48,6 @@ docs/private/
 
 # copied from node_modules on install
 /public/bryntum
+
+# local ElevenLabs voice samples
+/voice-samples
