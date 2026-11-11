@@ -714,7 +714,7 @@ export function DemoStage({ initialStory }: { initialStory?: string }) {
 
 function Phone({ who, speaks, dim, hideOnSmall, children }: { who: string; speaks: string; dim: boolean; hideOnSmall: boolean; children: ReactNode }) {
   return (
-    <figure className={`${hideOnSmall ? "hidden lg:block" : ""} transition-opacity duration-300 ${dim ? "lg:opacity-55" : ""}`}>
+    <figure className={`${hideOnSmall ? "hidden lg:block" : ""} transition-[filter,transform] duration-300 ${dim ? "lg:scale-[0.98] lg:grayscale" : ""}`}>
       <figcaption className="mb-2 flex items-baseline justify-between gap-2 px-2">
         <span className="whitespace-nowrap font-semibold">{who}</span>
         <span className="whitespace-nowrap text-sm text-ink-3">{speaks}, simulated</span>

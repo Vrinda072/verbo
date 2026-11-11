@@ -51,3 +51,8 @@ docs/private/
 
 # local ElevenLabs voice samples
 /voice-samples
+
+# Impeccable design tooling (installed per machine by its Claude Code plugin)
+.claude/settings.local.json
+.claude/skills/impeccable/
+.claude/agents/impeccable-*

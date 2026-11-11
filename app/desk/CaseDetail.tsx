@@ -8,7 +8,7 @@ interface Detail {
   packet: {
     simulated: boolean;
     caseTimeline: { at: string; event: string; actor: string }[];
-    conversation: { at: string; author: string; text: string; lang: string; translation: { text: string; lang: string } | null }[];
+    conversation: { at: string; author: string; text: string; lang: string; translation: { text: string; lang: string } | null; english?: string | null }[];
     instruction: { transcript: string; language: string; understoodBy: string } | null;
     payment: { paypal: { orderId?: string; captureId?: string }; risk: { level?: string; signals?: { code: string }[] } | null } | null;
     evidence: { score: number; facts: Record<string, boolean> };
@@ -94,6 +94,9 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
                   </p>
                 ) : (
                   <p className="mt-1 text-xs text-ink-3">not translated</p>
+                )}
+                {m.english && !m.lang.startsWith("en") && !m.translation?.lang?.startsWith("en") && (
+                  <p lang="en" className="v-sub">English: {m.english}</p>
                 )}
                 <p className="mt-1 text-xs text-ink-3">
                   {langName(m.lang)}

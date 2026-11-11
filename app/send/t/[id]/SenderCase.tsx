@@ -1,4 +1,5 @@
 "use client";
+import { En, EnText } from "@/components/En";
 import { useCallback, useEffect, useState } from "react";
 import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 import type { SenderCaseView } from "@/lib/recovery/views";
@@ -99,6 +100,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
           className="min-h-14 w-full rounded-v border-2 border-terracotta/60 px-6 text-lg font-semibold text-terracotta hover:bg-terracotta-soft disabled:opacity-60"
         >
           <span lang={L.usedLang}>{busy ? "…" : L.t("ask_back")}</span>
+          {!busy && <En L={L} k="ask_back" />}
         </button>
         {error && <p className="mt-2 text-terracotta">{error}</p>}
       </div>
@@ -112,10 +114,12 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
       {returned ? (
         <p lang={L.usedLang} dir={L.dir} className="rounded-v bg-brand-soft p-4 text-lg font-semibold text-brand">
           {L.t("returned_sender", { recipient: c.recipientName })}
+          <En L={L} k="returned_sender" vars={{ recipient: c.recipientName }} />
         </p>
       ) : (
         <p lang={L.usedLang} dir={L.dir} className="rounded-v bg-sky-soft p-4 font-semibold">
           {L.t("case_sent", { recipient: c.recipientName })}
+          <En L={L} k="case_sent" vars={{ recipient: c.recipientName }} />
         </p>
       )}
       <p className="mt-2 text-sm text-ink-3">
@@ -149,6 +153,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
             <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] rounded-v-lg px-4 py-2 ${mine ? "bg-brand-soft" : "border border-line bg-card"}`}>
                 <p lang={!mine && m.translatedText && !original ? (m.translatedLang ?? m.lang) : m.lang}>{shown}</p>
+                <EnText text={m.englishText} show={m.englishText !== shown && !(!mine && m.translatedText && !original ? (m.translatedLang ?? m.lang) : m.lang).startsWith("en")} />
                 {!mine && (
                   <p className="mt-1 text-xs text-ink-3">
                     {m.translatedText ? `Translated from ${nameOf(m.lang)}` : m.lang !== L.usedLang ? `Not translated (${nameOf(m.lang)})` : ""}
@@ -159,6 +164,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
                     {m.numbers.length > 0 && (
                       <span lang={L.usedLang} className="rounded-full bg-success-soft px-2.5 py-1 font-medium text-success">
                         {L.t("numbers_checked", { numbers: m.numbers.join(", ") })}
+                        <En L={L} k="numbers_checked" vars={{ numbers: m.numbers.join(", ") }} className="text-xs" />
                       </span>
                     )}
                     <button
@@ -239,6 +245,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
         />
         <button type="submit" disabled={!draft.trim() || busy} className="min-h-12 rounded-full bg-brand px-5 font-semibold text-paper disabled:opacity-40">
           <span lang={L.usedLang}>{L.t("rc_send")}</span>
+          <En L={L} k="rc_send" className="v-sub-on-dark text-xs" />
         </button>
       </form>
     </div>

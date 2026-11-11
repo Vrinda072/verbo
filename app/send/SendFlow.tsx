@@ -247,6 +247,11 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                         <p lang={L.usedLang} dir={L.dir} className="mx-auto mt-1 max-w-lg text-2xl font-medium leading-snug">
                           {questionLine}
                         </p>
+                        {L.usedLang !== "en" && (
+                          <p lang="en" className="v-sub mx-auto max-w-lg text-base">
+                            {questionText(question, labelsFor("en"))}
+                          </p>
+                        )}
                       </div>
                     ) : (
                     <p className="mb-6 text-lg">

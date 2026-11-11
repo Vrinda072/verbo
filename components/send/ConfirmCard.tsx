@@ -1,4 +1,5 @@
 "use client";
+import { En } from "@/components/En";
 import { NameDiff } from "@/components/NameDiff";
 import { useEffect, useState } from "react";
 import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
@@ -106,6 +107,7 @@ export function ConfirmCard({
         <div lang={L.usedLang} dir={L.dir}>
           <h2 id="confirm-title" className="text-sm text-ink-3">
             {L.t("title")}
+            <En L={L} k="title" className="text-xs" />
           </h2>
           <p className="mt-1 text-xl font-medium leading-snug">{L.t("readback", vars)}</p>
         </div>
@@ -183,6 +185,7 @@ export function ConfirmCard({
         <div className="mt-5">
           <label htmlFor="typed-amount" className="block font-semibold" lang={L.usedLang} dir={L.dir}>
             {L.t("typed_amount")}
+            <En L={L} k="typed_amount" />
           </label>
           <input
             id="typed-amount"
@@ -206,12 +209,15 @@ export function ConfirmCard({
           className="min-h-14 sm:col-span-2 rounded-full bg-brand px-6 text-lg font-semibold text-brand-ink shadow-v transition-transform hover:opacity-90 disabled:translate-y-0 disabled:opacity-50"
         >
           <span lang={L.usedLang}>{busy ? "…" : L.t("confirm")}</span>
+          {!busy && <En L={L} k="confirm" className="v-sub-on-dark" />}
         </button>
         <button type="button" onClick={onEdit} disabled={busy} className="min-h-12 rounded-full px-6 font-semibold text-brand hover:bg-brand-soft">
           <span lang={L.usedLang}>{L.t("edit")}</span>
+          <En L={L} k="edit" />
         </button>
         <button type="button" onClick={onCancel} disabled={busy} className="min-h-12 rounded-full px-6 font-semibold text-terracotta hover:bg-terracotta-soft">
           <span lang={L.usedLang}>{L.t("cancel")}</span>
+          <En L={L} k="cancel" />
         </button>
       </div>
 

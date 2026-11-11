@@ -7,6 +7,7 @@ import { money } from "@/lib/paypal/money";
 const CODES = ["hi", "te", "ar", "pt", "es", "en"];
 const AMOUNT = money(4000);
 const RECIPIENT = "Manuel Lopes";
+const EN = labelsFor("en");
 
 /** One payment in each read-back language. The written amount changes by language; the checked value never does. */
 function line(code: string) {
@@ -21,6 +22,9 @@ function line(code: string) {
     english: info.englishName,
     native: info.nativeName,
     confirm: L.t("confirm"),
+    // The English subtitle, with the amount written the way this language writes it.
+    subtitle: code === "en" ? null : EN.t("readback", { amount: formatAmount(AMOUNT, "en").localized, recipient: RECIPIENT }),
+    confirmEn: code === "en" ? null : EN.t("confirm"),
     before: at < 0 ? text : text.slice(0, at),
     amount: at < 0 ? "" : amount,
     after: at < 0 ? "" : text.slice(at + amount.length),
@@ -65,6 +69,11 @@ export function SixLanguages() {
             {cur.amount && <bdi dir="ltr" className="whitespace-nowrap rounded-[10px] bg-signal px-2.5 text-navy">{cur.amount.replace(/[\u200e\u200f]/g, "")}</bdi>}
             {cur.after}
           </p>
+          {cur.subtitle && (
+            <p key={`${cur.code}-en`} lang="en" className="v-sub v-sub-on-dark -mt-3 text-lg">
+              {cur.subtitle}
+            </p>
+          )}
           <dl className="grid gap-4 border-t border-navy-2 pt-5 sm:grid-cols-3">
             <div>
               <dt className="text-sm text-navy-ink/75">Amount checked</dt>
@@ -73,7 +82,7 @@ export function SixLanguages() {
             <div>
               <dt className="text-sm text-navy-ink/75">Recipient</dt>
               <dd className="text-xl font-semibold">
-                Manuel Lope<span className="text-[#F2A93B]">s</span>
+                Manuel Lope<span className="text-mark-on-dark">s</span>
               </dd>
             </div>
             <div>
@@ -85,6 +94,7 @@ export function SixLanguages() {
           </dl>
           <span lang={cur.code} className="self-start rounded-full bg-white px-7 py-3 text-lg font-semibold text-navy">
             {cur.confirm}
+            {cur.confirmEn && <span lang="en" className="v-sub text-sm">{cur.confirmEn}</span>}
           </span>
         </div>
       </section>
@@ -111,6 +121,11 @@ export function SixLanguages() {
                 {l.before}
                 <bdi dir="ltr" className="border-b-[3px] border-signal">{l.amount.replace(/[\u200e\u200f]/g, "")}</bdi>
                 {l.after}
+                {l.subtitle && (
+                  <span lang="en" dir="ltr" className="v-sub">
+                    {l.subtitle}
+                  </span>
+                )}
               </span>
               <span className="text-right font-semibold tabular-nums">40.00 USD</span>
             </li>

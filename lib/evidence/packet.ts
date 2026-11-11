@@ -100,6 +100,7 @@ export async function buildPacket(caseId: string, generatedAt = new Date()) {
       text: m.text,
       lang: m.lang,
       translation: m.translatedText ? { text: m.translatedText, lang: m.translatedLang, by: m.translator } : null,
+      english: m.englishText ?? null,
     })),
     returnPayment: ret
       ? { transferId: ret.id, state: ret.state, paypal: { orderId: ret.orderId, captureId: ret.captureId, payoutBatchId: ret.payoutBatchId } }

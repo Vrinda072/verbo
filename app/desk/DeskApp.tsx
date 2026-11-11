@@ -83,7 +83,7 @@ const TAB_HELP = {
   dashboard: "Totals, outcomes and evidence across all cases. Ask the analyst a question in plain words.",
   cases: "Every recovery case after money went to the wrong person. Open a row for its timeline, messages and evidence packet.",
   languages: "Where mistaken payments happen, by the sender's language and the recipient's. Click a cell for that pair.",
-  timeline: "Open cases by deadline. Drag the end of a bar to change when a case escalates.",
+  timeline: "Open cases, soonest deadline first. Shaded hours are night where the recipient lives, and reminders wait for their morning. Drag the right end of a bar to change when a case escalates.",
   alerts: "Payments that were checked before sending: similar names, pressure, first payments and unusual amounts.",
 } as const;
 
@@ -158,9 +158,9 @@ export function DeskApp() {
     <div className="mx-auto max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-ink-3">Operator view</p>
           <h1 className="text-3xl font-semibold tracking-tight">Case Desk</h1>
           <p className="mt-1 text-ink-2">
+            Operator view ·{" "}
             {live} live sandbox case{live === 1 ? "" : "s"} ·{" "}
             <strong className="text-marigold-ink">{sim} simulated cases (synthetic data, for demonstration)</strong>
           </p>

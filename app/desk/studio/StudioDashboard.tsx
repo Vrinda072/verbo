@@ -129,7 +129,7 @@ export default function StudioDashboard({ rows }: { rows: DeskRow[] }) {
           ))}
         </div>
       </div>
-      <div className="v-studio h-[900px] overflow-hidden rounded-v-lg border border-line">
+      <div className="v-studio h-[900px] overflow-hidden">
         <AgStudioProvider licenseKey={key} modules={[AgStudioAiModule]}>
           <AgStudio data={data as any} initialState={INITIAL_STATE as any} mode={view === "view" ? "view" : "edit"} theme={theme} widgets={widgets as any} ai={ai as any} panels={panels as any} />
         </AgStudioProvider>

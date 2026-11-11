@@ -1,4 +1,5 @@
 "use client";
+import { En, EnText } from "@/components/En";
 import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/components/SiteHeader";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
@@ -75,20 +76,27 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                 <path d="M14 25l7 7 13-15" fill="none" stroke="var(--v-success)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <h1 className="mt-3 text-2xl font-semibold text-success">{L.t("rc_returned", { sender: v.senderName })}</h1>
+              <En L={L} k="rc_returned" vars={{ sender: v.senderName }} className="text-base" />
             </div>
           ) : (
             <>
               <h1 className="text-2xl font-semibold leading-tight">{L.t("rc_title")}</h1>
+              <En L={L} k="rc_title" className="text-base" />
               <p className="mt-3 text-xl text-ink-2">{L.t("rc_body", { sender: v.senderName, amount: amount.localized })}</p>
+              <En L={L} k="rc_body" vars={{ sender: v.senderName, amount: amount.localized }} />
               <p dir="ltr" className="v-digits mt-6 text-center" aria-hidden>
                 ${whole}
                 <span className="text-ink-3">.{frac}</span>
               </p>
-              <p className="mt-6 rounded-v bg-sky-soft p-4 text-ink">{L.t("rc_choice")}</p>
+              <p className="mt-6 rounded-v bg-sky-soft p-4 text-ink">
+                {L.t("rc_choice")}
+                <En L={L} k="rc_choice" />
+              </p>
 
               {v.state === "REFUSED" && (
                 <p role="status" className="mt-4 rounded-v bg-paper-2 p-4 font-semibold">
                   {L.t("rc_refused", { sender: v.senderName })}
+                  <En L={L} k="rc_refused" vars={{ sender: v.senderName }} className="font-normal" />
                 </p>
               )}
 
@@ -99,6 +107,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                 className="mt-6 min-h-16 w-full rounded-full bg-brand px-8 text-xl font-semibold text-brand-ink shadow-v transition-transform hover:opacity-90 disabled:opacity-60"
               >
                 {busy === "return" ? "…" : L.t("rc_return")}
+                {busy !== "return" && <En L={L} k="rc_return" className="v-sub-on-dark" />}
               </button>
               {v.state !== "REFUSED" && (
                 <button
@@ -108,6 +117,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                   className="mt-3 min-h-12 w-full rounded-full font-semibold text-ink-2 underline-offset-4 hover:underline"
                 >
                   {busy === "refuse" ? "…" : L.t("rc_keep")}
+                  {busy !== "refuse" && <En L={L} k="rc_keep" />}
                 </button>
               )}
             </>
@@ -122,6 +132,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
         <section aria-labelledby="chat-title" className="mt-8">
           <h2 id="chat-title" className="text-lg font-semibold">
             {L.t("rc_chat", { sender: v.senderName })}
+            <En L={L} k="rc_chat" vars={{ sender: v.senderName }} />
           </h2>
           <ol className="mt-3 space-y-3">
             {v.messages.map((m) => {
@@ -133,6 +144,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                 <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[85%] rounded-v-lg px-4 py-3 ${mine ? "bg-brand text-brand-ink" : "bg-card shadow-v"}`}>
                     <p lang={showLang}>{shown}</p>
+                    <EnText text={m.englishText} show={showLang.split("-")[0] !== "en" && m.englishText !== shown} className={mine ? "v-sub-on-dark" : ""} />
                     {!mine && (
                       <p className="mt-1 text-xs text-ink-3">
                         {m.translatedText ? L.t("rc_translated") : m.lang !== L.usedLang ? L.t("rc_untranslated") : ""}
@@ -143,6 +155,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                         {m.numbers.length > 0 && (
                           <span className="rounded-full bg-success-soft px-2.5 py-1 font-medium text-success">
                             {L.t("numbers_checked", { numbers: m.numbers.join(", ") })}
+                            <En L={L} k="numbers_checked" vars={{ numbers: m.numbers.join(", ") }} className="text-xs" />
                           </span>
                         )}
                         <button
@@ -186,6 +199,7 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
             />
             <button type="submit" disabled={!draft.trim() || busy !== null} className="min-h-12 rounded-full bg-brand px-5 font-semibold text-paper disabled:opacity-40">
               {L.t("rc_send")}
+              <En L={L} k="rc_send" className="v-sub-on-dark text-xs" />
             </button>
           </form>
         </section>
