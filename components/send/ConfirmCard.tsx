@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";
 import { useReadAloud } from "@/lib/speech/useReadAloud";
+import type { SpokenPart } from "@/lib/speech/spoken";
 
 export interface UnderstandResponse {
   draftId: string | null;
@@ -52,9 +53,13 @@ export function ConfirmCard({
   const vars = { amount: data.amount.localized, recipient: data.recipient.name };
   // Same fixed templates as the screen, so the voice can never say anything the card doesn't.
   const spoken = [L.t("readback", vars), ...data.lookAlikes.map((o) => L.t("lookalike", { other: o.name }))].join(" ");
-  const voice = useReadAloud(spoken, L.usedLang);
+  const parts: SpokenPart[] = [
+    { key: "readback", vars },
+    ...data.lookAlikes.map((o) => ({ key: "lookalike" as const, vars: { other: o.name } })),
+  ];
+  const voice = useReadAloud(spoken, L.usedLang, parts);
   useEffect(() => {
-    if (voice.available && !muted()) voice.play();
+    if (voice.available && !muted()) void voice.play();
     // Once per card, as soon as a voice is ready.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [voice.available]);
@@ -90,7 +95,7 @@ export function ConfirmCard({
         </div>
         {showEnglish && <p className="mt-1 text-sm text-ink-3">{en.t("readback", vars)}</p>}
         {voice.available && (
-          <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-card px-4 text-sm font-medium text-brand shadow-v">
+          <button type="button" onClick={() => void voice.play()} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-card px-4 text-sm font-medium text-brand shadow-v">
             <SpeakerIcon />
             {voice.speaking ? "Speaking…" : "Hear it again"}
           </button>

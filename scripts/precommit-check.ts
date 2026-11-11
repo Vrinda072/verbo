@@ -19,7 +19,7 @@ if (existsSync(".env")) {
     const [, key, raw] = m;
     const v = raw.trim().replace(/^["']|["']$/g, "");
     // Non-secret config values are allowed to appear in code.
-    if (["APP_NAME", "NEXT_PUBLIC_APP_NAME", "APP_BASE_URL", "MOCK", "PAYPAL_ENV", "LLM_PROVIDER"].includes(key)) continue;
+    if (["APP_NAME", "NEXT_PUBLIC_APP_NAME", "APP_BASE_URL", "MOCK", "PAYPAL_ENV", "LLM_PROVIDER", "ELEVENLABS_VOICE_ID"].includes(key)) continue;
     if (v.length >= 8) envValues.push(v);
   }
 }
@@ -31,6 +31,7 @@ const PATTERNS = [
   /A21AA[A-Za-z0-9_-]{40,}/, // PayPal access token
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
   /ghp_[A-Za-z0-9]{30,}|gho_[A-Za-z0-9]{30,}/,
+  /\bsk_[a-f0-9]{40,}/, // ElevenLabs
 ];
 
 const hits: string[] = [];

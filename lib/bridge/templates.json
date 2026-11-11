@@ -32,7 +32,15 @@
     "rc_expired",
     "ask_back",
     "case_sent",
-    "returned_sender"
+    "returned_sender",
+    "ask_which",
+    "ask_amount",
+    "ask_recipient",
+    "ask_same_sound",
+    "ask_option_known",
+    "ask_option_new",
+    "word_one",
+    "word_two"
   ],
   "templates": {
     "en": {
@@ -70,7 +78,15 @@
         "rc_expired": "This link has expired or is not valid.",
         "ask_back": "Sent to the wrong person? Ask for it back",
         "case_sent": "We sent {recipient} a link in their language. They can return the money with one tap.",
-        "returned_sender": "{recipient} sent your money back."
+        "returned_sender": "{recipient} sent your money back.",
+        "ask_which": "Two contacts have similar names. Say one for {a}, or two for {b}.",
+        "ask_amount": "How much do you want to send?",
+        "ask_recipient": "Who do you want to pay?",
+        "ask_same_sound": "Two contacts have names that sound the same.",
+        "ask_option_known": "Say {n} for {name}, spelled with the letter {letter}, who you have paid before.",
+        "ask_option_new": "Say {n} for {name}, spelled with the letter {letter}, who you have never paid.",
+        "word_one": "one",
+        "word_two": "two"
       }
     },
     "te": {
@@ -108,7 +124,15 @@
         "rc_expired": "ఈ లింక్ గడువు ముగిసింది లేదా చెల్లదు.",
         "ask_back": "తప్పు వ్యక్తికి పంపారా? తిరిగి అడగండి",
         "case_sent": "{recipient} కి వారి భాషలో ఒక లింక్ పంపాం. వారు ఒక్క ట్యాప్‌తో డబ్బు తిరిగి పంపవచ్చు.",
-        "returned_sender": "{recipient} మీ డబ్బు తిరిగి పంపారు."
+        "returned_sender": "{recipient} మీ డబ్బు తిరిగి పంపారు.",
+        "ask_which": "ఇద్దరు పరిచయాల పేర్లు ఒకేలా ఉన్నాయి. {a} కోసం ఒకటి అని చెప్పండి, లేదా {b} కోసం రెండు అని చెప్పండి.",
+        "ask_amount": "మీరు ఎంత డబ్బు పంపాలనుకుంటున్నారు?",
+        "ask_recipient": "మీరు ఎవరికి డబ్బు పంపాలనుకుంటున్నారు?",
+        "ask_same_sound": "ఇద్దరు పరిచయాల పేర్లు ఒకేలా వినిపిస్తాయి.",
+        "ask_option_known": "{letter} అక్షరంతో ఉన్న {name} కోసం {n} అని చెప్పండి, వీరికి మీరు ఇంతకు ముందు డబ్బు పంపారు.",
+        "ask_option_new": "{letter} అక్షరంతో ఉన్న {name} కోసం {n} అని చెప్పండి, వీరికి మీరు ఎప్పుడూ డబ్బు పంపలేదు.",
+        "word_one": "ఒకటి",
+        "word_two": "రెండు"
       }
     },
     "hi": {
@@ -146,7 +170,15 @@
         "rc_expired": "यह लिंक समाप्त हो गया है या मान्य नहीं है।",
         "ask_back": "गलत व्यक्ति को भेज दिया? वापस माँगें",
         "case_sent": "हमने {recipient} को उनकी भाषा में एक लिंक भेजा है। वे एक टैप में पैसे लौटा सकते हैं।",
-        "returned_sender": "{recipient} ने आपके पैसे लौटा दिए।"
+        "returned_sender": "{recipient} ने आपके पैसे लौटा दिए।",
+        "ask_which": "दो संपर्कों के नाम मिलते-जुलते हैं। {a} के लिए एक बोलें, या {b} के लिए दो बोलें।",
+        "ask_amount": "आप कितने पैसे भेजना चाहते हैं?",
+        "ask_recipient": "आप किसे पैसे भेजना चाहते हैं?",
+        "ask_same_sound": "दो संपर्कों के नाम एक जैसे सुनाई देते हैं।",
+        "ask_option_known": "{name} के लिए {n} बोलें, जिनके नाम में {letter} अक्षर है और जिन्हें आप पहले पैसे भेज चुके हैं।",
+        "ask_option_new": "{name} के लिए {n} बोलें, जिनके नाम में {letter} अक्षर है और जिन्हें आपने कभी पैसे नहीं भेजे।",
+        "word_one": "एक",
+        "word_two": "दो"
       }
     },
     "es": {
@@ -184,7 +216,15 @@
         "rc_expired": "Este enlace ha caducado o no es válido.",
         "ask_back": "¿Lo enviaste a la persona equivocada? Pide que te lo devuelvan",
         "case_sent": "Le enviamos a {recipient} un enlace en su idioma. Puede devolver el dinero con un toque.",
-        "returned_sender": "{recipient} te devolvió el dinero."
+        "returned_sender": "{recipient} te devolvió el dinero.",
+        "ask_which": "Dos contactos tienen nombres parecidos. Di uno para {a}, o dos para {b}.",
+        "ask_amount": "¿Cuánto dinero quieres enviar?",
+        "ask_recipient": "¿A quién quieres enviar el dinero?",
+        "ask_same_sound": "Dos contactos tienen nombres que suenan igual.",
+        "ask_option_known": "Di {n} para {name}, que se escribe con la letra {letter}, a quien ya le has pagado antes.",
+        "ask_option_new": "Di {n} para {name}, que se escribe con la letra {letter}, a quien nunca le has pagado.",
+        "word_one": "uno",
+        "word_two": "dos"
       }
     },
     "pt": {
@@ -222,7 +262,15 @@
         "rc_expired": "Este link expirou ou não é válido.",
         "ask_back": "Enviou para a pessoa errada? Peça de volta",
         "case_sent": "Enviamos a {recipient} um link no idioma dele. Ele pode devolver o dinheiro com um toque.",
-        "returned_sender": "{recipient} devolveu seu dinheiro."
+        "returned_sender": "{recipient} devolveu seu dinheiro.",
+        "ask_which": "Dois contatos têm nomes parecidos. Diga um para {a}, ou dois para {b}.",
+        "ask_amount": "Quanto dinheiro você quer enviar?",
+        "ask_recipient": "Para quem você quer enviar o dinheiro?",
+        "ask_same_sound": "Dois contatos têm nomes que soam iguais.",
+        "ask_option_known": "Diga {n} para {name}, que se escreve com a letra {letter}, para quem você já pagou antes.",
+        "ask_option_new": "Diga {n} para {name}, que se escreve com a letra {letter}, para quem você nunca pagou.",
+        "word_one": "um",
+        "word_two": "dois"
       }
     },
     "ar": {
@@ -260,7 +308,15 @@
         "rc_expired": "انتهت صلاحية هذا الرابط أو أنه غير صالح.",
         "ask_back": "أرسلتها إلى الشخص الخطأ؟ اطلب استردادها",
         "case_sent": "أرسلنا إلى {recipient} رابطًا بلغته. يمكنه إعادة المبلغ بلمسة واحدة.",
-        "returned_sender": "أعاد {recipient} أموالك."
+        "returned_sender": "أعاد {recipient} أموالك.",
+        "ask_which": "لدى جهتي اتصال اسمان متشابهان. قل «واحد» لاختيار {a}، أو «اثنان» لاختيار {b}.",
+        "ask_amount": "كم من المال تريد أن ترسل؟",
+        "ask_recipient": "إلى من تريد إرسال المال؟",
+        "ask_same_sound": "لدى جهتي اتصال اسمان يبدوان متطابقين عند النطق.",
+        "ask_option_known": "قل «{n}» لاختيار {name}، الذي يُكتب بحرف {letter}، والذي دفعت له من قبل.",
+        "ask_option_new": "قل «{n}» لاختيار {name}، الذي يُكتب بحرف {letter}، والذي لم تدفع له من قبل.",
+        "word_one": "واحد",
+        "word_two": "اثنان"
       }
     }
   }
