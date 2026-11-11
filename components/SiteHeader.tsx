@@ -7,9 +7,9 @@ const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Verbo";
 const NAV = [
   { href: "/", label: "Home" },
   { href: "/send", label: "Send" },
-  { href: "/demo", label: "Walkthrough" },
-  { href: "/desk", label: "Case Desk" },
+  { href: "/demo", label: "Examples" },
 ];
+const OPERATOR = { href: "/desk", label: "Case Desk" };
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
@@ -32,18 +32,20 @@ export function SiteHeader() {
         <Link href="/" aria-label={`${APP_NAME} home`} className="shrink-0 py-4">
           <Logo />
         </Link>
-        <nav aria-label="Main" className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-          {NAV.map((n) => {
+        <nav aria-label="Main" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+          {[...NAV, OPERATOR].map((n) => {
             const active = n.href === "/" ? path === "/" : path?.startsWith(n.href);
             return (
               <Link
                 key={n.href}
                 href={n.href}
+                title={n === OPERATOR ? "For the team that handles recovery cases" : undefined}
                 aria-current={active ? "page" : undefined}
                 className={`whitespace-nowrap border-b-[3px] px-3 pb-[1.05rem] pt-[1.25rem] text-base font-medium transition-colors ${
                   active ? "border-signal text-navy-ink" : "border-transparent text-navy-ink/75 hover:text-navy-ink"
                 }`}
               >
+                {n === OPERATOR && <span className="mr-2 border-l border-navy-ink/25 pl-4 text-xs font-normal text-navy-ink/60">Operators</span>}
                 {n.label}
               </Link>
             );

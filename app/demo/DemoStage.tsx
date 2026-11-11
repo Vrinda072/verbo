@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { MoneyPath, type PathTone } from "@/components/MoneyPath";
 import { NameDiff } from "@/components/NameDiff";
 import { labelsFor } from "@/lib/bridge/readback";
@@ -12,6 +13,9 @@ import { labelsFor } from "@/lib/bridge/readback";
  */
 const hi = labelsFor("hi");
 const pt = labelsFor("pt");
+const te = labelsFor("te");
+const ar = labelsFor("ar");
+const en = labelsFor("en");
 const AMOUNT = "$40.00";
 const WRONG = "Manuel Lopes";
 const RIGHT = "Manuel Lopez";
@@ -85,7 +89,7 @@ const Bubble = ({ mine, text, lang, translated }: { mine: boolean; text: string;
   </div>
 );
 
-const STEPS: Step[] = [
+const SIMILAR_NAMES: Step[] = [
   {
     title: "Voice input",
     story: "Sreenivas speaks Hindi and intends to pay his friend Manuel Lopez $40. He starts recording and says the payment.",
@@ -254,19 +258,312 @@ const STEPS: Step[] = [
   },
 ];
 
+const Say = ({ lang, children, className = "" }: { lang: string; children: ReactNode; className?: string }) => (
+  <span lang={lang} dir={lang === "ar" ? "rtl" : undefined} className={className}>
+    {children}
+  </span>
+);
+
+const Mic = ({ said, lang, english }: { said: string; lang: string; english: string }) => (
+  <div className="flex h-full flex-col items-center justify-center gap-5 p-5 text-center">
+    <div className="grid h-24 w-24 place-items-center rounded-full bg-terracotta text-paper">
+      <span className="v-pulse absolute h-24 w-24 rounded-full border-4 border-terracotta" aria-hidden />
+      <span aria-hidden className="h-8 w-8 rounded-md bg-paper" />
+    </div>
+    <Say lang={lang} className="text-xl font-semibold leading-snug">“{said}”</Say>
+    {lang !== "en" && <p className="text-xs text-ink-3">“{english}”</p>}
+  </div>
+);
+
+const Received = ({ amount, from }: { amount: string; from: string }) => (
+  <div className="flex h-full flex-col items-center justify-center gap-2 p-5 text-center">
+    <p className="text-sm text-ink-3">PayPal</p>
+    <p className="v-digits !text-5xl text-success">+{amount}</p>
+    <p className="text-ink-2">from {from}</p>
+  </div>
+);
+
+// Gemini translations made with Verbo's own translator on Nov 11, 2026, saved so the story needs no key.
+const WRONG_NUMBER_CHAT = {
+  te: "హాయ్, నేను పొరపాటున మీకు 60 డాలర్లు పంపాను. అవి నా స్నేహితుడు కిరణ్ కోసం, మరియు అతని పాత నంబర్ ఇప్పుడు మీది అని అనుకుంటున్నాను. దయచేసి వాటిని వెనక్కి పంపగలరా?",
+  ar: "مرحباً، لقد أرسلت لك 60 دولاراً عن طريق الخطأ. كانت مخصصة لصديقي كيران، وأعتقد أن رقمه القديم أصبح رقمك الآن. هل يمكنك إرجاعها من فضلك؟",
+  replyAr: "عذراً، لم أره إلا الآن. هذا هو رقمي الجديد. نعم، سأعيده اليوم.",
+  replyTe: "క్షమించండి, నేను దీన్ని ఇప్పుడే చూశాను. ఇది నా కొత్త నంబర్. అవును, నేను దీన్ని ఈరోజే వెనక్కి పంపుతాను.",
+};
+const STRANGER = "Fatima Haddad";
+
+const WRONG_NUMBER: Step[] = [
+  {
+    title: "Voice input",
+    story: "Sreenivas speaks Telugu and pays his friend Kiran Reddy $60, as he has done before.",
+    under: "Whisper transcribes the Telugu. Gemini finds the name and amount, and code checks both against what was said.",
+    where: "sender",
+    active: "sender",
+    sender: <Mic said="కిరణ్ రెడ్డికి 60 డాలర్లు పంపండి" lang="te" english="Send 60 dollars to Kiran Reddy" />,
+    recipient: <Asleep />,
+  },
+  {
+    title: "Read-back, low risk",
+    story: "Kiran is a saved contact he has paid before, and the amount is normal for him. Nothing looks wrong, so there is no hold.",
+    under: "Checks can only see the address book. They can't know that Kiran changed his number and the old one now belongs to someone else.",
+    where: "sender",
+    active: "sender",
+    sender: (
+      <div className="flex h-full flex-col gap-3 p-5">
+        <Say lang="te" className="text-lg font-semibold">{te.t("readback", { amount: "$60.00", recipient: "Kiran Reddy" })}</Say>
+        <p className="v-digits !text-5xl">$60<span className="text-ink-3">.00</span></p>
+        <div className="mt-auto">
+          <PhoneButton tone="go" selected>
+            <Say lang="te">{te.t("confirm")}</Say>
+          </PhoneButton>
+        </div>
+      </div>
+    ),
+    recipient: <Asleep />,
+  },
+  {
+    title: "Paid to a stranger",
+    story: `Kiran's old phone number now belongs to ${STRANGER}, who speaks Arabic. The $60 reaches her account instead of his.`,
+    under: "This kind of mistake passes every check, which is why Verbo also covers what happens after the money has gone.",
+    where: "recipient",
+    active: "both",
+    sender: (
+      <div className="flex h-full flex-col justify-center gap-4 p-5">
+        <Say lang="te" className="font-semibold">{te.t("sent", { recipient: "Kiran Reddy" })}</Say>
+        <p className="rounded-v bg-paper-2 p-3 text-sm">Kiran: “I didn’t get anything.”</p>
+      </div>
+    ),
+    recipient: <Received amount="$60" from="Sreenivas" />,
+  },
+  {
+    title: "A polite request",
+    story: `Sreenivas asks for the money back. The AI coach drafts a polite message in Telugu, which he checks and sends. ${STRANGER} gets a private page in Arabic.`,
+    under: "The coach only suggests text. Code drops any draft with a link or a wrong amount, and he presses send himself.",
+    where: "recipient",
+    active: "both",
+    sender: (
+      <div className="flex h-full flex-col justify-center gap-3 p-5">
+        <div className="rounded-v bg-paper p-3">
+          <p className="text-xs text-ink-3">Suggested by AI</p>
+          <Say lang="te" className="mt-1 block text-sm">{WRONG_NUMBER_CHAT.te}</Say>
+        </div>
+        <PhoneButton tone="go" selected>
+          <Say lang="te">{te.t("rc_send")}</Say>
+        </PhoneButton>
+      </div>
+    ),
+    recipient: (
+      <div className="flex h-full flex-col gap-3 p-5" dir="rtl">
+        <Say lang="ar" className="text-xl font-semibold leading-tight">{ar.t("rc_title")}</Say>
+        <Say lang="ar" className="text-sm">{ar.t("rc_body", { sender: "Sreenivas", amount: "$60.00" })}</Say>
+        <div className="mt-auto grid gap-2">
+          <PhoneButton tone="go"><Say lang="ar">{ar.t("rc_return")}</Say></PhoneButton>
+          <PhoneButton><Say lang="ar">{ar.t("rc_keep")}</Say></PhoneButton>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: "No reply yet",
+    story: "A day passes with no answer. Verbo sends a reminder, and the case appears on the Case Desk with a deadline before it escalates.",
+    under: "The reminder is sent after 24 hours and escalation after 72. An operator can move the deadline on the Case Desk timeline.",
+    where: "recipient",
+    active: "recipient",
+    sender: (
+      <div className="flex h-full flex-col justify-center gap-2 p-5 text-sm">
+        <p className="font-semibold">Case timeline</p>
+        <p className="border-l-2 border-line pl-3">Link sent</p>
+        <p className="border-l-2 border-line pl-3">She opened the link</p>
+        <p className="border-l-2 border-brand pl-3 font-semibold">Reminder sent (24 h)</p>
+      </div>
+    ),
+    recipient: (
+      <div className="flex h-full flex-col justify-center gap-3 p-5" dir="rtl">
+        <p className="text-xs text-ink-3" dir="ltr">Reminder</p>
+        <Say lang="ar" className="text-lg font-semibold">{ar.t("rc_title")}</Say>
+        <Say lang="ar" className="text-sm text-ink-2">{ar.t("rc_choice")}</Say>
+      </div>
+    ),
+  },
+  {
+    title: "Translated messages",
+    story: `${STRANGER} replies in Arabic that this is her new number and she will send it back. Sreenivas reads it in Telugu.`,
+    under: "Gemini translates both ways. Code rejects any translation in which a number changed.",
+    where: "recipient",
+    active: "both",
+    sender: (
+      <div className="flex h-full flex-col justify-end gap-2 p-4">
+        <Bubble mine text={WRONG_NUMBER_CHAT.te} lang="te" translated={false} />
+        <Bubble mine={false} text={WRONG_NUMBER_CHAT.replyTe} lang="te" translated />
+      </div>
+    ),
+    recipient: (
+      <div className="flex h-full flex-col justify-end gap-2 p-4" dir="rtl">
+        <Bubble mine={false} text={WRONG_NUMBER_CHAT.ar} lang="ar" translated />
+        <Bubble mine text={WRONG_NUMBER_CHAT.replyAr} lang="ar" translated={false} />
+      </div>
+    ),
+  },
+  {
+    title: "Funds returned",
+    story: `${STRANGER} approves the return on PayPal and the $60 goes back to Sreenivas, who then pays Kiran's new number.`,
+    under: "The return is a new order she approves, followed by a payout to Sreenivas. The evidence packet records each step.",
+    where: "sender",
+    active: "both",
+    sender: (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-5 text-center">
+        <p className="v-digits !text-5xl text-success">+$60</p>
+        <Say lang="te" className="text-lg font-semibold">{te.t("returned_sender", { recipient: STRANGER })}</Say>
+      </div>
+    ),
+    recipient: (
+      <div className="flex h-full items-center p-5 text-center" dir="rtl">
+        <Say lang="ar" className="text-lg font-semibold">{ar.t("rc_returned", { sender: "Sreenivas" })}</Say>
+      </div>
+    ),
+  },
+];
+
+const PRESSURED: Step[] = [
+  {
+    title: "A call from “the bank”",
+    story: "A caller says they are from Sreenivas's bank, that his account is at risk, and that he must move $900 to a safe account now. They had him add Javier Ruiz as a contact first.",
+    under: "Verbo can't hear the call. It only hears what Sreenivas says to it, and that is enough to notice the pressure.",
+    where: "sender",
+    active: "sender",
+    sender: <Mic said="Send 900 dollars to Javier Ruiz right now, it's urgent" lang="en" english="" />,
+    recipient: <Asleep />,
+  },
+  {
+    title: "Read-back with warnings",
+    story: "Verbo reads the payment back and shows three warnings: rushed or pressured words, a first payment to this person, and an amount far above his usual.",
+    under: "Code flags each signal. Gemini also lists pressure cues, but code decides the risk and the hold.",
+    where: "sender",
+    active: "sender",
+    sender: (
+      <div className="flex h-full flex-col gap-2 p-5">
+        <p className="text-lg font-semibold">{en.t("readback", { amount: "$900.00", recipient: "Javier Ruiz" })}</p>
+        <Warn>{en.t("pressure")}</Warn>
+        <Warn>{en.t("first_time")}</Warn>
+        <Warn>{en.t("unusual_amount")}</Warn>
+      </div>
+    ),
+    recipient: <Asleep />,
+  },
+  {
+    title: "Safety hold",
+    story: "He confirms while still on the phone. PayPal authorizes the payment, but Verbo holds it for 10 minutes instead of sending it.",
+    under: "The money is authorized, not captured. Until the hold ends, nothing has left his account.",
+    where: "hold",
+    active: "sender",
+    sender: (
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-5 text-center">
+        <p className="text-xl font-semibold">{en.t("hold_title")}</p>
+        <p className="v-digits !text-5xl tabular-nums">10:00</p>
+        <p className="text-sm text-ink-2">{en.t("hold_notice", { minutes: "10" })}</p>
+        <PhoneButton>{en.t("cancel_hold")}</PhoneButton>
+      </div>
+    ),
+    recipient: <Asleep />,
+  },
+  {
+    title: "Second thoughts",
+    story: "The warnings make him hang up and call the number on his bank card. The bank says it never asks customers to move money. He taps cancel.",
+    under: "Cancelling during the hold is one tap, in the sender's own language.",
+    where: "hold",
+    active: "sender",
+    sender: (
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-5 text-center">
+        <p className="v-digits !text-5xl tabular-nums">06:12</p>
+        <PhoneButton selected>{en.t("cancel_hold")}</PhoneButton>
+      </div>
+    ),
+    recipient: <Asleep />,
+  },
+  {
+    title: "Cancelled, nothing moved",
+    story: "The payment is cancelled. The $900 never left Sreenivas's account, and Javier Ruiz receives nothing.",
+    under: "Cancelling voids the PayPal authorization, so there is nothing to recover. The attempt is still recorded as a pre-send alert on the Case Desk.",
+    where: "sender",
+    active: "both",
+    sender: (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-5 text-center">
+        <p className="text-xl font-semibold">{en.t("cancelled")}</p>
+        <p className="v-digits !text-5xl text-success">$900</p>
+        <p className="text-sm text-ink-2">Still in his account</p>
+      </div>
+    ),
+    recipient: (
+      <div className="flex h-full items-center justify-center p-5 text-center text-ink-3">
+        <p>Nothing received.</p>
+      </div>
+    ),
+  },
+];
+
+export interface Story {
+  id: string;
+  label: string;
+  outcome: string;
+  amount: string;
+  sender: { name: string; speaks: string };
+  recipient: { name: string; speaks: string };
+  steps: Step[];
+}
+
+export const STORIES: Story[] = [
+  {
+    id: "similar-names",
+    label: "Similar names",
+    outcome: "Returned",
+    amount: "$40",
+    sender: { name: SENDER, speaks: "Hindi" },
+    recipient: { name: WRONG, speaks: "Portuguese" },
+    steps: SIMILAR_NAMES,
+  },
+  {
+    id: "wrong-number",
+    label: "Wrong number",
+    outcome: "Returned after a reminder",
+    amount: "$60",
+    sender: { name: SENDER, speaks: "Telugu" },
+    recipient: { name: STRANGER, speaks: "Arabic" },
+    steps: WRONG_NUMBER,
+  },
+  {
+    id: "pressured",
+    label: "Pressured payment",
+    outcome: "Cancelled during the hold",
+    amount: "$900",
+    sender: { name: SENDER, speaks: "English" },
+    recipient: { name: "Javier Ruiz", speaks: "Stranger" },
+    steps: PRESSURED,
+  },
+];
+
 const AUTO_MS = 6500;
 
-export function DemoStage() {
+export function DemoStage({ initialStory }: { initialStory?: string }) {
+  const router = useRouter();
+  const [story, setStory] = useState<Story>(() => STORIES.find((s) => s.id === initialStory) ?? STORIES[0]);
+  const STEPS = story.steps;
   const [i, setI] = useState(0);
   const [auto, setAuto] = useState(false);
   const step = STEPS[i];
   const last = i === STEPS.length - 1;
 
+  function choose(next: Story) {
+    setStory(next);
+    setI(0);
+    setAuto(true);
+    router.replace(`/demo?story=${next.id}`, { scroll: false });
+  }
+
   useEffect(() => {
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) setAuto(true);
   }, []);
 
-  const go = useCallback((n: number) => setI(Math.max(0, Math.min(STEPS.length - 1, n))), []);
+  const go = useCallback((n: number) => setI(Math.max(0, Math.min(STEPS.length - 1, n))), [STEPS.length]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -288,8 +585,8 @@ export function DemoStage() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-semibold tracking-tight">How a wrong payment gets recovered</h1>
-          <p className="mt-1 text-sm text-ink-3">Scripted with simulated people. No money moves. Hindi and Portuguese are machine translations.</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Examples</h1>
+          <p className="mt-1 text-sm text-ink-3">Three scripted stories with simulated people, built from Verbo&apos;s real screens. No money moves. Translations are machine-made.</p>
         </div>
         <button
           type="button"
@@ -302,6 +599,24 @@ export function DemoStage() {
         >
           {auto ? "Pause" : last ? "Replay" : "Play"}
         </button>
+      </div>
+
+      <div role="tablist" aria-label="Example stories" className="mt-5 grid gap-2 sm:grid-cols-3">
+        {STORIES.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            aria-selected={s.id === story.id}
+            onClick={() => choose(s)}
+            className={`rounded-v-lg p-4 text-left transition-colors ${s.id === story.id ? "bg-navy text-navy-ink" : "bg-card shadow-v hover:bg-paper-2"}`}
+          >
+            <span className="block font-semibold">{s.label}</span>
+            <span className={`mt-0.5 block text-sm ${s.id === story.id ? "text-navy-ink/75" : "text-ink-3"}`}>
+              {s.sender.speaks} to {s.recipient.speaks === "Stranger" ? "a stranger" : s.recipient.speaks} · {s.outcome}
+            </span>
+          </button>
+        ))}
       </div>
 
       <ol className="mt-5 flex gap-1.5" aria-label="Jump to a step">
@@ -321,7 +636,7 @@ export function DemoStage() {
                 {n < i && <span className="block h-full w-full bg-brand" />}
                 {n === i &&
                   (auto ? (
-                    <span key={`${i}-play`} className="v-fill block h-full bg-brand" style={{ animationDuration: `${AUTO_MS}ms` }} />
+                    <span key={`${story.id}-${i}-play`} className="v-fill block h-full bg-brand" style={{ animationDuration: `${AUTO_MS}ms` }} />
                   ) : (
                     <span className="block h-full w-full bg-brand" />
                   ))}
@@ -332,12 +647,12 @@ export function DemoStage() {
       </ol>
 
       <div className="mt-4 grid items-stretch gap-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,19rem)]">
-        <Phone who="Sreenivas" speaks="Hindi" dim={step.active === "recipient"} hideOnSmall={step.active === "recipient"}>
-          <div key={i} className="v-rise h-full">{step.sender}</div>
+        <Phone who={story.sender.name} speaks={story.sender.speaks} dim={step.active === "recipient"} hideOnSmall={step.active === "recipient"}>
+          <div key={`${story.id}-${i}`} className="v-rise h-full">{step.sender}</div>
         </Phone>
 
         <section aria-live="polite" className="order-first flex flex-col gap-5 lg:order-none lg:px-2">
-          <div key={i} className="v-rise">
+          <div key={`${story.id}-${i}`} className="v-rise">
             <p className="text-sm font-semibold text-ink-3">
               Step {i + 1} of {STEPS.length}
             </p>
@@ -351,7 +666,7 @@ export function DemoStage() {
 
           <div className="rounded-v-lg bg-card p-5 shadow-v-lg">
             <p className="mb-2 text-sm text-ink-3">Where the money is</p>
-            <MoneyPath stops={[SENDER, "Safety hold", WRONG]} at={WHERE[step.where]} amount="$40" tone={TONE[step.where]} />
+            <MoneyPath stops={[story.sender.name, "Safety hold", story.recipient.name]} at={WHERE[step.where]} amount={story.amount} tone={TONE[step.where]} />
           </div>
 
           <div className="mt-auto">
@@ -389,8 +704,8 @@ export function DemoStage() {
           </div>
         </section>
 
-        <Phone who="Manuel Lopes" speaks="Portuguese" dim={step.active === "sender"} hideOnSmall={step.active === "sender"}>
-          <div key={i} className="v-rise h-full">{step.recipient}</div>
+        <Phone who={story.recipient.name} speaks={story.recipient.speaks} dim={step.active === "sender"} hideOnSmall={step.active === "sender"}>
+          <div key={`${story.id}-${i}`} className="v-rise h-full">{step.recipient}</div>
         </Phone>
       </div>
     </div>

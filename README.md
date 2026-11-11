@@ -16,7 +16,7 @@ their own language.
 | `/send` | Say a payment in your language. Verbo reads it back from a fixed template, checks for similar names and pressure, and holds risky payments for 10 minutes. |
 | `/recover/[token]` | The person who got money by mistake sees a translated page and can return it in one step. |
 | `/desk` | Operators see all recovery cases, a dashboard with an analyst agent, a draggable deadline timeline, and an evidence packet per case. |
-| `/demo` | A scripted walkthrough of a rescue. |
+| `/demo` | Three example stories: similar names, a wrong phone number, and a pressured payment cancelled during the hold. |
 
 ## How the AI is kept away from the money
 The LLM extracts what was said. It never sets an amount on its own.
