@@ -101,6 +101,7 @@ export class RealPayPalClient implements PayPalClient {
           ...(input.payerEmail ? { email_address: input.payerEmail } : {}),
           experience_context: {
             brand_name: config.appName,
+            ...(input.locale ? { locale: input.locale } : {}),
             shipping_preference: "NO_SHIPPING",
             user_action: "CONTINUE",
             landing_page: "LOGIN",

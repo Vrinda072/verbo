@@ -1,5 +1,31 @@
 # Status
 
+## Nov 11 — redesign around language safety
+
+- **Purpose made visible:** Home leads with "The words change. The money doesn't." and the same read-back in six languages, with the
+  checked value (40.00 USD) unchanged beside each. Type is the Noto family so Devanagari, Telugu, Arabic and Latin match.
+- **PayPal in the person's language:** orders.create now sets `experience_context.locale` from the sender's language, and the return order
+  from the recipient's. The sandbox accepted en-US, hi-IN, te-IN, es-MX, pt-BR and ar-EG. Whether PayPal's page is translated is PayPal's choice.
+- **Examples:** "Three ways money gets lost in translation" (sound-alike names, numbers said as words, currency words), each tied to a real check.
+- **Case Desk:** a Languages tab, an AG Grid of sender language × recipient language with counts and returns per pair.
+- **Recovery:** translated messages show "Numbers checked: …" and a "Show original" toggle, in the reader's language (new templates in
+  all six languages, machine-written). Case details show each message's language pair and the numbers kept.
+- **Reminders in the recipient's daytime (built):** contacts carry a time zone. A reminder that falls due between 21:00 and 08:00
+  where the recipient lives waits for their morning; escalation never waits (`lib/localTime.ts`, `dueTimerEvent`). The Bryntum
+  Deadlines tab shades each recipient's night on their own row and shows their local time.
+- **Wrong numbers:** "Or pay a phone number" on Send. A number one digit (or one swapped pair) off a contact's is stopped: it shows the
+  differing digits, who the number really reaches, the language they read and their local time, and offers the contact instead.
+  Sending anyway adds the `number_near_contact` risk signal, which holds the payment. Three simulated strangers, each reading a
+  different language from the contact they nearly are.
+- **More sound-alike people (simulated):** Kiran Reddy / Kiran Reddi (Telugu / Hindi), Ana Souza / Ana Sousa (Portuguese / Spanish),
+  Mohamed Ali / Mohamad Ali (Arabic / English), plus Manuel Lopez / Lopes. Send has a "Try these" panel and an AG Grid of everyone you
+  can pay, grouped by how the names sound (the same test the voice check uses).
+- **PayPal calls per payment:** the payment page lists each PayPal operation behind it, in order: orders.create through the APIMatic
+  SDK with the approval-page locale, then authorize, hold, capture or void, payout, each with its idempotency key. Derived from the
+  transfer's own state history (`lib/paypal/trail.ts`).
+- **Home:** the "How AI is used" section and the language buttons are gone; the read-back steps through the six languages by itself
+  (off when reduced motion is set).
+
 ## Nov 10 — spoken follow-ups on Send
 
 - **Added:** when a voice request is missing the name or amount, or matches two similar contacts, Verbo asks aloud and listens. Answers

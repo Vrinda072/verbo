@@ -25,6 +25,9 @@ const ACTIONS: { action: "remind" | "escalate" | "close"; label: string; allowed
   { action: "close", label: "Close case", allowed: ["RETURNED", "REFUSED", "ESCALATED"] },
 ];
 
+/** Digits in a message, any script. A translation that changed one is never stored, so these were kept. */
+const numbersIn = (s: string) => [...new Set(s.normalize("NFKC").match(/\p{Nd}+(?:[.,]\p{Nd}+)?/gu) ?? [])];
+
 /** Expanded row: translated timeline, conversation, evidence checklist, quick actions and downloads. */
 export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onChanged?: () => void }) {
   const row = props.data!;
@@ -92,6 +95,11 @@ export function CaseDetail(props: CustomDetailCellRendererProps<DeskRow> & { onC
                 ) : (
                   <p className="mt-1 text-xs text-ink-3">not translated</p>
                 )}
+                <p className="mt-1 text-xs text-ink-3">
+                  {langName(m.lang)}
+                  {m.translation ? ` to ${langName(m.translation.lang)}` : ""}
+                  {m.translation ? (numbersIn(m.text).length ? `, numbers kept: ${numbersIn(m.text).join(", ")}` : ", no numbers") : ""}
+                </p>
               </li>
             ))}
           </ol>

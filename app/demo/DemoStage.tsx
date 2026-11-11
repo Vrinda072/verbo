@@ -585,7 +585,7 @@ export function DemoStage({ initialStory }: { initialStory?: string }) {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-semibold tracking-tight">Examples</h1>
+          <h2 className="text-3xl font-bold tracking-tight">Example stories</h2>
           <p className="mt-1 text-sm text-ink-3">Three scripted stories with simulated people, built from Verbo&apos;s real screens. No money moves. Translations are machine-made.</p>
         </div>
         <button

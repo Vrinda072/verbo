@@ -12,6 +12,7 @@ import type { RecipientView } from "@/lib/recovery/views";
 export function RecoverView({ token, initial, initialLang }: { token: string; initial: RecipientView; initialLang: string }) {
   const [v, setV] = useState(initial);
   const [lang, setLang] = useState(initialLang);
+  const [originals, setOriginals] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState<null | "return" | "refuse" | "message">(null);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -125,8 +126,9 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
           <ol className="mt-3 space-y-3">
             {v.messages.map((m) => {
               const mine = m.author === "recipient";
-              const shown = !mine && m.translatedText ? m.translatedText : m.text;
-              const showLang = !mine && m.translatedText ? (m.translatedLang ?? m.lang) : m.lang;
+              const original = originals.has(m.id);
+              const shown = !mine && m.translatedText && !original ? m.translatedText : m.text;
+              const showLang = !mine && m.translatedText && !original ? (m.translatedLang ?? m.lang) : m.lang;
               return (
                 <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[85%] rounded-v-lg px-4 py-3 ${mine ? "bg-brand text-brand-ink" : "bg-card shadow-v"}`}>
@@ -135,6 +137,29 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                       <p className="mt-1 text-xs text-ink-3">
                         {m.translatedText ? L.t("rc_translated") : m.lang !== L.usedLang ? L.t("rc_untranslated") : ""}
                       </p>
+                    )}
+                    {!mine && m.translatedText && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                        {m.numbers.length > 0 && (
+                          <span className="rounded-full bg-success-soft px-2.5 py-1 font-medium text-success">
+                            {L.t("numbers_checked", { numbers: m.numbers.join(", ") })}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOriginals((s) => {
+                              const n = new Set(s);
+                              if (n.has(m.id)) n.delete(m.id);
+                              else n.add(m.id);
+                              return n;
+                            })
+                          }
+                          className="font-medium text-brand underline underline-offset-2"
+                        >
+                          {original ? L.t("show_translation") : L.t("show_original")}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </li>

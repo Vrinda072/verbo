@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BryntumSchedulerPro } from "@bryntum/schedulerpro-react";
 import type { DeskRow } from "@/lib/desk/queries";
-import { timelineData } from "@/lib/desk/timeline";
+import { timelineData, VIEW_AFTER_MS, VIEW_BEFORE_MS } from "@/lib/desk/timeline";
 
 const ERRORS: Record<string, string> = {
   not_open: "This case has closed, so its deadline can't change.",
@@ -12,7 +12,8 @@ const ERRORS: Record<string, string> = {
 
 const COLUMNS = [
   { text: "Case", field: "name", width: 220 },
-  { text: "Status", field: "state", width: 130 },
+  { text: "Status", field: "state", width: 110 },
+  { text: "Their time", field: "local", width: 150 },
 ];
 
 /** Bryntum Scheduler Pro: each row is an open recovery case. Dragging the end of a bar moves its escalation deadline. */
@@ -40,12 +41,13 @@ export default function DeadlineTimeline({ rows }: { rows: DeskRow[] }) {
         resourcesData: data.resources,
         eventsData: data.events,
         assignmentsData: data.assignments,
+        resourceTimeRangesData: data.resourceTimeRanges,
         timeRangesData: [{ id: "now", name: "Now", startDate: now.toISOString() }],
       }) as any,
     [data, now],
   );
-  const startDate = useMemo(() => new Date(now.getTime() - 4 * 86_400_000), [now]);
-  const endDate = useMemo(() => new Date(now.getTime() + 8 * 86_400_000), [now]);
+  const startDate = useMemo(() => new Date(now.getTime() - VIEW_BEFORE_MS), [now]);
+  const endDate = useMemo(() => new Date(now.getTime() + VIEW_AFTER_MS), [now]);
 
   const saved = useRef(new Map<string, string>());
   for (const e of data.events) if (!saved.current.has(String(e.id))) saved.current.set(String(e.id), String(e.endDate));
@@ -75,7 +77,7 @@ export default function DeadlineTimeline({ rows }: { rows: DeskRow[] }) {
   return (
     <div className="grid h-full grid-rows-[auto_1fr] gap-2">
       <p className={`text-sm ${message?.bad ? "font-semibold text-terracotta" : "text-ink-2"}`} role="status">
-        {message?.text ?? `${data.resources.length} open cases, soonest deadline first. Drag the right edge of a bar to change when the case escalates.`}
+        {message?.text ?? `${data.resources.length} open cases, soonest deadline first. Shaded hours are night where the recipient lives; reminders wait for their morning. Drag the right edge of a bar to change when the case escalates.`}
       </p>
       <BryntumSchedulerPro
         project={project}
@@ -94,6 +96,7 @@ export default function DeadlineTimeline({ rows }: { rows: DeskRow[] }) {
         cellEditFeature={false}
         dependenciesFeature={false}
         timeRangesFeature={{ showCurrentTimeLine: true }}
+        resourceTimeRangesFeature
         eventTooltipFeature={{
           template: ({ eventRecord }: any) => `${eventRecord.name}<br>${eventRecord.startDate.toLocaleString()} to ${eventRecord.endDate.toLocaleString()}`,
         }}

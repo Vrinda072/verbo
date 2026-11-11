@@ -1,7 +1,7 @@
 /** Read models for the Case Desk. Live sandbox cases and simulated ones share tables; `simulated` tells them apart. */
 import { desc, inArray, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { CONTACTS } from "@/lib/contacts";
+import { personById } from "@/lib/contacts";
 import { evidenceScore } from "@/lib/evidence/meter";
 import type { RiskAssessment } from "@/lib/risk/score";
 
@@ -123,7 +123,7 @@ export async function listAlerts(limit = 50): Promise<AlertRow[]> {
       draftId: d.id,
       createdAt: d.createdAt.toISOString(),
       language: d.language,
-      recipientName: CONTACTS.find((c) => c.id === d.recipientId)?.name ?? d.recipientId,
+      recipientName: personById(d.recipientId)?.name ?? d.recipientId,
       cents: d.amountCents,
       level: risk.level,
       signals: risk.signals.map((s) => s.code),

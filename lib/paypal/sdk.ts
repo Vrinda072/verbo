@@ -43,6 +43,7 @@ export class SdkPayPalClient extends RealPayPalClient {
               emailAddress: input.payerEmail,
               experienceContext: {
                 brandName: config.appName,
+                locale: input.locale,
                 shippingPreference: PaypalWalletContextShippingPreference.NoShipping,
                 userAction: PaypalExperienceUserAction.Continue,
                 landingPage: PaypalExperienceLandingPage.Login,

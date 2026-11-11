@@ -29,7 +29,7 @@ export const verboGridTheme = themeQuartz.withParams({
   oddRowBackgroundColor: "var(--v-paper)",
   rowHoverColor: "var(--v-brand-soft)",
   selectedRowBackgroundColor: "var(--v-brand-soft)",
-  fontFamily: "var(--font-figtree), system-ui, sans-serif",
+  fontFamily: "var(--font-noto), system-ui, sans-serif",
   fontSize: 15,
   spacing: 7,
   wrapperBorderRadius: 14,
