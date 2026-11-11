@@ -77,7 +77,7 @@ export default function DeadlineTimeline({ rows }: { rows: DeskRow[] }) {
   return (
     <div className="grid h-full grid-rows-[auto_1fr] gap-2">
       <p className={`text-sm ${message?.bad ? "font-semibold text-terracotta" : "text-ink-2"}`} role="status">
-        {message?.text ?? `${data.resources.length} open cases, soonest deadline first. Shaded hours are night where the recipient lives; reminders wait for their morning. Drag the right edge of a bar to change when the case escalates.`}
+        {message?.text ?? ""}
       </p>
       <BryntumSchedulerPro
         project={project}

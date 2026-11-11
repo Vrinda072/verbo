@@ -88,7 +88,7 @@ export function TrapExplorer() {
           {t.figure.map((f, i) => (
             <p key={i} lang={f.lang} className={`font-display text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl ${f.strong ? "" : "text-navy-ink/60"}`}>
               {f.a}
-              {f.mark && <span className="text-[#F2A93B]">{f.mark}</span>}
+              {f.mark && <span className="text-mark-on-dark">{f.mark}</span>}
               {"rest" in f ? f.rest : ""}
               <span className="ml-4 align-middle font-sans text-2xl font-medium text-signal">{f.note}</span>
             </p>
@@ -103,7 +103,7 @@ export function TrapExplorer() {
             <p className="text-navy-ink/75">“{t.saidEnglish}”</p>
           </div>
           <div>
-            <p className="text-[#F2A93B]">What could go wrong</p>
+            <p className="text-mark-on-dark">What could go wrong</p>
             <p className="mt-1 text-lg leading-relaxed">{t.risk}</p>
           </div>
           <div>

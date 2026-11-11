@@ -1,4 +1,5 @@
 "use client";
+import { En } from "@/components/En";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
@@ -129,7 +130,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
               Approve on PayPal
             </a>
           )}
-          <CancelButton label={L.t("cancel")} lang={L.usedLang} onClick={cancel} busy={busy} />
+          <CancelButton label={L.t("cancel")} lang={L.usedLang} onClick={cancel} busy={busy} english={<En L={L} k="cancel" />} />
         </>
       )}
 
@@ -137,6 +138,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
         <>
           <h1 lang={L.usedLang} dir={L.dir} className="mt-5 text-2xl font-semibold">
             {L.t("hold_title")}
+            <En L={L} k="hold_title" className="text-base" />
           </h1>
           <HoldRing fraction={remaining / (t.holdMinutes * 60000)} label={`${mm}:${ss}`} srLabel={`${mm} minutes ${ss} seconds left`} />
           <p lang={L.usedLang} dir={L.dir} className="mt-4 text-lg font-semibold">
@@ -157,6 +159,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
             className="mt-6 min-h-16 w-full rounded-full bg-terracotta px-8 text-xl font-semibold text-paper shadow-v disabled:opacity-60"
           >
             <span lang={L.usedLang}>{busy ? "…" : L.t("cancel_hold")}</span>
+            {!busy && <En L={L} k="cancel_hold" className="v-sub-on-dark" />}
           </button>
           <p className="mt-3 text-sm text-ink-3">The money is authorized but not taken. Cancelling releases it — nothing moves.</p>
         </>
@@ -219,10 +222,11 @@ const SIGNAL_TEXT: Record<string, string> = {
   number_near_contact: "This number is one digit away from a contact's number.",
 };
 
-function CancelButton({ label, lang, onClick, busy }: { label: string; lang: string; onClick: () => void; busy: boolean }) {
+function CancelButton({ label, lang, onClick, busy, english }: { label: string; lang: string; onClick: () => void; busy: boolean; english?: React.ReactNode }) {
   return (
     <button type="button" onClick={onClick} disabled={busy} className="mt-4 block w-full font-semibold text-terracotta underline">
       <span lang={lang}>{label}</span>
+      {english}
     </button>
   );
 }

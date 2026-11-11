@@ -127,6 +127,8 @@ export const caseMessages = pgTable(
     lang: text("lang").notNull(),
     translatedText: text("translated_text"),
     translatedLang: text("translated_lang"),
+    /** The message in English, so every reader can see an English line under it. Null when no translation was possible. */
+    englishText: text("english_text"),
     translator: text("translator", { enum: ["anthropic", "gemini", "mymemory", "template", "none"] }).notNull(),
     at: timestamp("at", { withTimezone: true }).notNull(),
   },

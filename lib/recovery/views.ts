@@ -13,6 +13,7 @@ function messages(d: Detail) {
     lang: m.lang,
     translatedText: m.translatedText,
     translatedLang: m.translatedLang,
+    englishText: m.englishText,
     /** Numbers in a translated message. Each was found again in the translation, or it would not have been kept. */
     numbers: m.translatedText ? [...new Set(numbersOf(m.text))] : [],
     at: m.at.toISOString(),

@@ -2,6 +2,15 @@
 
 ## Nov 11 — redesign around language safety
 
+- **English subtitles everywhere:** every line shown in another language now has its English under it: the Home read-backs,
+  Send's spoken questions, the review card and its buttons, the hold and sent screens, both sides of the recovery chat and the
+  Case Desk conversation. Chat messages store an English copy (`case_messages.english_text`, migration 0004), translated when
+  neither side writes English. In right-to-left pages the English lines up with the text above it (`components/En.tsx`).
+- **Impeccable** (impeccable.style) installed as a Claude Code plugin; its detector now reports no issues on Home, Send, Examples
+  and the Case Desk at desktop and phone width. Fixes: input overflow on Send, long footer line, AG Studio title contrast, a
+  nested card, the dimmed phone in Examples (now greyscale instead of faded text), the eyebrow above "Case Desk", themed text
+  selection, caret, placeholders and scrollbars, balanced headings, and the orange mark colour moved into a token.
+
 - **Purpose made visible:** Home leads with "The words change. The money doesn't." and the same read-back in six languages, with the
   checked value (40.00 USD) unchanged beside each. Type is the Noto family so Devanagari, Telugu, Arabic and Latin match.
 - **PayPal in the person's language:** orders.create now sets `experience_context.locale` from the sender's language, and the return order

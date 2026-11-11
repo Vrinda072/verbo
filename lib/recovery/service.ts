@@ -105,6 +105,9 @@ export async function postMessage(c: CaseRow, author: "sender" | "recipient", te
   if (!clean) throw new TransferError("empty_message");
   const target = author === "sender" ? c.recipientLanguage : c.senderLanguage;
   const tr = await getTranslator().translate(clean, lang, target);
+  // An English copy for the subtitles. Reuses the translation when one side is English.
+  const english =
+    lang.split("-")[0] === "en" ? clean : target.split("-")[0] === "en" ? tr.text : (await getTranslator().translate(clean, lang, "en")).text;
   const db = await getDb();
   await db.insert(schema.caseMessages).values({
     caseId: c.id,
@@ -113,6 +116,7 @@ export async function postMessage(c: CaseRow, author: "sender" | "recipient", te
     lang,
     translatedText: tr.text,
     translatedLang: tr.text ? target : null,
+    englishText: english ?? null,
     translator: tr.text ? tr.translator : "none",
     at: now,
   });

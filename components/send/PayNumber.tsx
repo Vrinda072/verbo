@@ -115,13 +115,13 @@ export function PayNumber({ lang, onReview }: { lang: string; onReview: (r: Numb
         Or pay a phone number
       </h2>
       <div className="grid gap-3 sm:grid-cols-[1fr_9rem_auto]">
-        <label className="grid gap-1 text-sm text-ink-3">
+        <label className="grid min-w-0 gap-1 text-sm text-ink-3">
           Phone number
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="off" placeholder="+91 98480 22339" className="min-h-12 rounded-v border-2 border-line bg-card px-4 text-lg text-ink tabular-nums outline-none focus:border-brand" />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="off" placeholder="+91 98480 22339" className="min-h-12 w-full min-w-0 rounded-v border-2 border-line bg-card px-4 text-lg text-ink tabular-nums outline-none focus:border-brand" />
         </label>
-        <label className="grid gap-1 text-sm text-ink-3">
+        <label className="grid min-w-0 gap-1 text-sm text-ink-3">
           Amount (USD)
-          <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" placeholder="60" className="min-h-12 rounded-v border-2 border-line bg-card px-4 text-lg text-ink tabular-nums outline-none focus:border-brand" />
+          <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" placeholder="60" className="min-h-12 w-full min-w-0 rounded-v border-2 border-line bg-card px-4 text-lg text-ink tabular-nums outline-none focus:border-brand" />
         </label>
         <button type="submit" disabled={busy || phone.trim().length < 6} className="min-h-12 self-end rounded-full bg-navy px-6 font-semibold text-navy-ink disabled:opacity-50">
           {busy ? "Checking…" : "Check"}

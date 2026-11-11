@@ -35,6 +35,9 @@
   --v-sky: #0b5cd6;
   --v-sky-soft: #eaf3fe;
   --v-focus: #0b5cd6;
+  /* the one letter that differs, marked on navy surfaces */
+  --v-mark-on-dark: #f2a93b;
+  --v-placeholder: #5f7096; /* >=4.5:1 on white */
 
   /* type scale */
   --v-text-xs: 0.8125rem;
@@ -73,6 +76,7 @@
   --color-navy-2: var(--v-navy-2);
   --color-navy-ink: var(--v-navy-ink);
   --color-signal: var(--v-signal);
+  --color-mark-on-dark: var(--v-mark-on-dark);
   --color-success: var(--v-success);
   --color-success-soft: var(--v-success-soft);
   --color-marigold: var(--v-marigold);
@@ -109,7 +113,35 @@ body {
   font-family: var(--font-sans);
   font-size: var(--v-text-base);
   line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--v-brand);
+}
+
+/* Browser surfaces carry the palette too. */
+::selection {
+  background: var(--v-signal);
+  color: var(--v-navy);
+}
+::placeholder {
+  color: var(--v-placeholder);
+  opacity: 1;
+}
+html {
+  scrollbar-color: var(--v-line-strong) transparent;
+}
+p,
+li,
+dd,
+label {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+a {
+  text-underline-offset: 0.2em;
 }
 
 :focus-visible {
@@ -193,4 +225,34 @@ body {
 .b-sch-resource-time-range.v-night {
   background: color-mix(in srgb, var(--v-navy) 9%, transparent);
   border: 0;
+}
+
+/* English subtitle under a line in another language (components/En.tsx). */
+@layer components {
+  .v-sub {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--v-ink-3);
+    font-family: var(--font-sans, inherit);
+  }
+  .v-sub-on-dark {
+    color: inherit;
+    opacity: 0.85;
+  }
+}
+
+/* AG Studio's filter titles default to a grey below 4.5:1 on white. */
+.v-studio .ag-studio-filter-widget-title {
+  color: var(--v-ink-3);
+}
+/* In a right-to-left block the English line keeps left-to-right order but lines up with the text above it. */
+[dir="rtl"] .v-sub {
+  text-align: right;
+}
+[dir="rtl"] .text-center .v-sub,
+[dir="rtl"] button .v-sub {
+  text-align: center;
 }
