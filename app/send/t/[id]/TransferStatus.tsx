@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
 import { MoneyPath, type PathTone } from "@/components/MoneyPath";
 import { SenderCase } from "./SenderCase";
+import type { TrailStep } from "@/lib/paypal/trail";
 
 export interface TransferView {
   id: string;
@@ -18,6 +19,45 @@ export interface TransferView {
   risk: { level: string; hold: boolean; signals: string[] } | null;
   serverNow: string;
   mode: string;
+  trail?: TrailStep[];
+}
+
+const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+/** Every PayPal operation behind this payment, in order, with the idempotency key each money call carries. */
+function PayPalCalls({ steps, mock }: { steps: TrailStep[]; mock: boolean }) {
+  const calls = steps.filter((s) => s.operation).length;
+  // Times use the viewer's own clock, so they are filled in after hydration to match the server's HTML.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return (
+    <details className="mt-8 rounded-v-lg border border-line bg-paper text-left">
+      <summary className="cursor-pointer px-4 py-3 font-semibold">
+        PayPal calls for this payment ({calls})
+        <span className="ml-2 text-sm font-normal text-ink-3">{mock ? "offline demo: the same calls, answered locally" : "PayPal sandbox"}</span>
+      </summary>
+      <ol className="grid gap-px border-t border-line">
+        {steps.map((s, i) => (
+          <li key={i} className="grid gap-1 bg-card px-4 py-3 sm:grid-cols-[5.5rem_1fr]">
+            <span className="text-sm tabular-nums text-ink-3">{mounted ? clock(s.at) : ""}</span>
+            <div>
+              {s.operation ? (
+                <p className="flex flex-wrap items-center gap-2">
+                  <code className="font-semibold">{s.operation}</code>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.via === "APIMatic SDK" ? "bg-navy text-navy-ink" : "bg-paper-2 text-ink-2"}`}>{s.via}</span>
+                  {s.idempotency && <span className="rounded-full bg-sky-soft px-2 py-0.5 text-xs text-navy">{s.idempotency}</span>}
+                </p>
+              ) : (
+                <p className="font-semibold text-ink-2">No PayPal call</p>
+              )}
+              {s.endpoint && <p className="text-sm text-ink-3"><code>{s.endpoint}</code></p>}
+              <p className="text-sm text-ink-2">{s.note}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </details>
+  );
 }
 
 const SENDING = new Set(["APPROVED", "AUTHORIZED", "CAPTURED", "PAYOUT_PENDING"]);
@@ -164,6 +204,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
           Send another
         </Link>
       )}
+      {t.trail && t.trail.length > 0 && <PayPalCalls steps={t.trail} mock={t.mode === "mock"} />}
       {t.mode === "mock" && <p className="mt-6 text-xs text-ink-3">Offline demo mode — no real sandbox calls.</p>}
     </section>
   );
@@ -175,6 +216,7 @@ const SIGNAL_TEXT: Record<string, string> = {
   unusual_amount: "This is much more than you usually send.",
   pressure_language: "What you said sounded rushed or pressured.",
   language_mismatch: "This new contact speaks a different language than you.",
+  number_near_contact: "This number is one digit away from a contact's number.",
 };
 
 function CancelButton({ label, lang, onClick, busy }: { label: string; lang: string; onClick: () => void; busy: boolean }) {

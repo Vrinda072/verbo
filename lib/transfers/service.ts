@@ -3,10 +3,12 @@
  * risk (lib/risk), and persistence (lib/store). Every PayPal call inside uses deterministic idempotency
  * keys derived from the transfer id, so retries and racing workers are safe.
  */
+import { paypalTrail } from "@/lib/paypal/trail";
 import { randomUUID } from "node:crypto";
 import { config } from "@/lib/config";
-import { CONTACTS, contactEmail } from "@/lib/contacts";
+import { contactEmail, personById, type Contact } from "@/lib/contacts";
 import { getPayPal } from "@/lib/paypal";
+import { paypalLocale } from "@/lib/paypal/locale";
 import { MockPayPalClient } from "@/lib/paypal/mock";
 import {
   authorizeTransfer,
@@ -67,6 +69,34 @@ export async function createDraft(u: Understanding, transcript: string, language
   return draft;
 }
 
+/**
+ * A typed phone number and amount → risk-scored draft. The number decides the person; nothing is interpreted.
+ * A number one digit from a contact's adds the near-number signal, which holds the payment.
+ */
+export async function createNumberDraft(args: { recipient: Contact; cents: number; language: string; nearContact?: Contact }): Promise<Draft> {
+  const risk = assessRisk({
+    recipient: args.recipient,
+    lookAlikes: [],
+    cents: args.cents,
+    transcript: "",
+    senderLanguage: args.language,
+    nearContact: args.nearContact,
+  });
+  const draft: Draft = {
+    id: randomUUID(),
+    language: args.language,
+    transcript: `Pay ${args.recipient.phone}`,
+    extractor: "number",
+    recipientId: args.recipient.id,
+    amountCents: args.cents,
+    amountSource: "numerals",
+    risk,
+    expiresAt: new Date(Date.now() + DRAFT_TTL_MS),
+  };
+  await insertDraft(draft);
+  return draft;
+}
+
 /** "Yes, send" → PayPal Order (AUTHORIZE). Idempotent per nonce. */
 export async function createTransferFromDraft(args: { draftId: string; nonce: string; typedCents?: number }): Promise<StoredTransfer> {
   const id = `tr_${args.nonce}`;
@@ -78,7 +108,7 @@ export async function createTransferFromDraft(args: { draftId: string; nonce: st
   if (draft.expiresAt.getTime() < Date.now()) throw new TransferError("draft_expired", 410);
   if (draft.amountSource === "words" && args.typedCents !== draft.amountCents) throw new TransferError("typed_amount_mismatch");
 
-  const contact = CONTACTS.find((c) => c.id === draft.recipientId);
+  const contact = personById(draft.recipientId);
   if (!contact) throw new TransferError("unknown_recipient");
   const recipientEmail = contactEmail(contact) ?? (config.mock ? `${contact.id}@example.test` : undefined);
   const senderEmail = process.env.SANDBOX_SENDER_EMAIL || (config.mock ? "sender@example.test" : undefined);
@@ -92,6 +122,7 @@ export async function createTransferFromDraft(args: { draftId: string; nonce: st
     recipientEmail,
     urls: { returnUrl: `${config.baseUrl}/paypal/return`, cancelUrl: `${config.baseUrl}/paypal/return?cancelled=1` },
     description: `Verbo transfer to ${contact.name} (sandbox)`,
+    locale: paypalLocale(draft.language),
   });
   if (pp.kind === "mock") t.approveUrl = `${config.baseUrl}/paypal/return?token=${t.orderId}`;
   try {
@@ -166,7 +197,7 @@ export async function cancel(id: string, now = new Date()): Promise<StoredTransf
 
 /** What the sender's screen may see (no emails, no PayPal ids). */
 export function publicView(t: StoredTransfer, now = new Date()) {
-  const contact = CONTACTS.find((c) => c.id === t.meta.recipientId);
+  const contact = personById(t.meta.recipientId);
   return {
     id: t.id,
     state: t.state,
@@ -180,6 +211,7 @@ export function publicView(t: StoredTransfer, now = new Date()) {
     risk: t.meta.risk ? summarizeRisk(t.meta.risk) : null,
     serverNow: now.toISOString(),
     mode: getPayPal().kind,
+    trail: paypalTrail(t),
   };
 }
 

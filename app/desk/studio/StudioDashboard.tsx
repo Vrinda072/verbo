@@ -17,7 +17,7 @@ const theme = studioTheme.withParams({
   foregroundColor: "var(--v-ink)",
   accentColor: "var(--v-brand)",
   borderColor: "var(--v-line)",
-  fontFamily: "var(--font-figtree), system-ui, sans-serif",
+  fontFamily: "var(--font-noto), system-ui, sans-serif",
 });
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- generic registry types add nothing for this fixed set of widgets. */

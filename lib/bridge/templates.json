@@ -40,7 +40,11 @@
     "ask_option_known",
     "ask_option_new",
     "word_one",
-    "word_two"
+    "word_two",
+    "numbers_checked",
+    "show_original",
+    "show_translation",
+    "number_near"
   ],
   "templates": {
     "en": {
@@ -86,7 +90,11 @@
         "ask_option_known": "Say {n} for {name}, spelled with the letter {letter}, who you have paid before.",
         "ask_option_new": "Say {n} for {name}, spelled with the letter {letter}, who you have never paid.",
         "word_one": "one",
-        "word_two": "two"
+        "word_two": "two",
+        "numbers_checked": "Numbers checked: {numbers}",
+        "show_original": "Show original",
+        "show_translation": "Show translation",
+        "number_near": "This number is one digit away from {contact}'s number. Check it before you send."
       }
     },
     "te": {
@@ -132,7 +140,11 @@
         "ask_option_known": "{letter} అక్షరంతో ఉన్న {name} కోసం {n} అని చెప్పండి, వీరికి మీరు ఇంతకు ముందు డబ్బు పంపారు.",
         "ask_option_new": "{letter} అక్షరంతో ఉన్న {name} కోసం {n} అని చెప్పండి, వీరికి మీరు ఎప్పుడూ డబ్బు పంపలేదు.",
         "word_one": "ఒకటి",
-        "word_two": "రెండు"
+        "word_two": "రెండు",
+        "numbers_checked": "సంఖ్యలు తనిఖీ చేయబడ్డాయి: {numbers}",
+        "show_original": "అసలు సందేశం చూపించు",
+        "show_translation": "అనువాదం చూపించు",
+        "number_near": "ఈ నంబర్ {contact} నంబర్ నుండి ఒక్క అంకె మాత్రమే తేడా ఉంది. పంపే ముందు తనిఖీ చేయండి."
       }
     },
     "hi": {
@@ -178,7 +190,11 @@
         "ask_option_known": "{name} के लिए {n} बोलें, जिनके नाम में {letter} अक्षर है और जिन्हें आप पहले पैसे भेज चुके हैं।",
         "ask_option_new": "{name} के लिए {n} बोलें, जिनके नाम में {letter} अक्षर है और जिन्हें आपने कभी पैसे नहीं भेजे।",
         "word_one": "एक",
-        "word_two": "दो"
+        "word_two": "दो",
+        "numbers_checked": "संख्याएँ जाँची गईं: {numbers}",
+        "show_original": "मूल संदेश दिखाएँ",
+        "show_translation": "अनुवाद दिखाएँ",
+        "number_near": "यह नंबर {contact} के नंबर से सिर्फ़ एक अंक अलग है। भेजने से पहले जाँच लें।"
       }
     },
     "es": {
@@ -224,7 +240,11 @@
         "ask_option_known": "Di {n} para {name}, que se escribe con la letra {letter}, a quien ya le has pagado antes.",
         "ask_option_new": "Di {n} para {name}, que se escribe con la letra {letter}, a quien nunca le has pagado.",
         "word_one": "uno",
-        "word_two": "dos"
+        "word_two": "dos",
+        "numbers_checked": "Números verificados: {numbers}",
+        "show_original": "Ver original",
+        "show_translation": "Ver traducción",
+        "number_near": "Este número difiere en un solo dígito del número de {contact}. Revísalo antes de enviar."
       }
     },
     "pt": {
@@ -270,7 +290,11 @@
         "ask_option_known": "Diga {n} para {name}, que se escreve com a letra {letter}, para quem você já pagou antes.",
         "ask_option_new": "Diga {n} para {name}, que se escreve com a letra {letter}, para quem você nunca pagou.",
         "word_one": "um",
-        "word_two": "dois"
+        "word_two": "dois",
+        "numbers_checked": "Números verificados: {numbers}",
+        "show_original": "Ver original",
+        "show_translation": "Ver tradução",
+        "number_near": "Este número difere em apenas um dígito do número de {contact}. Confira antes de enviar."
       }
     },
     "ar": {
@@ -316,7 +340,11 @@
         "ask_option_known": "قل «{n}» لاختيار {name}، الذي يُكتب بحرف {letter}، والذي دفعت له من قبل.",
         "ask_option_new": "قل «{n}» لاختيار {name}، الذي يُكتب بحرف {letter}، والذي لم تدفع له من قبل.",
         "word_one": "واحد",
-        "word_two": "اثنان"
+        "word_two": "اثنان",
+        "numbers_checked": "تم التحقق من الأرقام: {numbers}",
+        "show_original": "عرض النص الأصلي",
+        "show_translation": "عرض الترجمة",
+        "number_near": "هذا الرقم يختلف برقم واحد فقط عن رقم {contact}. تحقق منه قبل الإرسال."
       }
     }
   }

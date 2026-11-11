@@ -1,7 +1,7 @@
 "use client";
 import { NameDiff } from "@/components/NameDiff";
 import { useEffect, useState } from "react";
-import { labelsFor } from "@/lib/bridge/readback";
+import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";
 import { useReadAloud } from "@/lib/speech/useReadAloud";
 import type { SpokenPart } from "@/lib/speech/spoken";
@@ -19,6 +19,8 @@ export interface UnderstandResponse {
   amount: { cents: number; currency: string; localized: string; digits: string } | null;
   amountSource: "numerals" | "words" | null;
   currencyAssumed: boolean;
+  /** Paying a typed number one digit away from this contact's number. */
+  nearContact?: string;
 }
 
 /**
@@ -84,6 +86,20 @@ export function ConfirmCard({
           <span className="text-ink-3">.{frac}</span>
         </p>
         <p className="mt-1 text-sm text-ink-3">{data.amount.currency}</p>
+        <dl className="mx-auto mt-4 flex max-w-sm flex-wrap justify-center gap-x-8 gap-y-2 text-sm">
+          <div>
+            <dt className="text-ink-3">Amount checked</dt>
+            <dd className="font-semibold tabular-nums">
+              {data.amount.digits} {data.amount.currency}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-ink-3">PayPal opens in</dt>
+            <dd lang={L.usedLang} className="font-semibold">
+              {LANGUAGES.find((l) => l.code === L.usedLang)?.nativeName ?? "English"}
+            </dd>
+          </div>
+        </dl>
       </div>
 
       <div className="mt-5 rounded-v bg-paper p-4">
@@ -126,6 +142,11 @@ export function ConfirmCard({
             {L.t("lookalike", { other: o.name })}
           </Notice>
         ))}
+        {data.nearContact && (
+          <Notice tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("number_near", { contact: data.nearContact }) : undefined}>
+            {L.t("number_near", { contact: data.nearContact })}
+          </Notice>
+        )}
         {data.risk?.signals.includes("pressure_language") && (
           <Notice tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("pressure") : undefined}>
             {L.t("pressure")}

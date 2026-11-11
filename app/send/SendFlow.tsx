@@ -10,6 +10,19 @@ import { MicButton } from "@/components/send/MicButton";
 import { NameDiff } from "@/components/NameDiff";
 import { ConfirmCard, type UnderstandResponse } from "@/components/send/ConfirmCard";
 import { Stepper } from "@/components/send/Stepper";
+import { PayNumber, type NumberResponse } from "@/components/send/PayNumber";
+import dynamic from "next/dynamic";
+
+const PeopleGrid = dynamic(() => import("@/components/send/PeopleGrid"), { ssr: false, loading: () => <p className="text-ink-3">Loading contacts…</p> });
+
+/** Requests that show each check. Judges can say or type them. */
+const TRY = [
+  { say: "Send 40 dollars to Manuel Lopez", shows: "Names that sound alike, in Spanish and Portuguese" },
+  { say: "Send 30 dollars to Mohamed Ali", shows: "Mohamed or Mohamad: Arabic or English" },
+  { say: "Send 20 dollars to Ana Souza", shows: "Souza or Sousa: Portuguese or Spanish" },
+  { say: "Send sixty dollars to Kiran Reddy", shows: "An amount in words must be typed in digits" },
+  { say: "Send 900 dollars to Ana Souza right now, it's urgent", shows: "Pressure, a first payment and a large amount: held" },
+];
 
 type Phase = "input" | "understanding" | "review" | "creating" | "created" | "cancelled";
 
@@ -337,6 +350,17 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
               </ul>
             </div>
           )}
+          <section className="rounded-v-lg bg-card p-6 shadow-v">
+            <PayNumber
+              lang={lang}
+              onReview={(r: NumberResponse) => {
+                heardByVoice.current = "";
+                setResult(r);
+                setNonce(crypto.randomUUID());
+                setPhase("review");
+              }}
+            />
+          </section>
           {error && (
             <p role="alert" className="mx-auto max-w-xl rounded-v border border-terracotta/50 bg-terracotta-soft p-4 text-center">
               {error}
@@ -344,42 +368,51 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           )}
           </div>
 
-          <aside className="grid gap-6">
+          <aside className="grid content-start gap-6">
             <section aria-labelledby="try-title" className="rounded-v-lg bg-navy p-6 text-navy-ink">
-              <h2 id="try-title" className="text-sm text-navy-ink/75">
-                Example
-              </h2>
-              <p lang={lang} dir={langInfo?.dir} className="mt-3 text-lg font-medium leading-snug">
-                “{EXAMPLES[lang] ?? EXAMPLES.en}”
-              </p>
-              {lang !== "en" && EXAMPLES[lang] && <p className="mt-2 text-sm text-navy-ink/75">“{EXAMPLES.en}”</p>}
-            </section>
-            <section aria-labelledby="contacts-title" className="rounded-v-lg bg-card p-6">
-              <h2 id="contacts-title" className="text-sm font-semibold text-ink-3">
-                People you can pay (simulated)
+              <h2 id="try-title" className="text-lg font-semibold">
+                Try these
               </h2>
               <ul className="mt-3 grid gap-2">
-                {CONTACTS.map((c) => (
-                  <li key={c.id}>
+                {TRY.map((t) => (
+                  <li key={t.say}>
                     <button
                       type="button"
                       onClick={() => {
                         setTyping(true);
-                        mic.setTranscript(`${mic.transcript} ${c.name}`.trim());
+                        mic.setTranscript(t.say);
                       }}
-                      className="flex min-h-11 w-full items-center gap-3 rounded-full px-2 text-left font-semibold hover:bg-paper-2"
+                      className="w-full rounded-v bg-navy-2 px-4 py-3 text-left hover:bg-white/10"
                     >
-                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft text-sm text-brand">
-                        {c.name[0]}
-                      </span>
-                      {c.name}
+                      <span className="block font-medium">“{t.say}”</span>
+                      <span className="block text-sm text-navy-ink/75">{t.shows}</span>
                     </button>
                   </li>
                 ))}
               </ul>
+              <p className="mt-4 text-sm text-navy-ink/75">
+                Or pay +91 98480 22339: one digit off Kiran Reddy&apos;s number, it reaches someone who reads Arabic.
+              </p>
             </section>
           </aside>
         </div>
+      )}
+
+      {(phase === "input" || phase === "understanding") && (
+        <section aria-labelledby="people-title" className="mt-10 grid gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 id="people-title" className="text-2xl font-bold">
+              People you can pay
+            </h2>
+            <p className="text-sm text-ink-3">Grouped by how the names sound. Click a person to use their name. Simulated people.</p>
+          </div>
+          <PeopleGrid
+            onPick={(name) => {
+              setTyping(true);
+              mic.setTranscript(`${mic.transcript} ${name}`.trim());
+            }}
+          />
+        </section>
       )}
 
       {(phase === "review" || phase === "creating") && reviewable && (

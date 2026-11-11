@@ -25,6 +25,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [ideas, setIdeas] = useState<string[]>([]);
+  const [originals, setOriginals] = useState<Set<number>>(new Set());
   const [drafting, setDrafting] = useState(false);
   const L = labelsFor(lang);
   const nameOf = (code: string) => LANGUAGES.find((l) => l.code === code)?.englishName ?? code;
@@ -142,15 +143,40 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
       <ol className="mt-2 space-y-2">
         {c.messages.map((m) => {
           const mine = m.author === "sender";
-          const shown = !mine && m.translatedText ? m.translatedText : m.text;
+          const original = originals.has(m.id);
+          const shown = !mine && m.translatedText && !original ? m.translatedText : m.text;
           return (
             <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] rounded-v-lg px-4 py-2 ${mine ? "bg-brand-soft" : "border border-line bg-card"}`}>
-                <p lang={!mine && m.translatedText ? (m.translatedLang ?? m.lang) : m.lang}>{shown}</p>
+                <p lang={!mine && m.translatedText && !original ? (m.translatedLang ?? m.lang) : m.lang}>{shown}</p>
                 {!mine && (
                   <p className="mt-1 text-xs text-ink-3">
                     {m.translatedText ? `Translated from ${nameOf(m.lang)}` : m.lang !== L.usedLang ? `Not translated (${nameOf(m.lang)})` : ""}
                   </p>
+                )}
+                {!mine && m.translatedText && (
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                    {m.numbers.length > 0 && (
+                      <span lang={L.usedLang} className="rounded-full bg-success-soft px-2.5 py-1 font-medium text-success">
+                        {L.t("numbers_checked", { numbers: m.numbers.join(", ") })}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      lang={L.usedLang}
+                      onClick={() =>
+                        setOriginals((s) => {
+                          const n = new Set(s);
+                          if (n.has(m.id)) n.delete(m.id);
+                          else n.add(m.id);
+                          return n;
+                        })
+                      }
+                      className="font-medium text-brand underline underline-offset-2"
+                    >
+                      {original ? L.t("show_translation") : L.t("show_original")}
+                    </button>
+                  </div>
                 )}
               </div>
             </li>

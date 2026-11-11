@@ -45,7 +45,7 @@ export interface FlowUrls {
 
 export async function startTransfer(
   pp: PayPalClient,
-  args: { id: string; amount: Money; senderEmail: string; recipientEmail: string; urls: FlowUrls; description?: string },
+  args: { id: string; amount: Money; senderEmail: string; recipientEmail: string; urls: FlowUrls; locale?: string; description?: string },
 ): Promise<Transfer> {
   const order = await pp.createOrder({
     intent: "AUTHORIZE",
@@ -55,6 +55,7 @@ export async function startTransfer(
     returnUrl: args.urls.returnUrl,
     cancelUrl: args.urls.cancelUrl,
     payerEmail: args.senderEmail,
+    locale: args.locale,
     requestId: idempotencyKey(args.id, "create-order"),
   });
   return {
@@ -169,7 +170,7 @@ export async function refreshPayout(pp: PayPalClient, t: Transfer, now = new Dat
  */
 export async function startReturn(
   pp: PayPalClient,
-  args: { id: string; original: Transfer; returnerEmail: string; urls: FlowUrls },
+  args: { id: string; original: Transfer; returnerEmail: string; urls: FlowUrls; locale?: string },
 ): Promise<Transfer> {
   const order = await pp.createOrder({
     intent: "CAPTURE",
@@ -179,6 +180,7 @@ export async function startReturn(
     returnUrl: args.urls.returnUrl,
     cancelUrl: args.urls.cancelUrl,
     payerEmail: args.returnerEmail,
+    locale: args.locale,
     requestId: idempotencyKey(args.id, "return-create-order"),
   });
   return {

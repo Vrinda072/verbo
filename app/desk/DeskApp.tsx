@@ -15,6 +15,7 @@ const DeadlineTimeline = dynamic(() => import("./timeline/DeadlineTimeline"), {
   ssr: false,
   loading: () => <p className="text-ink-3">Loading timeline…</p>,
 });
+const LanguagePairs = dynamic(() => import("./LanguagePairs"), { ssr: false });
 const StudioDashboard = dynamic(() => import("./studio/StudioDashboard"), {
   ssr: false,
   loading: () => <p className="py-20 text-center text-ink-3">Loading dashboard…</p>,
@@ -81,6 +82,7 @@ function LangPair({ data }: CustomCellRendererProps<DeskRow>) {
 const TAB_HELP = {
   dashboard: "Totals, outcomes and evidence across all cases. Ask the analyst a question in plain words.",
   cases: "Every recovery case after money went to the wrong person. Open a row for its timeline, messages and evidence packet.",
+  languages: "Where mistaken payments happen, by the sender's language and the recipient's. Click a cell for that pair.",
   timeline: "Open cases by deadline. Drag the end of a bar to change when a case escalates.",
   alerts: "Payments that were checked before sending: similar names, pressure, first payments and unusual amounts.",
 } as const;
@@ -88,7 +90,7 @@ const TAB_HELP = {
 export function DeskApp() {
   const [rows, setRows] = useState<DeskRow[] | null>(null);
   const [alerts, setAlerts] = useState<AlertRow[]>([]);
-  const [tab, setTab] = useState<"dashboard" | "timeline" | "cases" | "alerts">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "timeline" | "cases" | "languages" | "alerts">("dashboard");
   const [scope, setScope] = useState<"all" | "live" | "sim">("all");
   const [quick, setQuick] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -184,6 +186,7 @@ export function DeskApp() {
           [
             ["dashboard", "Overview"],
             ["cases", `Cases (${scoped.length})`],
+            ["languages", "Languages"],
             ["timeline", "Deadlines"],
             ["alerts", `Pre-send alerts (${alerts.length})`],
           ] as const
@@ -198,7 +201,7 @@ export function DeskApp() {
             {label}
           </button>
         ))}
-        <label className={`ml-auto self-center ${tab === "dashboard" || tab === "timeline" ? "invisible" : ""}`}>
+        <label className={`ml-auto self-center ${tab === "dashboard" || tab === "timeline" || tab === "languages" ? "invisible" : ""}`}>
           <span className="sr-only">Search cases</span>
           <input
             value={quick}
@@ -215,10 +218,12 @@ export function DeskApp() {
 
       {tab === "dashboard" && <div className="mt-4">{rows ? <StudioDashboard key={scope} rows={scoped} /> : <p className="py-20 text-center text-ink-3">Loading cases…</p>}</div>}
 
+      {tab === "languages" && <div className="mt-4">{rows ? <LanguagePairs key={scope} rows={scoped} /> : null}</div>}
+
       {tab === "timeline" && <div className="mt-4 h-[640px]">{rows ? <DeadlineTimeline key={scope} rows={scoped} /> : null}</div>}
 
-      <div className={`mt-4 h-[640px] ${tab === "dashboard" || tab === "timeline" ? "hidden" : ""}`}>
-        {tab === "dashboard" || tab === "timeline" ? null : tab === "cases" ? (
+      <div className={`mt-4 h-[640px] ${tab === "dashboard" || tab === "timeline" || tab === "languages" ? "hidden" : ""}`}>
+        {tab === "dashboard" || tab === "timeline" || tab === "languages" ? null : tab === "cases" ? (
           <AgGridReact<DeskRow>
             theme={verboGridTheme}
             rowData={rows ? scoped : undefined}

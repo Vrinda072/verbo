@@ -3,12 +3,14 @@
  * signed link in their language and can return the money with one tap (they approve a PayPal order themselves —
  * Verbo cannot take money from anyone), refuse, or reply. Timers send a reminder at 24 h and escalate at 72 h.
  */
+import { isQuiet, timeZoneFor } from "@/lib/localTime";
 import { randomUUID } from "node:crypto";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { config } from "@/lib/config";
-import { CONTACTS, SENDER } from "@/lib/contacts";
+import { personById, SENDER } from "@/lib/contacts";
 import { getPayPal } from "@/lib/paypal";
+import { paypalLocale } from "@/lib/paypal/locale";
 import type { MockPayPalClient } from "@/lib/paypal/mock";
 import { completeReturn, startReturn } from "@/lib/paypal/flows";
 import { getTransfer, getTransferByOrder, insertTransfer, type StoredTransfer } from "@/lib/store/transfers";
@@ -60,7 +62,7 @@ export async function openCase(transferId: string, now = new Date()): Promise<{ 
   const t = await getTransfer(transferId);
   if (!t || t.meta.kind !== "send") throw new TransferError("not_found", 404);
   if (t.state !== "COMPLETED" && t.state !== "PAYOUT_PENDING") throw new TransferError("transfer_not_completed", 409);
-  const contact = CONTACTS.find((c) => c.id === t.meta.recipientId);
+  const contact = personById(t.meta.recipientId);
 
   const id = `case_${randomUUID()}`;
   const [row] = await db
@@ -141,6 +143,7 @@ export async function startCaseReturn(c: CaseRow, now = new Date()): Promise<{ a
     original,
     returnerEmail: original.recipientEmail,
     urls: { returnUrl: `${config.baseUrl}/paypal/return`, cancelUrl: `${config.baseUrl}/paypal/return?cancelled=1` },
+    locale: paypalLocale(c.recipientLanguage),
   });
   if (pp.kind === "mock") r.approveUrl = `${config.baseUrl}/paypal/return?token=${r.orderId}`;
   await insertTransfer(r, { kind: "return", originalTransferId: original.id, recipientId: "sender", language: c.recipientLanguage });
@@ -176,7 +179,8 @@ export async function processTimers(now = new Date()) {
     .where(and(inArray(schema.cases.state, [...OPEN_STATES]), eq(schema.cases.simulated, 0)));
   const done: { caseId: string; event: string }[] = [];
   for (const c of open) {
-    const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, escalateAt: c.escalateAt, remindersSent: c.remindersSent, now });
+    const recipientQuiet = isQuiet(now, timeZoneFor(c.recipientName, c.recipientLanguage));
+    const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, escalateAt: c.escalateAt, remindersSent: c.remindersSent, now, recipientQuiet });
     if (!ev) continue;
     try {
       await applyEvent(c, ev, "system", {

@@ -16,7 +16,8 @@ export type RiskSignal =
   | { code: "first_time"; weight: number }
   | { code: "unusual_amount"; weight: number; medianCents: number | null }
   | { code: "pressure_language"; weight: number; cues: PressureCue[] }
-  | { code: "language_mismatch"; weight: number; recipientLanguage: string };
+  | { code: "language_mismatch"; weight: number; recipientLanguage: string }
+  | { code: "number_near_contact"; weight: number; contact: string };
 
 export interface RiskAssessment {
   level: RiskLevel;
@@ -32,6 +33,7 @@ export const WEIGHTS = {
   unusualAmount: 2,
   pressure: 3,
   languageMismatch: 1,
+  nearNumber: 3, // a typed number one digit from a contact's number, reaching someone else
 } as const;
 export const MEDIUM_AT = 2;
 export const HIGH_AT = 4;
@@ -47,6 +49,8 @@ export interface RiskInput {
   senderLanguage: string;
   modelPressureCues?: string[];
   history?: PastPayment[];
+  /** The contact whose number differs by one digit from the one typed, if any. */
+  nearContact?: Contact;
 }
 
 function median(xs: number[]): number | null {
@@ -82,6 +86,8 @@ export function assessRisk(input: RiskInput): RiskAssessment {
   const senderLang = input.senderLanguage.split("-")[0];
   if (!paidBefore && input.recipient.language !== senderLang)
     signals.push({ code: "language_mismatch", weight: WEIGHTS.languageMismatch, recipientLanguage: input.recipient.language });
+
+  if (input.nearContact) signals.push({ code: "number_near_contact", weight: WEIGHTS.nearNumber, contact: input.nearContact.name });
 
   const score = signals.reduce((s, x) => s + x.weight, 0);
   const level: RiskLevel = score >= HIGH_AT ? "high" : score >= MEDIUM_AT ? "medium" : "low";

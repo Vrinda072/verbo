@@ -8,23 +8,23 @@
 :root {
   color-scheme: light;
   /* colour: surfaces */
-  --v-paper: #f5f7fa;
-  --v-paper-2: #edf1f6;
+  --v-paper: #f4f7fc;
+  --v-paper-2: #eaf1fa;
   --v-card: #ffffff;
-  --v-line: #e3e8ef;
-  --v-line-strong: #c9d2de;
+  --v-line: #dce6f5;
+  --v-line-strong: #c3d2ea;
   /* colour: text */
-  --v-ink: #0b1f3f;
-  --v-ink-2: #3a4c66;
-  --v-ink-3: #5a6a81; /* >=4.5:1 on paper */
+  --v-ink: #071a4d;
+  --v-ink-2: #34476b;
+  --v-ink-3: #4d6189; /* >=4.5:1 on paper */
   /* colour: brand & semantic */
-  --v-navy: #001c64;
-  --v-navy-2: #0a2a7a;
+  --v-navy: #071a4d;
+  --v-navy-2: #12307a;
   --v-navy-ink: #ffffff;
-  --v-signal: #60cdff;
-  --v-brand: #0070e0;
+  --v-signal: #8fd3ff;
+  --v-brand: #0b5cd6;
   --v-brand-ink: #ffffff;
-  --v-brand-soft: #e6f1fd;
+  --v-brand-soft: #e7f0fc;
   --v-success: #0d7a48;
   --v-success-soft: #e4f5ec;
   --v-marigold: #a85300;
@@ -32,9 +32,9 @@
   --v-marigold-soft: #fff4e0;
   --v-terracotta: #c4261d;
   --v-terracotta-soft: #fdecea;
-  --v-sky: #0070e0;
+  --v-sky: #0b5cd6;
   --v-sky-soft: #eaf3fe;
-  --v-focus: #0070e0;
+  --v-focus: #0b5cd6;
 
   /* type scale */
   --v-text-xs: 0.8125rem;
@@ -83,8 +83,8 @@
   --color-sky: var(--v-sky);
   --color-sky-soft: var(--v-sky-soft);
 
-  --font-sans: var(--font-figtree), "Noto Sans", system-ui, sans-serif;
-  --font-display: var(--font-figtree), "Noto Sans", system-ui, sans-serif;
+  --font-sans: var(--font-noto), var(--font-deva), var(--font-telu), var(--font-arab), system-ui, sans-serif;
+  --font-display: var(--font-noto-display), var(--font-deva), var(--font-telu), var(--font-arab), system-ui, sans-serif;
 
   --text-digits: var(--v-text-digits);
   --radius-v: var(--v-radius);
@@ -96,6 +96,11 @@
 html {
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
 }
 
 body {
@@ -182,4 +187,10 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Bryntum: night where the recipient lives, on their own row of the deadline timeline. */
+.b-sch-resource-time-range.v-night {
+  background: color-mix(in srgb, var(--v-navy) 9%, transparent);
+  border: 0;
 }
