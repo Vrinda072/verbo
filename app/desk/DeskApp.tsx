@@ -77,6 +77,14 @@ function LangPair({ data }: CustomCellRendererProps<DeskRow>) {
   );
 }
 
+/** One line per tab saying what it is for, so the views read as steps rather than separate tools. */
+const TAB_HELP = {
+  dashboard: "Totals, outcomes and evidence across all cases. Ask the analyst a question in plain words.",
+  cases: "Every recovery case after money went to the wrong person. Open a row for its timeline, messages and evidence packet.",
+  timeline: "Open cases by deadline. Drag the end of a bar to change when a case escalates.",
+  alerts: "Payments that were checked before sending: similar names, pressure, first payments and unusual amounts.",
+} as const;
+
 export function DeskApp() {
   const [rows, setRows] = useState<DeskRow[] | null>(null);
   const [alerts, setAlerts] = useState<AlertRow[]>([]);
@@ -148,6 +156,7 @@ export function DeskApp() {
     <div className="mx-auto max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
+          <p className="text-sm text-ink-3">Operator view</p>
           <h1 className="text-3xl font-semibold tracking-tight">Case Desk</h1>
           <p className="mt-1 text-ink-2">
             {live} live sandbox case{live === 1 ? "" : "s"} ·{" "}
@@ -173,9 +182,9 @@ export function DeskApp() {
       <div role="tablist" aria-label="Desk views" className="mt-8 flex flex-wrap items-end gap-x-2 border-b border-line">
         {(
           [
-            ["dashboard", "Dashboard"],
+            ["dashboard", "Overview"],
+            ["cases", `Cases (${scoped.length})`],
             ["timeline", "Deadlines"],
-            ["cases", `Recovery cases (${scoped.length})`],
             ["alerts", `Pre-send alerts (${alerts.length})`],
           ] as const
         ).map(([id, label]) => (
@@ -199,6 +208,8 @@ export function DeskApp() {
           />
         </label>
       </div>
+
+      <p className="mt-3 text-sm text-ink-2">{TAB_HELP[tab]}</p>
 
       {error && <p role="alert" className="mt-4 text-terracotta">{error}</p>}
 

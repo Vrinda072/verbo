@@ -4,15 +4,15 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 
 const ACTIVITY = [
-  { name: "Manuel Lopes", note: "Returned after a wrong payment", amount: "+$40.00", status: "Recovered", tone: "bg-success-soft text-success" },
-  { name: "Ana Souza", note: "Cancelled during the safety hold", amount: "$120.00", status: "Cancelled", tone: "bg-paper-2 text-ink-2" },
-  { name: "Lakshmi Rao", note: "Read back in Telugu", amount: "-$25.00", status: "Completed", tone: "bg-brand-soft text-brand" },
-  { name: "Kiran Reddy", note: "Similar name check passed", amount: "-$60.00", status: "Completed", tone: "bg-brand-soft text-brand" },
+  { name: "Manuel Lopes", note: "Similar name to Manuel Lopez · returned", amount: "+$40.00", status: "Recovered", tone: "bg-success-soft text-success", href: "/demo?story=similar-names" },
+  { name: "Fatima Haddad", note: "Kiran's old phone number · returned", amount: "+$60.00", status: "Recovered", tone: "bg-success-soft text-success", href: "/demo?story=wrong-number" },
+  { name: "Javier Ruiz", note: "Pressured payment · cancelled during the hold", amount: "$900.00", status: "Cancelled", tone: "bg-paper-2 text-ink-2", href: "/demo?story=pressured" },
+  { name: "Lakshmi Rao", note: "Read back in Telugu", amount: "-$25.00", status: "Completed", tone: "bg-brand-soft text-brand", href: "/send" },
 ];
 
 const ACTIONS = [
   { href: "/send", label: "Send by voice", icon: "M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3" },
-  { href: "/demo", label: "See a recovery", icon: "M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" },
+  { href: "/demo", label: "Examples", icon: "M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" },
   { href: "/desk", label: "Case Desk", icon: "M4 6h16M4 12h16M4 18h10" },
 ];
 
@@ -91,22 +91,25 @@ export default function Home() {
           <section aria-labelledby="activity" className="rounded-v-lg bg-card p-6 shadow-v-lg">
             <div className="flex items-baseline justify-between">
               <h2 id="activity" className="text-xl font-semibold">Recent activity</h2>
-              <span className="text-sm text-ink-3">Simulated</span>
+              <span className="text-sm text-ink-3">Simulated · tap one to see what happened</span>
             </div>
             <ul className="mt-2 divide-y divide-line">
               {ACTIVITY.map((a) => (
-                <li key={a.name} className="flex items-center gap-3 py-3.5">
-                  <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper-2 font-semibold text-ink-2">
-                    {a.name[0]}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{a.name}</p>
-                    <p className="truncate text-sm text-ink-3">{a.note}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium tabular-nums">{a.amount}</p>
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${a.tone}`}>{a.status}</span>
-                  </div>
+                <li key={a.name}>
+                  <Link href={a.href} className="-mx-2 flex items-center gap-3 rounded-v px-2 py-3.5 hover:bg-paper">
+                    <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper-2 font-semibold text-ink-2">
+                      {a.name[0]}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">{a.name}</p>
+                      <p className="truncate text-sm text-ink-3">{a.note}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium tabular-nums">{a.amount}</p>
+                      <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${a.tone}`}>{a.status}</span>
+                    </div>
+                    <span aria-hidden className="text-ink-3">›</span>
+                  </Link>
                 </li>
               ))}
             </ul>
