@@ -13,10 +13,27 @@ export const GROQ_MODEL = process.env.GROQ_STT_MODEL || "whisper-large-v3-turbo"
 
 export type TranscribeError = "not_configured" | "busy" | "empty" | "failed";
 
+/**
+ * Why a call failed, safe to log: the HTTP status, or the network error's name and code. Never the error message, because
+ * Node's message for a malformed header quotes the header, which here is the API key.
+ */
+export interface TranscribeDetail {
+  status?: number;
+  error?: string;
+}
+
 export class TranscribeFailed extends Error {
-  constructor(public code: TranscribeError) {
+  constructor(
+    public code: TranscribeError,
+    public detail: TranscribeDetail = {},
+  ) {
     super(`Transcription failed: ${code}`);
   }
+}
+
+function networkError(err: unknown): string {
+  const e = err as { name?: string; cause?: { code?: string; name?: string } };
+  return [e?.name, e?.cause?.code ?? e?.cause?.name].filter(Boolean).join(" ") || "unknown";
 }
 
 export interface TranscribeInput {
@@ -29,8 +46,10 @@ export interface TranscribeInput {
 export async function transcribe(
   { audio, fileName, language }: TranscribeInput,
   fetcher: typeof fetch = fetch,
-  apiKey = process.env.GROQ_API_KEY,
+  rawKey = process.env.GROQ_API_KEY,
 ): Promise<string> {
+  // A key pasted into a hosting dashboard can pick up a newline or spaces, which makes the request header invalid.
+  const apiKey = rawKey?.trim();
   if (!apiKey) throw new TranscribeFailed("not_configured");
 
   const attempt = (withLanguage: boolean) => {
@@ -53,11 +72,11 @@ export async function transcribe(
     res = await attempt(true);
     // A language code Whisper doesn't know shouldn't stop the person: let it detect the language instead.
     if (res.status === 400) res = await attempt(false);
-  } catch {
-    throw new TranscribeFailed("busy");
+  } catch (err) {
+    throw new TranscribeFailed("busy", { error: networkError(err) });
   }
-  if (res.status === 429 || res.status >= 500) throw new TranscribeFailed("busy");
-  if (!res.ok) throw new TranscribeFailed("failed");
+  if (res.status === 429 || res.status >= 500) throw new TranscribeFailed("busy", { status: res.status });
+  if (!res.ok) throw new TranscribeFailed("failed", { status: res.status });
   const body = (await res.json().catch(() => ({}))) as { text?: string };
   const text = body.text?.replace(/\s+/g, " ").trim();
   if (!text) throw new TranscribeFailed("empty");
