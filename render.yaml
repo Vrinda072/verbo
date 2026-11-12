@@ -1,10 +1,11 @@
 # Verbo on Render. Source: render.com/docs/blueprint-spec and render.com/schema/render.yaml.json (read Nov 7, 2026).
 # Secrets use `sync: false`: Render asks for each value once in its dashboard, and none of them live in this file.
-# Paid small plans, because Render's free Postgres expires after 30 days and judging runs to Dec 15, and its free web
-# service sleeps after 15 idle minutes.
+# Free plans (no card on file). Limits: the web service sleeps after 15 idle minutes, the free Postgres expires after
+# 30 days, and Render has no free cron plan, so the hourly reminder job is not defined here (see docs/guides/DEPLOY.md).
+# Plan names checked against render.com/docs/blueprint-spec (Nov 12, 2026).
 databases:
   - name: verbo-db
-    plan: basic-256mb
+    plan: free
     region: oregon
     ipAllowList: []
 
@@ -12,7 +13,7 @@ services:
   - type: web
     name: verbo
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
     buildCommand: npm ci --include=dev && npx next build
     startCommand: npx next start
@@ -53,28 +54,3 @@ services:
       - key: SANDBOX_WRONG_RECIPIENT_EMAIL
         sync: false
 
-  # Sends the 24-hour reminders and the 72-hour escalations.
-  - type: cron
-    name: verbo-recovery-tick
-    runtime: node
-    plan: starter
-    region: oregon
-    schedule: "0 * * * *"
-    buildCommand: npm ci --include=dev
-    startCommand: npm run recovery-tick
-    envVars:
-      - key: NODE_VERSION
-        value: 20.20.2
-      - key: MOCK
-        value: "1"
-      - key: PAYPAL_ENV
-        value: sandbox
-      - key: DATABASE_URL
-        fromDatabase:
-          name: verbo-db
-          property: connectionString
-      - key: TOKEN_SIGNING_SECRET
-        fromService:
-          type: web
-          name: verbo
-          envVarKey: TOKEN_SIGNING_SECRET
