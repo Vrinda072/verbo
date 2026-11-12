@@ -1,5 +1,5 @@
 {
-  "_note": "Fixed read-back strings. Never generated per request. Amounts/names are inserted by code. 'reviewed' flips to true only after a native speaker signs off (docs/guides/language-coverage.md).",
+  "_note": "Fixed read-back strings. Never generated per request. Amounts/names are inserted by code. 'reviewed' flips to true only after a native speaker signs off (docs/language-coverage.md).",
   "keys": [
     "title",
     "readback",

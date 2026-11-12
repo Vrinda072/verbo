@@ -1,58 +1,25 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# build output
 /.next/
 /out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# secrets (the example file is committed)
+.env*
 !.env.example
 
-# verbo
-docs/private/
+# local data
 /.pglite/
 /out-evidence/
+/coverage
 
 # copied from node_modules on install
 /public/bryntum
 
-# local ElevenLabs voice samples
-/voice-samples
-
-# Impeccable design tooling (installed per machine by its Claude Code plugin)
-.claude/settings.local.json
-.claude/skills/impeccable/
-.claude/agents/impeccable-*
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
