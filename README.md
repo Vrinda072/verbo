@@ -7,17 +7,9 @@
 Say a payment in your own language. Verbo checks the name and the amount with code, reads the payment back in your
 language, and helps you get the money back if it still goes to the wrong person.
 
-### [Try it live → verbo-371g.onrender.com](https://verbo-371g.onrender.com)
+**Live demo: [verbo-371g.onrender.com](https://verbo-371g.onrender.com)**
 
-![PayPal AI Hackathon](https://img.shields.io/badge/PayPal-AI%20Hackathon-0b5cd6)
-![Sandbox only](https://img.shields.io/badge/PayPal-sandbox%20only-071a4d)
-![Tests](https://img.shields.io/badge/tests-231%20passing-0d7a48)
-![Scripted eval](https://img.shields.io/badge/scripted%20eval-57%2F57-0d7a48)
-![License: MIT](https://img.shields.io/badge/license-MIT-34476b)
-
-<br>
-
-<img src="docs/img/phone-demo.gif" alt="A simulated phone plays one payment in English, Hindi, Telugu and Arabic: the sender speaks, Verbo asks which of two similar names they mean, reads the payment back with $40.00 checked, and confirms it was sent." width="320">
+<img src="docs/img/phone-demo.gif" alt="A simulated phone plays one payment in English, Hindi, Telugu and Arabic: the sender speaks, Verbo asks which of two similar names they mean, reads the payment back with $40.00 checked, and confirms it was sent." width="240">
 
 <sub>The Home page demo: one payment in English, Hindi, Telugu and Arabic. The amount reads $40.00 in every language. Simulated data, no money moves.</sub>
 
@@ -44,9 +36,6 @@ The live site runs in mock mode: no PayPal login is needed, and no money moves.
 
 ## Why
 
-This project started with a real case. A grandfather who speaks only Telugu sent money to a wrong number. The person who
-received it spoke Hindi. Nobody could talk to each other, and the money was never recovered.
-
 Person-to-person payments assume that the sender and the recipient understand each other. When they don't, small mistakes
 become permanent: a name that sounds like another name, a phone number one digit off, *forty* heard as *fourteen*. Voice
 assistants make paying easier, and they also make these mistakes easier. Verbo is a prototype of a safety layer PayPal could
@@ -67,12 +56,12 @@ build into its own app, so money is not lost to a language barrier.
 <table>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/img/send-readback-ar.png" alt="The Send review card in Arabic: the read-back sentence with $30.00 highlighted and kept left-to-right, the English line under it, the checked amount, and a notice that a contact named Manuel Lopes also exists, with the differing letter marked.">
+<img width="300" src="docs/img/send-readback-ar.png" alt="The Send review card in Arabic: the read-back sentence with $30.00 highlighted and kept left-to-right, the English line under it, the checked amount, and a notice that a contact named Manuel Lopes also exists, with the differing letter marked.">
 <br><b>Read-back in the sender's language.</b> A fixed template in Arabic, with its English under it. The amount stays
 <code>$30.00</code> inside right-to-left text. A sound-alike contact is shown with the one different letter marked.
 </td>
 <td width="50%" valign="top">
-<img src="docs/img/wrong-number.png" alt="A warning that the typed number is one digit off Kiran Reddy's number, with both numbers shown and the differing digit marked, who the number belongs to and the language they read, and a button to pay Kiran Reddy instead.">
+<img width="360" src="docs/img/wrong-number.png" alt="A warning that the typed number is one digit off Kiran Reddy's number, with both numbers shown and the differing digit marked, who the number belongs to and the language they read, and a button to pay Kiran Reddy instead.">
 <br><b>A number one digit off.</b> Code compares every typed number with every contact's. It shows who the number reaches,
 the language they read, their local time, and offers the contact instead.
 </td>
@@ -80,7 +69,7 @@ the language they read, their local time, and offers the contact instead.
 </table>
 
 <div align="center">
-<img src="docs/img/checks.png" alt="Six checks with an example each: names that sound the same, a number one digit off, amounts said in words, pressure and first payments, a 10-minute hold, and a return page in the recipient's language." width="880">
+<img src="docs/img/checks.png" alt="Six checks with an example each: names that sound the same, a number one digit off, amounts said in words, pressure and first payments, a 10-minute hold, and a return page in the recipient's language." width="600">
 </div>
 
 | Check | What happens |
@@ -95,11 +84,11 @@ the language they read, their local time, and offers the contact instead.
 <table>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/img/examples.png" alt="The Examples page: three stories (names that sound alike, numbers said as words, currency words), here showing Lopez and Lopes with what was said in Hindi, what could go wrong and what Verbo does.">
+<img width="360" src="docs/img/examples.png" alt="The Examples page: three stories (names that sound alike, numbers said as words, currency words), here showing Lopez and Lopes with what was said in Hindi, what could go wrong and what Verbo does.">
 <br><b>Examples.</b> Three short stories: what was said, what could have gone wrong, and what Verbo does instead.
 </td>
 <td width="50%" valign="top">
-<img src="docs/img/case-desk.png" alt="The Case Desk overview: totals for cases, open, returned and escalated, charts of cases by outcome, recovery by recipient language, evidence readiness and pre-send risk.">
+<img width="360" src="docs/img/case-desk.png" alt="The Case Desk overview: totals for cases, open, returned and escalated, charts of cases by outcome, recovery by recipient language, evidence readiness and pre-send risk.">
 <br><b>Case Desk.</b> The operator view: recovery cases, a language grid, a deadline timeline and an evidence packet per case.
 Most cases here are simulated and labelled as such.
 </td>
@@ -109,7 +98,7 @@ Most cases here are simulated and labelled as such.
 ## How it works
 
 <div align="center">
-<img src="docs/img/architecture.svg" alt="Before money moves: speak, extract with Gemini into a strict schema, code checks, fixed-template read-back, confirm and approve on PayPal. PayPal authorizes, holds risky payments for 10 minutes, then captures and pays out. After a mistake: open a case, a signed link to a page in the recipient's language, one-tap return, Case Desk." width="900">
+<img src="docs/img/architecture.svg" alt="Before money moves: speak, extract with Gemini into a strict schema, code checks, fixed-template read-back, confirm and approve on PayPal. PayPal authorizes, holds risky payments for 10 minutes, then captures and pays out. After a mistake: open a case, a signed link to a page in the recipient's language, one-tap return, Case Desk." width="720">
 </div>
 
 1. **Speak.** Groq Whisper turns speech into text. Typing works too.
@@ -138,7 +127,7 @@ fraud data behind them.
 | Same scenarios with Gemini | **57 / 57** | [docs/eval/eval-gemini.md](docs/eval/eval-gemini.md) |
 | Deliberately wrong model output | **11 / 11** caught by code validation | both eval reports |
 | Unit and integration tests | **231** passing | `npm test` |
-| Live PayPal sandbox money loop (Nov 5, 2026) | Send → authorize → capture → payout ✅ · risk hold → void ✅ · return payment ✅ | [docs/plan/STATUS.md](docs/plan/STATUS.md) |
+| Live PayPal sandbox money loop (Nov 5, 2026) | Send, authorize, capture and payout; a risk hold voided; a return payment. All three completed. | [docs/plan/STATUS.md](docs/plan/STATUS.md) |
 
 The scenarios cover English, Telugu, Hindi, Spanish, Portuguese and Arabic, native-script digits, decimal commas,
 sound-alike names, pressure wording, unusual amounts, unsupported currencies and off-topic requests. The rules parser and the
@@ -182,11 +171,8 @@ npm test                 # Vitest
 npm run typecheck
 npm run eval             # scripted scenarios, writes docs/eval/
 npm run verify-templates # keys, placeholders, no digits, script direction
-npm run money-loop       # sandbox: order → authorize → capture → payout, void path, return path
+npm run money-loop       # sandbox: send, void and return paths
 ```
-
-To re-make the README images after a UI change, run the dev server, then `node scripts/readme-shots.mjs` (needs Google Chrome;
-the GIF also needs ffmpeg).
 
 ## Limits and what's next
 
@@ -232,9 +218,9 @@ the GIF also needs ffmpeg).
 | `components/` | `ui/` shared pieces, `home/` the Home page, `send/` the Send flow |
 | `lib/` | `core/` config and logging, `people/` simulated contacts and name checks, `paypal/`, `transfers/`, `recovery/`, `risk/`, `agents/`, `bridge/` (languages and templates), `speech/`, `desk/`, `evidence/` |
 | `db/` | Database schema, client and migrations |
-| `scripts/` | Command-line tools: environment check, sandbox money loop, evaluation, language list, README images |
+| `scripts/` | Command-line tools: environment check, sandbox money loop, evaluation, language list |
 | `tests/` | Vitest suites |
-| `docs/` | `plan/` brief and status, `eval/` scripted evaluation results, `guides/` deployment and APIMatic notes, `img/` README images |
+| `docs/` | `plan/` brief and status, `eval/` scripted evaluation results, `guides/` deployment and APIMatic notes, `img/` images |
 
 ## License
 
