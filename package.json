@@ -18,12 +18,10 @@
     "db:generate": "drizzle-kit generate",
     "gen-languages": "tsx scripts/gen-languages.ts",
     "verify-templates": "tsx scripts/verify-templates.ts",
-    "speech-spike": "tsx scripts/speech-spike.ts",
     "eval": "tsx scripts/eval.ts",
     "release-holds": "tsx scripts/release-holds.ts",
     "recovery-tick": "tsx scripts/recovery-tick.ts",
-    "e2e-recovery": "tsx scripts/e2e-recovery.ts",
-    "voice-samples": "tsx scripts/voice-samples.ts"
+    "e2e-recovery": "tsx scripts/e2e-recovery.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",
