@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CONTACTS } from "@/lib/contacts";
+import { CONTACTS } from "@/lib/people/contacts";
 import { assessRisk } from "@/lib/risk/score";
 import { findPressureCues } from "@/lib/risk/pressure";
 

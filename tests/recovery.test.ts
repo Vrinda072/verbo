@@ -15,7 +15,7 @@ import {
   startCaseReturn,
 } from "@/lib/recovery/service";
 import { getDb } from "@/db";
-import { hourIn, timeZoneFor } from "@/lib/localTime";
+import { hourIn, timeZoneFor } from "@/lib/people/localTime";
 
 process.env.TOKEN_SIGNING_SECRET ||= "test-secret-test-secret-test-secret-0123";
 const rules = new RulesExtractor();

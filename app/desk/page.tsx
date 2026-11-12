@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 import { DeskApp } from "./DeskApp";
 
 export const metadata = { title: "Case Desk" };

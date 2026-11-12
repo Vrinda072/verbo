@@ -4,7 +4,7 @@
  * POST /v1/text-to-speech/{voice_id}?output_format=mp3_44100_128, header xi-api-key, body { text, model_id, language_code }.
  * eleven_v4_turbo is the low-latency model with 90+ languages, including Telugu and Hindi.
  */
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 const API = "https://api.elevenlabs.io/v1/text-to-speech";
 export const VOICE_MODEL = "eleven_v4_turbo";

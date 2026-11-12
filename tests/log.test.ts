@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mask, maskEmail } from "@/lib/log";
+import { mask, maskEmail } from "@/lib/core/log";
 
 describe("log masking", () => {
   it("masks emails and phone numbers", () => {

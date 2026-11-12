@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { diffParts } from "@/lib/nameDiff";
+import { diffParts } from "@/lib/people/nameDiff";
 
 describe("diffParts", () => {
   it("isolates the letter that differs", () => {

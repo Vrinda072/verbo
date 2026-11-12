@@ -1,5 +1,5 @@
 import { CheckoutPaymentIntent, Client, Environment, OrdersController, PaypalExperienceLandingPage, PaypalExperienceUserAction, PaypalWalletContextShippingPreference, ApiError } from "@paypal/paypal-server-sdk";
-import { assertSandbox, config } from "@/lib/config";
+import { assertSandbox, config } from "@/lib/core/config";
 import { toPayPalValue } from "./money";
 import { RealPayPalClient } from "./real";
 import { PayPalApiError, type CreatedOrder, type CreateOrderInput } from "./types";

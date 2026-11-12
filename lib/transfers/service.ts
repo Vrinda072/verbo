@@ -5,8 +5,8 @@
  */
 import { paypalTrail } from "@/lib/paypal/trail";
 import { randomUUID } from "node:crypto";
-import { config } from "@/lib/config";
-import { contactEmail, personById, type Contact } from "@/lib/contacts";
+import { config } from "@/lib/core/config";
+import { contactEmail, personById, type Contact } from "@/lib/people/contacts";
 import { getPayPal } from "@/lib/paypal";
 import { paypalLocale } from "@/lib/paypal/locale";
 import { MockPayPalClient } from "@/lib/paypal/mock";
@@ -31,8 +31,8 @@ import {
   saveTransfer,
   type Draft,
   type StoredTransfer,
-} from "@/lib/store/transfers";
-import { log } from "@/lib/log";
+} from "@/lib/transfers/store";
+import { log } from "@/lib/core/log";
 
 export class TransferError extends Error {
   constructor(public code: string, public status = 400) {

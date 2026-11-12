@@ -3,8 +3,8 @@ import { useState } from "react";
 import { decimalToCents } from "@/lib/agents/numbers";
 import type { UnderstandResponse } from "./ConfirmCard";
 import { labelsFor, languageNameIn } from "@/lib/bridge/readback";
-import { En, Tpl } from "@/components/En";
-import { Digits } from "@/components/Digits";
+import { En, Tpl } from "@/components/ui/En";
+import { Digits } from "@/components/ui/Digits";
 
 export type NumberResponse = UnderstandResponse & {
   number: {

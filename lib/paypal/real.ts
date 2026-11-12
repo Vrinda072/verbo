@@ -1,5 +1,5 @@
-import { assertSandbox, config } from "@/lib/config";
-import { log } from "@/lib/log";
+import { assertSandbox, config } from "@/lib/core/config";
+import { log } from "@/lib/core/log";
 import type { PayPalClient } from "./client";
 import { toPayPalValue } from "./money";
 import {

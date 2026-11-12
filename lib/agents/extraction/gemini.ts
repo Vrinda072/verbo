@@ -1,4 +1,4 @@
-import { geminiJson, realGeminiCreate, type GeminiCreate } from "@/lib/ai/gemini";
+import { geminiJson, realGeminiCreate, type GeminiCreate } from "@/lib/agents/gemini";
 import { EXTRACTION_SYSTEM } from "./anthropic";
 import { LlmExtraction, type ExtractionInput, type Extractor } from "./schema";
 

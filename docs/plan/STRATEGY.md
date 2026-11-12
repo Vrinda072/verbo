@@ -64,7 +64,7 @@ We can win at most one. **Most Impactful** is the best natural fit; Best Use of 
 
 ### Best Use of APIMatic (×3 $1,000)
 Only one sponsor prize can be won, so this is a backup. The rules say "use any APIMatic tools".
-- Install and actually use the **APIMatic Context Plugin** while writing the PayPal calls (Day 2 onward), and log concrete examples in `docs/apimatic.md` (prompt, what it returned, what we changed).
+- Install and actually use the **APIMatic Context Plugin** while writing the PayPal calls (Day 2 onward), and log concrete examples in `docs/guides/apimatic.md` (prompt, what it returned, what we changed).
 - _Today:_ the plugin is not installed in this environment; Day 1 calls were verified directly against PayPal's OpenAPI specs instead. Install it before more PayPal code is written.
 
 ### Render (credits)

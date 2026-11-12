@@ -3,7 +3,7 @@
  * exactly one PayPal call (or none, for the hold), so the trail is derived, not logged separately.
  * Operation names are the PayPal OpenAPI operationIds already cited in real.ts and sdk.ts.
  */
-import type { StoredTransfer } from "@/lib/store/transfers";
+import type { StoredTransfer } from "@/lib/transfers/store";
 import { paypalLocale } from "./locale";
 
 export interface TrailStep {
