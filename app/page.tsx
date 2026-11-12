@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { SixLanguages } from "@/components/SixLanguages";
 import { SiteHeader } from "@/components/SiteHeader";
+import { HeroDemo } from "@/components/demo/HeroDemo";
+import { SafetyChecks } from "@/components/SafetyChecks";
 
 const ACTIVITY = [
   { name: "Manuel Lopes", note: "Similar name to Manuel Lopez · returned", amount: "+$40.00", status: "Recovered", tone: "bg-success-soft text-success", href: "/demo?story=similar-names" },
@@ -22,9 +24,11 @@ export default function Home() {
     <>
       <SiteHeader />
       <main id="main" className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <HeroDemo />
+        <SafetyChecks />
         <SixLanguages />
 
-        <div className="mt-16 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+        <div className="mt-20 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
           <section aria-labelledby="activity" className="rounded-v-lg bg-card p-6 shadow-v-lg">
             <div className="flex items-baseline justify-between">
               <h2 id="activity" className="text-xl font-semibold">Recent activity</h2>
