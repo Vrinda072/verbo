@@ -1,6 +1,6 @@
 /** Turns Desk rows into the resources and events for the Bryntum deadline timeline. */
 import type { DeskRow } from "./queries";
-import { cityFor, clockIn, nextDaytime, quietRanges, timeZoneFor } from "@/lib/localTime";
+import { cityFor, clockIn, nextDaytime, quietRanges, timeZoneFor } from "@/lib/people/localTime";
 import { ESCALATE_AFTER_H, REMINDER_AFTER_H, OPEN_STATES, type CaseState } from "@/lib/recovery/state";
 
 const H = 3_600_000;

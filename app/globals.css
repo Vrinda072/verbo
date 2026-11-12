@@ -227,7 +227,7 @@ a {
   border: 0;
 }
 
-/* English subtitle under a line in another language (components/En.tsx). */
+/* English subtitle under a line in another language (components/ui/En.tsx). */
 @layer components {
   .v-sub {
     display: block;

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cancel, publicView, TransferError } from "@/lib/transfers/service";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 export const dynamic = "force-dynamic";
 

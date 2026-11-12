@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { SixLanguages } from "@/components/SixLanguages";
-import { SiteHeader } from "@/components/SiteHeader";
-import { HeroDemo } from "@/components/demo/HeroDemo";
-import { SafetyChecks } from "@/components/SafetyChecks";
+import { SixLanguages } from "@/components/home/SixLanguages";
+import { SiteHeader } from "@/components/ui/SiteHeader";
+import { HeroDemo } from "@/components/home/HeroDemo";
+import { SafetyChecks } from "@/components/home/SafetyChecks";
 
 const ACTIVITY = [
   { name: "Manuel Lopes", note: "Similar name to Manuel Lopez · returned", amount: "+$40.00", status: "Recovered", tone: "bg-success-soft text-success", href: "/demo?story=similar-names" },

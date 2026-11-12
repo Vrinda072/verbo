@@ -5,10 +5,10 @@
  * person's messages are model input and could try to steer what gets written.
  */
 import { z } from "zod";
-import { geminiJson, realGeminiCreate, type GeminiCreate } from "@/lib/ai/gemini";
+import { geminiJson, realGeminiCreate, type GeminiCreate } from "@/lib/agents/gemini";
 import { numbersOf } from "@/lib/bridge/translate";
 import { LANGUAGES } from "@/lib/bridge/readback";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 export interface CoachInput {
   senderName: string;

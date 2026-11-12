@@ -365,14 +365,14 @@ describe("Gemini integration (fake client, no network)", () => {
     const ok = { output_text: JSON.stringify({ a: 1 }) };
 
     it("reads the retry time from the quota message", async () => {
-      const { retryAfterMs } = await import("@/lib/ai/gemini");
+      const { retryAfterMs } = await import("@/lib/agents/gemini");
       expect(retryAfterMs(quota().message)).toBe(3723_000);
       expect(retryAfterMs("Please retry in 30.5s")).toBe(30_500);
       expect(retryAfterMs("no time given")).toBe(60_000);
     });
 
     it("moves to the next model at quota, parks the first until its retry time, then tries it again", async () => {
-      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const { withModelFallback, newFallbackState } = await import("@/lib/agents/gemini");
       const calls: string[] = [];
       let t = 0;
       let firstFull = true;
@@ -396,7 +396,7 @@ describe("Gemini integration (fake client, no network)", () => {
     });
 
     it("stops calling once every model is at quota, and reports quota", async () => {
-      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const { withModelFallback, newFallbackState } = await import("@/lib/agents/gemini");
       let calls = 0;
       const create = withModelFallback(async () => { calls++; throw quota(); }, ["a", "b"], newFallbackState(), () => 0);
       await expect(create(req)).rejects.toMatchObject({ reason: "quota" });
@@ -406,7 +406,7 @@ describe("Gemini integration (fake client, no network)", () => {
     });
 
     it("treats an overloaded model as an outage without parking it, and throws other errors unchanged", async () => {
-      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const { withModelFallback, newFallbackState } = await import("@/lib/agents/gemini");
       let calls = 0;
       const busy = withModelFallback(async () => { calls++; throw Object.assign(new Error("503"), { status: 503 }); }, ["a"], newFallbackState(), () => 0);
       await expect(busy(req)).rejects.toMatchObject({ reason: "unavailable" });
@@ -417,7 +417,7 @@ describe("Gemini integration (fake client, no network)", () => {
     });
 
     it("reuses a good answer for the same request, but never a broken one", async () => {
-      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const { withModelFallback, newFallbackState } = await import("@/lib/agents/gemini");
       let calls = 0;
       const create = withModelFallback(async () => { calls++; return ok; }, ["a"], newFallbackState(), () => 0);
       await create(req);
@@ -433,7 +433,7 @@ describe("Gemini integration (fake client, no network)", () => {
     });
 
     it("at full quota, understanding still works through the rules parser and says so", async () => {
-      const { withModelFallback, newFallbackState } = await import("@/lib/ai/gemini");
+      const { withModelFallback, newFallbackState } = await import("@/lib/agents/gemini");
       const { GeminiExtractor } = await import("@/lib/agents/extraction/gemini");
       const { understand } = await import("@/lib/agents/extraction");
       const ex = new GeminiExtractor(withModelFallback(async () => { throw quota(); }, ["a"], newFallbackState(), () => 0));

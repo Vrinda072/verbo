@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CONTACTS } from "@/lib/contacts";
+import { CONTACTS } from "@/lib/people/contacts";
 import { labelsFor, languageNameIn } from "@/lib/bridge/readback";
-import { En } from "@/components/En";
+import { En } from "@/components/ui/En";
 import { ANSWER_MS, matchChoice, MAX_FOLLOW_UPS, mergeAnswer, nextQuestion, questionParts, questionText, SPEECH_TIMEOUT_MS, type Question } from "@/lib/speech/clarify";
 import { useReadAloud } from "@/lib/speech/useReadAloud";
 import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { MicButton } from "@/components/send/MicButton";
-import { NameDiff } from "@/components/NameDiff";
+import { NameDiff } from "@/components/ui/NameDiff";
 import { ConfirmCard, type UnderstandResponse } from "@/components/send/ConfirmCard";
 import { Stepper } from "@/components/send/Stepper";
 import { PayNumber, type NumberResponse } from "@/components/send/PayNumber";

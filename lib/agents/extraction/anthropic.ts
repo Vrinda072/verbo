@@ -6,7 +6,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 import { LlmExtraction, type ExtractionInput, type Extractor } from "./schema";
 
 export const EXTRACTION_MODEL = "claude-opus-5-5";

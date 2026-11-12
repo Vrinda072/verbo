@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { paypalTrail } from "@/lib/paypal/trail";
-import type { StoredTransfer } from "@/lib/store/transfers";
+import type { StoredTransfer } from "@/lib/transfers/store";
 
 const base = {
   id: "tr_1",

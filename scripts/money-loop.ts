@@ -20,7 +20,7 @@ import { RealPayPalClient } from "@/lib/paypal/real";
 import type { PayPalClient } from "@/lib/paypal/client";
 import { authorizeTransfer, completeReturn, refreshPayout, releaseTransfer, startReturn, startTransfer, voidTransfer, type Transfer } from "@/lib/paypal/flows";
 import { money, toPayPalValue } from "@/lib/paypal/money";
-import { maskEmail } from "@/lib/log";
+import { maskEmail } from "@/lib/core/log";
 import { PayPalApiError } from "@/lib/paypal/types";
 
 const args = new Set(process.argv.slice(2));

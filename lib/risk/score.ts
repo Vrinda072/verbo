@@ -5,8 +5,8 @@
  *   high   → the payment is authorized but held (uncaptured) for the hold window; cancel = VOID
  * Weights are hand-set for the demo and documented here; they are not tuned on real fraud data.
  */
-import type { Contact } from "@/lib/contacts";
-import { SENDER_HISTORY, type PastPayment } from "@/lib/history";
+import type { Contact } from "@/lib/people/contacts";
+import { SENDER_HISTORY, type PastPayment } from "@/lib/people/history";
 import { findPressureCues, type PressureCue } from "./pressure";
 
 export type RiskLevel = "low" | "medium" | "high";

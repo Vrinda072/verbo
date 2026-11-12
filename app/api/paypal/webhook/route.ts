@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getPayPal, type WebhookEvent, type WebhookHeaders } from "@/lib/paypal";
-import { config } from "@/lib/config";
-import { log } from "@/lib/log";
+import { config } from "@/lib/core/config";
+import { log } from "@/lib/core/log";
 import { recordWebhookEvent } from "@/lib/paypal/webhook-store";
 
 export const runtime = "nodejs";

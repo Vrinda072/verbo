@@ -1,9 +1,9 @@
 "use client";
-import { En, Tpl } from "@/components/En";
+import { En, Tpl } from "@/components/ui/En";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
-import { MoneyPath, type PathTone } from "@/components/MoneyPath";
+import { MoneyPath, type PathTone } from "@/components/ui/MoneyPath";
 import { SenderCase } from "./SenderCase";
 import type { TrailStep } from "@/lib/paypal/trail";
 

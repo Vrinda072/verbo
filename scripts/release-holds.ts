@@ -6,7 +6,7 @@
  * Safe to run concurrently with the app: state updates are optimistic and PayPal calls are idempotent.
  */
 import "dotenv/config";
-import { dueHolds } from "@/lib/store/transfers";
+import { dueHolds } from "@/lib/transfers/store";
 import { tick } from "@/lib/transfers/service";
 
 async function once() {

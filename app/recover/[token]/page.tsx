@@ -1,4 +1,4 @@
-import { Logo } from "@/components/SiteHeader";
+import { Logo } from "@/components/ui/SiteHeader";
 import { caseDetail, caseFromToken, recordView } from "@/lib/recovery/service";
 import { recipientView } from "@/lib/recovery/views";
 import { labelsFor, templateLanguages } from "@/lib/bridge/readback";

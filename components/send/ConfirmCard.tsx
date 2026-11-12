@@ -1,7 +1,7 @@
 "use client";
-import { CONTACTS } from "@/lib/contacts";
-import { En, Tpl } from "@/components/En";
-import { NameDiff } from "@/components/NameDiff";
+import { CONTACTS } from "@/lib/people/contacts";
+import { En, Tpl } from "@/components/ui/En";
+import { NameDiff } from "@/components/ui/NameDiff";
 import { useEffect, useState } from "react";
 import { labelsFor, languageNameIn, LANGUAGES } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";

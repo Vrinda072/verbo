@@ -1,5 +1,5 @@
 "use client";
-import { En, EnText, Tpl } from "@/components/En";
+import { En, EnText, Tpl } from "@/components/ui/En";
 import { useCallback, useEffect, useState } from "react";
 import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 import type { SenderCaseView } from "@/lib/recovery/views";

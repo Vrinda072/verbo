@@ -2,8 +2,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { MoneyPath, type PathTone } from "@/components/MoneyPath";
-import { NameDiff } from "@/components/NameDiff";
+import { MoneyPath, type PathTone } from "@/components/ui/MoneyPath";
+import { NameDiff } from "@/components/ui/NameDiff";
 import { labelsFor } from "@/lib/bridge/readback";
 
 /**

@@ -8,9 +8,9 @@ Submission target: **Nov 12 daytime** (hard deadline Nov 12 12:00 PT = Nov 13 00
 - [x] `scripts/money-loop.ts`: Order(AUTHORIZE) → sender approves → authorize → capture → Payout; void path; return path
 - [x] Webhook endpoint with signature verification; `scripts/register-webhook.ts`
 - [ ] Run money loop live (needs sandbox keys in `.env`)
-- [ ] `languages.json` + `docs/language-coverage.md` (needs SONIOX_API_KEY)
+- [ ] `languages.json` + `docs/guides/language-coverage.md` (needs SONIOX_API_KEY)
 - [ ] AG Studio starter in `app/desk`
-- [x] `docs/STRATEGY.md`, `docs/STATUS.md`
+- [x] `docs/plan/STRATEGY.md`, `docs/plan/STATUS.md`
 
 ## Day 2 — Nov 5: voice send + Language Bridge
 - Soniox streaming STT in browser (temporary key minted server-side), speech spike script
@@ -23,7 +23,7 @@ Submission target: **Nov 12 daytime** (hard deadline Nov 12 12:00 PT = Nov 13 00
 - Similar recipient (Jaro-Winkler, edit distance, digit diff), unusual amount, first-time recipient,
   pressure-language classifier (LLM), country/language mismatch → low/medium/high
 - High → 10-minute hold: authorization left uncaptured, countdown UI, VOID on cancel, capture+payout at expiry
-- `scripts/eval.ts` over 50 scripted scenarios → `docs/eval.md`
+- `scripts/eval.ts` over 50 scripted scenarios → `docs/eval/eval.md`
 
 ## Day 4 — Nov 7: recovery
 - Cases state machine (opened → link_sent → viewed → replied → returned | refused | escalated → closed), immutable events

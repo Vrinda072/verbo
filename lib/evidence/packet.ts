@@ -6,7 +6,7 @@
 import { createHash } from "node:crypto";
 import { asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { maskEmail } from "@/lib/log";
+import { maskEmail } from "@/lib/core/log";
 import { labelsFor } from "@/lib/bridge/readback";
 import { evidenceScore, type EvidenceFacts } from "./meter";
 

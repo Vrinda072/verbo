@@ -3,7 +3,7 @@
  * formatted by code. The voice service only reads them aloud, so it can't say anything the screen doesn't.
  */
 import { PLACEHOLDERS, type ReadbackLabels, type TemplateKey } from "@/lib/bridge/readback";
-import { CONTACTS } from "@/lib/contacts";
+import { CONTACTS } from "@/lib/people/contacts";
 
 export const SPOKEN_KEYS = ["readback", "lookalike", "ask_which", "ask_amount", "ask_recipient", "ask_same_sound", "ask_option_known", "ask_option_new"] as const;
 export type SpokenKey = (typeof SPOKEN_KEYS)[number];
