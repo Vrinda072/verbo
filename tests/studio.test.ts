@@ -10,7 +10,7 @@ const row = (over: Partial<DeskRow>): DeskRow => ({
 
 describe("request cap for AI routes", () => {
   it("allows up to the limit, keeps buckets apart, and frees up after a minute", async () => {
-    const { overLimit } = await import("@/lib/rateLimit");
+    const { overLimit } = await import("@/lib/core/rateLimit");
     expect([overLimit("t", 2, 0), overLimit("t", 2, 1), overLimit("t", 2, 2)]).toEqual([false, false, true]);
     expect(overLimit("other", 2, 2)).toBe(false);
     expect(overLimit("t", 2, 60_001)).toBe(false);

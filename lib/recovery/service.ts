@@ -3,22 +3,22 @@
  * signed link in their language and can return the money with one tap (they approve a PayPal order themselves —
  * Verbo cannot take money from anyone), refuse, or reply. Timers send a reminder at 24 h and escalate at 72 h.
  */
-import { isQuiet, timeZoneFor } from "@/lib/localTime";
+import { isQuiet, timeZoneFor } from "@/lib/people/localTime";
 import { randomUUID } from "node:crypto";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { config } from "@/lib/config";
-import { personById, SENDER } from "@/lib/contacts";
+import { config } from "@/lib/core/config";
+import { personById, SENDER } from "@/lib/people/contacts";
 import { getPayPal } from "@/lib/paypal";
 import { paypalLocale } from "@/lib/paypal/locale";
 import type { MockPayPalClient } from "@/lib/paypal/mock";
 import { completeReturn, startReturn } from "@/lib/paypal/flows";
-import { getTransfer, getTransferByOrder, insertTransfer, type StoredTransfer } from "@/lib/store/transfers";
+import { getTransfer, getTransferByOrder, insertTransfer, type StoredTransfer } from "@/lib/transfers/store";
 import { step, tick, TransferError } from "@/lib/transfers/service";
 import { getTranslator } from "@/lib/bridge/translate";
 import { signRecoveryToken, verifyRecoveryToken } from "./token";
 import { dueTimerEvent, ESCALATE_AFTER_H, nextCaseState, OPEN_STATES, type CaseEvent, type CaseState } from "./state";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 type CaseRow = typeof schema.cases.$inferSelect;
 type Actor = "sender" | "recipient" | "system" | "operator";

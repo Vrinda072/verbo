@@ -1,4 +1,4 @@
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 import { AnthropicExtractor } from "./anthropic";
 import { GeminiExtractor } from "./gemini";
 import { findAmount, RulesExtractor } from "./rules";

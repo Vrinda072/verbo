@@ -1,5 +1,5 @@
 import type { ReadbackLabels, TemplateKey } from "@/lib/bridge/readback";
-import { En } from "@/components/En";
+import { En } from "@/components/ui/En";
 
 const STEPS: TemplateKey[] = ["s_step_speak", "s_step_check", "s_step_approve"];
 

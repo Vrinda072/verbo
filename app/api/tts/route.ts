@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { labelsFor } from "@/lib/bridge/readback";
-import { overLimit } from "@/lib/rateLimit";
+import { overLimit } from "@/lib/core/rateLimit";
 import { synthesize } from "@/lib/speech/elevenlabs";
 import { MAX_PARTS, partsAreAllowed, renderSpoken, SPOKEN_KEYS, type SpokenPart } from "@/lib/speech/spoken";
 

@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, RowClickedEvent } from "ag-grid-community";
 import { registerGrid, verboGridTheme } from "@/app/desk/grid";
-import { soundAlikeGroups } from "@/lib/soundAlike";
+import { soundAlikeGroups } from "@/lib/people/soundAlike";
 import { LANGUAGES } from "@/lib/bridge/readback";
-import { CONTACTS } from "@/lib/contacts";
+import { CONTACTS } from "@/lib/people/contacts";
 
 // Modules must be registered before the first render, not in an effect.
 registerGrid();

@@ -5,8 +5,8 @@
  */
 import { normalizeDigits } from "@/lib/agents/numbers";
 import type { ReadbackLabels } from "@/lib/bridge/readback";
-import { CONTACTS } from "@/lib/contacts";
-import { diffParts } from "@/lib/nameDiff";
+import { CONTACTS } from "@/lib/people/contacts";
+import { diffParts } from "@/lib/people/nameDiff";
 import { renderSpoken, type SpokenPart } from "./spoken";
 
 export type Question = { kind: "which"; a: string; b: string } | { kind: "amount" } | { kind: "recipient" };

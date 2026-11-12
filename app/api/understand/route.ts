@@ -3,9 +3,9 @@ import { z } from "zod";
 import { understand } from "@/lib/agents/extraction";
 import { ExtractionFailed } from "@/lib/agents/extraction/anthropic";
 import { formatAmount, labelsFor } from "@/lib/bridge/readback";
-import { CONTACTS } from "@/lib/contacts";
-import { log } from "@/lib/log";
-import { overLimit } from "@/lib/rateLimit";
+import { CONTACTS } from "@/lib/people/contacts";
+import { log } from "@/lib/core/log";
+import { overLimit } from "@/lib/core/rateLimit";
 import { createDraft, summarizeRisk } from "@/lib/transfers/service";
 
 export const dynamic = "force-dynamic";

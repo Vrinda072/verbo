@@ -1,4 +1,4 @@
-import { config } from "@/lib/config";
+import { config } from "@/lib/core/config";
 import type { PayPalClient } from "./client";
 import { MockPayPalClient } from "./mock";
 import { SdkPayPalClient } from "./sdk";

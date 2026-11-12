@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { CONTACTS, PEOPLE, STRANGERS } from "@/lib/contacts";
-import { digitsOf, lookupNumber, oneDigitApart } from "@/lib/phone";
+import { CONTACTS, PEOPLE, STRANGERS } from "@/lib/people/contacts";
+import { digitsOf, lookupNumber, oneDigitApart } from "@/lib/people/phone";
 import { phoneticKey } from "@/lib/agents/phonetic";
 import { assessRisk } from "@/lib/risk/score";
 import { understand } from "@/lib/agents/extraction";
@@ -56,7 +56,7 @@ describe("one digit off", () => {
 
 describe("new sound-alike contacts", () => {
   it("groups every confusable pair together, and nobody else", async () => {
-    const { soundAlikeGroups } = await import("@/lib/soundAlike");
+    const { soundAlikeGroups } = await import("@/lib/people/soundAlike");
     const pairs = soundAlikeGroups(CONTACTS).filter((g) => g.length > 1).map((g) => g.sort().join(" / "));
     expect(pairs.sort()).toEqual(["Ana Sousa / Ana Souza", "Kiran Reddi / Kiran Reddy", "Manuel Lopes / Manuel Lopez", "Mohamad Ali / Mohamed Ali"]);
   });

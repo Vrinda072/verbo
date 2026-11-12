@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { log } from "@/lib/log";
-import { overLimit } from "@/lib/rateLimit";
+import { log } from "@/lib/core/log";
+import { overLimit } from "@/lib/core/rateLimit";
 import { TranscribeFailed, transcribe } from "@/lib/speech/transcribe";
 
 export const dynamic = "force-dynamic";

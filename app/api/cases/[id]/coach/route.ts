@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { coachMessages } from "@/lib/agents/recovery/coach";
-import { overLimit } from "@/lib/rateLimit";
+import { overLimit } from "@/lib/core/rateLimit";
 import { caseDetail } from "@/lib/recovery/service";
 
 export const dynamic = "force-dynamic";

@@ -1,4 +1,4 @@
-import { diffParts } from "@/lib/nameDiff";
+import { diffParts } from "@/lib/people/nameDiff";
 
 /** A name with the letters that differ from a similar contact's name highlighted. */
 export function NameDiff({ name, other, className = "" }: { name: string; other: string; className?: string }) {

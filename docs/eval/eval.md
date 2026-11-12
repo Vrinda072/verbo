@@ -1,10 +1,10 @@
 # Evaluation — scripted scenarios
 
-**What this is:** 68 scenarios written by the Verbo team (`evals/scenarios.ts`),
-run by `npm run eval` on 2026-11-06. They check that Verbo behaves the way we intended on cases we chose.
+**What this is:** 68 scenarios written by the Verbo team (`scripts/eval-scenarios.ts`),
+run by `npm run eval` on 2026-11-10. They check that Verbo behaves the way we intended on cases we chose.
 **What this is not:** a measure of real-world accuracy. No real users, no real voice audio, no fraud data.
 
-Extractor: **Gemini (`gemini-3.5-flash-lite`)**.
+Extractor: **rule-based parser (offline)**.
 
 **Caveats.** The rule-based parser and these scenarios were written by the same team at the same time, so a high
 score on the offline run mainly shows the parts are consistent with each other. Risk expectations follow the
@@ -51,7 +51,7 @@ contradicted those weights; two more changed on Nov 6 when the parser learned nu
 | te-ana | first-time, mixed-script | c_ana · 2000¢ · medium | c_ana · 2000¢ · medium | ✅ |
 | en-euros | currency | ✘ currency_unsupported | ✘ currency_unsupported | ✅ |
 | en-rupees | currency | ✘ currency_unsupported | ✘ currency_unsupported | ✅ |
-| en-unknown | unknown | ✘ missing_recipient or recipient_not_found | ✘ recipient_not_found | ✅ |
+| en-unknown | unknown | ✘ missing_recipient or recipient_not_found | ✘ missing_recipient | ✅ |
 | en-bare-manuel | ambiguous | ✘ recipient_ambiguous | ✘ recipient_ambiguous | ✅ |
 | en-no-amount | missing | ✘ missing_amount | ✘ missing_amount | ✅ |
 | en-too-much | limit | ✘ amount_out_of_range | ✘ amount_out_of_range | ✅ |

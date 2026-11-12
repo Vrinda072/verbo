@@ -1,12 +1,12 @@
 /**
- * Runs the scripted scenarios in evals/scenarios.ts and writes docs/eval.md.
+ * Runs the scripted scenarios in scripts/eval-scenarios.ts and writes docs/eval/eval.md.
  *
  *   npm run eval                      # rules extractor (offline, deterministic)
  *   npm run eval -- --extractor=gemini      # Gemini (needs GEMINI_API_KEY; free tier, paced 7 s per request, --pace=ms to change)
  *   GEMINI_MODEL=gemini-3.5-flash-lite npm run eval -- --extractor=gemini   # test one model on its own
  *   npm run eval -- --extractor=anthropic   # Claude extractor (needs ANTHROPIC_API_KEY; costs a few cents)
  *
- * Numbers in docs/eval.md describe these scripted cases only — not real users or real-world accuracy.
+ * Numbers in docs/eval/eval.md describe these scripted cases only — not real users or real-world accuracy.
  */
 import "dotenv/config";
 import { writeFileSync } from "node:fs";
@@ -14,9 +14,9 @@ import { understand, validateExtraction, type LlmExtraction } from "@/lib/agents
 import { RulesExtractor } from "@/lib/agents/extraction/rules";
 import { AnthropicExtractor, EXTRACTION_MODEL } from "@/lib/agents/extraction/anthropic";
 import { GeminiExtractor } from "@/lib/agents/extraction/gemini";
-import { GEMINI_MODELS, GeminiFailed } from "@/lib/ai/gemini";
+import { GEMINI_MODELS, GeminiFailed } from "@/lib/agents/gemini";
 import { assessRisk } from "@/lib/risk/score";
-import { GUARDS, PIPELINE, type Expect } from "@/evals/scenarios";
+import { GUARDS, PIPELINE, type Expect } from "@/scripts/eval-scenarios";
 
 const which = process.argv.find((a) => a.startsWith("--extractor="))?.split("=")[1] ?? "rules";
 const extractor = which === "anthropic" ? new AnthropicExtractor() : which === "gemini" ? new GeminiExtractor() : new RulesExtractor();
@@ -119,7 +119,7 @@ async function main() {
   const label = which === "anthropic" ? `Claude (\`${EXTRACTION_MODEL}\`)` : which === "gemini" ? `Gemini (\`${GEMINI_MODELS.join("`, then `")}\`)` : "rule-based parser (offline)";
   const md = `# Evaluation — scripted scenarios
 
-**What this is:** ${PIPELINE.length + GUARDS.length} scenarios written by the Verbo team (\`evals/scenarios.ts\`),
+**What this is:** ${PIPELINE.length + GUARDS.length} scenarios written by the Verbo team (\`scripts/eval-scenarios.ts\`),
 run by \`npm run eval\` on ${new Date().toISOString().slice(0, 10)}. They check that Verbo behaves the way we intended on cases we chose.
 **What this is not:** a measure of real-world accuracy. No real users, no real voice audio, no fraud data.
 
@@ -141,7 +141,7 @@ These feed a wrong extraction straight into validation to check that code — no
 
 ${table(guardRows)}
 `;
-  writeFileSync(which === "rules" ? "docs/eval.md" : `docs/eval-${which}.md`, md);
+  writeFileSync(which === "rules" ? "docs/eval/eval.md" : `docs/eval-${which}.md`, md);
   console.log(`pipeline ${p}/${ran.length} run${skipped ? ` (${skipped} not run)` : ""} · guards ${gp}/${guardRows.length} · extractor ${which}`);
   for (const r of [...rows, ...guardRows].filter((r) => !r.pass && !r.notRun)) console.log(`  ✘ ${r.id}: expected ${r.expected}, got ${r.got}`);
 }

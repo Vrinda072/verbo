@@ -3,9 +3,9 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatAmount, labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 import { money } from "@/lib/paypal/money";
-import { En, Tpl } from "@/components/En";
-import { NameDiff } from "@/components/NameDiff";
-import { Logo } from "@/components/SiteHeader";
+import { En, Tpl } from "@/components/ui/En";
+import { NameDiff } from "@/components/ui/NameDiff";
+import { Logo } from "@/components/ui/SiteHeader";
 import { IPhone } from "./IPhone";
 
 const CODES = ["en", "hi", "te", "ar", "pt", "es"] as const;

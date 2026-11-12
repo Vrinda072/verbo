@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { mintTemporaryKey, SONIOX_RT_MODEL } from "@/lib/speech/soniox";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 export const dynamic = "force-dynamic";
 

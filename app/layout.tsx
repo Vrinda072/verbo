@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans, Noto_Sans_Arabic, Noto_Sans_Devanagari, Noto_Sans_Display, Noto_Sans_Telugu } from "next/font/google";
-import { APP_NAME } from "@/lib/config";
+import { APP_NAME } from "@/lib/core/config";
 import "./globals.css";
 
 /** One type family across the scripts Verbo reads back in, so Hindi, Telugu, Arabic and Latin text sit together. */

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { caseDetail, caseFromToken, postMessage, refuse, startCaseReturn } from "@/lib/recovery/service";
 import { recipientView } from "@/lib/recovery/views";
 import { TransferError } from "@/lib/transfers/service";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 export const dynamic = "force-dynamic";
 

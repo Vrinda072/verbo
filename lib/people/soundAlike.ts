@@ -4,7 +4,7 @@
  */
 import { phoneticKey } from "@/lib/agents/phonetic";
 import { jaroWinkler, normalizeName } from "@/lib/agents/similarity";
-import type { Contact } from "@/lib/contacts";
+import type { Contact } from "@/lib/people/contacts";
 
 export const SOUND_ALIKE_AT = 0.9;
 
