@@ -15,6 +15,7 @@ import {
   startCaseReturn,
 } from "@/lib/recovery/service";
 import { getDb } from "@/db";
+import { hourIn, timeZoneFor } from "@/lib/localTime";
 
 process.env.TOKEN_SIGNING_SECRET ||= "test-secret-test-secret-test-secret-0123";
 const rules = new RulesExtractor();
@@ -88,7 +89,10 @@ describe("recovery (mock PayPal, in-memory DB)", () => {
 
   it("cannot return before the link is opened; timers remind at 24h and escalate at 72h", async () => {
     const sent = await mistakenPayment();
-    const t0 = new Date();
+    // Reminders wait for the recipient's daytime, so start the case at a time where +25h is midday for them.
+    const tz = timeZoneFor("Manuel Lopes", "pt");
+    const now = new Date();
+    const t0 = new Date(now.getTime() + (12 - hourIn(new Date(now.getTime() + 25 * 3_600_000), tz)) * 3_600_000);
     const { caseRow } = await openCase(sent.id, t0);
     await expect(startCaseReturn(caseRow)).rejects.toThrow("case_not_returnable");
     const h = (n: number) => new Date(t0.getTime() + n * 3_600_000);

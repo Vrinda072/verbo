@@ -15,9 +15,9 @@ import { VERBO_WIDGETS } from "./widgets";
 const theme = studioTheme.withParams({
   backgroundColor: "var(--v-card)",
   foregroundColor: "var(--v-ink)",
-  accentColor: "var(--v-evergreen)",
+  accentColor: "var(--v-brand)",
   borderColor: "var(--v-line)",
-  fontFamily: "var(--font-inter), system-ui, sans-serif",
+  fontFamily: "var(--font-noto), system-ui, sans-serif",
 });
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- generic registry types add nothing for this fixed set of widgets. */
@@ -122,14 +122,14 @@ export default function StudioDashboard({ rows }: { rows: DeskRow[] }) {
               type="button"
               aria-pressed={view === id}
               onClick={() => setView(id)}
-              className={`min-h-10 whitespace-nowrap rounded-v border px-4 text-sm font-semibold ${view === id ? "border-ink bg-ink text-paper" : "border-line-strong hover:bg-paper-2"}`}
+              className={`min-h-10 whitespace-nowrap rounded-full border px-4 text-sm font-semibold ${view === id ? "border-ink bg-ink text-paper" : "border-line-strong hover:bg-paper-2"}`}
             >
               {label}
             </button>
           ))}
         </div>
       </div>
-      <div className="v-studio h-[900px] overflow-hidden rounded-v-lg border border-line">
+      <div className="v-studio h-[900px] overflow-hidden">
         <AgStudioProvider licenseKey={key} modules={[AgStudioAiModule]}>
           <AgStudio data={data as any} initialState={INITIAL_STATE as any} mode={view === "view" ? "view" : "edit"} theme={theme} widgets={widgets as any} ai={ai as any} panels={panels as any} />
         </AgStudioProvider>

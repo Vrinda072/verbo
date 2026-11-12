@@ -45,3 +45,14 @@ next-env.d.ts
 docs/private/
 /.pglite/
 /out-evidence/
+
+# copied from node_modules on install
+/public/bryntum
+
+# local ElevenLabs voice samples
+/voice-samples
+
+# Impeccable design tooling (installed per machine by its Claude Code plugin)
+.claude/settings.local.json
+.claude/skills/impeccable/
+.claude/agents/impeccable-*

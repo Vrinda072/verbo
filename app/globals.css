@@ -6,28 +6,38 @@
  * everywhere. No ad-hoc hex in components.
  */
 :root {
+  color-scheme: light;
   /* colour: surfaces */
-  --v-paper: #f6f7f9;
-  --v-paper-2: #eef0f3;
+  --v-paper: #f4f7fc;
+  --v-paper-2: #eaf1fa;
   --v-card: #ffffff;
-  --v-line: #e1e4e9;
-  --v-line-strong: #c4cad2;
+  --v-line: #dce6f5;
+  --v-line-strong: #c3d2ea;
   /* colour: text */
-  --v-ink: #101828;
-  --v-ink-2: #344054;
-  --v-ink-3: #596477; /* >=4.5:1 on paper */
+  --v-ink: #071a4d;
+  --v-ink-2: #34476b;
+  --v-ink-3: #4d6189; /* >=4.5:1 on paper */
   /* colour: brand & semantic */
-  --v-evergreen: #0b6b5a;
-  --v-evergreen-ink: #ffffff;
-  --v-evergreen-soft: #e3f3ef;
-  --v-marigold: #b54708;
-  --v-marigold-ink: #7a2e0e;
-  --v-marigold-soft: #fef4e6;
-  --v-terracotta: #b42318;
+  --v-navy: #071a4d;
+  --v-navy-2: #12307a;
+  --v-navy-ink: #ffffff;
+  --v-signal: #8fd3ff;
+  --v-brand: #0b5cd6;
+  --v-brand-ink: #ffffff;
+  --v-brand-soft: #e7f0fc;
+  --v-success: #0d7a48;
+  --v-success-soft: #e4f5ec;
+  --v-marigold: #a85300;
+  --v-marigold-ink: #6b3a00;
+  --v-marigold-soft: #fff4e0;
+  --v-terracotta: #c4261d;
   --v-terracotta-soft: #fdecea;
-  --v-sky: #175cd3;
-  --v-sky-soft: #eaf1fd;
-  --v-focus: #175cd3;
+  --v-sky: #0b5cd6;
+  --v-sky-soft: #eaf3fe;
+  --v-focus: #0b5cd6;
+  /* the one letter that differs, marked on navy surfaces */
+  --v-mark-on-dark: #f2a93b;
+  --v-placeholder: #5f7096; /* >=4.5:1 on white */
 
   /* type scale */
   --v-text-xs: 0.8125rem;
@@ -37,53 +47,17 @@
   --v-text-xl: 1.5rem;
   --v-text-2xl: 2rem;
   --v-text-3xl: 2.5rem;
-  --v-text-digits: 3.5rem; /* confirmation amounts */
-
-  /* spacing (4px grid) */
-  --v-space-1: 0.25rem;
-  --v-space-2: 0.5rem;
-  --v-space-3: 0.75rem;
-  --v-space-4: 1rem;
-  --v-space-6: 1.5rem;
-  --v-space-8: 2rem;
-  --v-space-12: 3rem;
-  --v-space-16: 4rem;
+  --v-text-digits: 3.75rem; /* confirmation amounts */
 
   /* radius & elevation */
-  --v-radius-sm: 6px;
-  --v-radius: 8px;
-  --v-radius-lg: 12px;
-  --v-radius-pill: 999px;
-  --v-shadow: 0 1px 2px rgb(16 24 40 / 0.06);
-  --v-shadow-lg: 0 1px 3px rgb(16 24 40 / 0.08), 0 8px 24px -8px rgb(16 24 40 / 0.12);
+  --v-radius: 12px;
+  --v-radius-lg: 20px;
+  --v-shadow: 0 1px 2px rgb(0 28 100 / 0.05);
+  --v-shadow-lg: 0 1px 2px rgb(0 28 100 / 0.04), 0 12px 32px -16px rgb(0 28 100 / 0.18);
 
   /* motion */
   --v-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --v-dur: 200ms;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --v-paper: #0c1117;
-    --v-paper-2: #131a22;
-    --v-card: #151c25;
-    --v-line: #25303c;
-    --v-line-strong: #3a4756;
-    --v-ink: #f2f5f8;
-    --v-ink-2: #cdd5df;
-    --v-ink-3: #98a4b3;
-    --v-evergreen: #3ec6a6;
-    --v-evergreen-ink: #06251d;
-    --v-evergreen-soft: #0f2f29;
-    --v-marigold: #f5a94a;
-    --v-marigold-soft: #33240f;
-    --v-marigold-ink: #fcdcae;
-    --v-terracotta: #f47f72;
-    --v-terracotta-soft: #36191a;
-    --v-sky: #84adf5;
-    --v-sky-soft: #15233a;
-    --v-focus: #84adf5;
-  }
 }
 
 @theme inline {
@@ -95,9 +69,16 @@
   --color-ink: var(--v-ink);
   --color-ink-2: var(--v-ink-2);
   --color-ink-3: var(--v-ink-3);
-  --color-evergreen: var(--v-evergreen);
-  --color-evergreen-ink: var(--v-evergreen-ink);
-  --color-evergreen-soft: var(--v-evergreen-soft);
+  --color-brand: var(--v-brand);
+  --color-brand-ink: var(--v-brand-ink);
+  --color-brand-soft: var(--v-brand-soft);
+  --color-navy: var(--v-navy);
+  --color-navy-2: var(--v-navy-2);
+  --color-navy-ink: var(--v-navy-ink);
+  --color-signal: var(--v-signal);
+  --color-mark-on-dark: var(--v-mark-on-dark);
+  --color-success: var(--v-success);
+  --color-success-soft: var(--v-success-soft);
   --color-marigold: var(--v-marigold);
   --color-marigold-ink: var(--v-marigold-ink);
   --color-marigold-soft: var(--v-marigold-soft);
@@ -106,8 +87,8 @@
   --color-sky: var(--v-sky);
   --color-sky-soft: var(--v-sky-soft);
 
-  --font-sans: var(--font-inter), "Noto Sans", system-ui, sans-serif;
-  --font-display: var(--font-inter), "Noto Sans", system-ui, sans-serif;
+  --font-sans: var(--font-noto), var(--font-deva), var(--font-telu), var(--font-arab), system-ui, sans-serif;
+  --font-display: var(--font-noto-display), var(--font-deva), var(--font-telu), var(--font-arab), system-ui, sans-serif;
 
   --text-digits: var(--v-text-digits);
   --radius-v: var(--v-radius);
@@ -121,14 +102,46 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+h1,
+h2 {
+  font-family: var(--font-display);
+}
+
 body {
   background: var(--v-paper);
   color: var(--v-ink);
   font-family: var(--font-sans);
   font-size: var(--v-text-base);
   line-height: 1.55;
-  font-feature-settings: "tnum" 0, "cv11" 1;
   -webkit-font-smoothing: antialiased;
+  caret-color: var(--v-brand);
+}
+
+/* Browser surfaces carry the palette too. */
+::selection {
+  background: var(--v-signal);
+  color: var(--v-navy);
+}
+::placeholder {
+  color: var(--v-placeholder);
+  opacity: 1;
+}
+html {
+  scrollbar-color: var(--v-line-strong) transparent;
+}
+p,
+li,
+dd,
+label {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+a {
+  text-underline-offset: 0.2em;
 }
 
 :focus-visible {
@@ -141,9 +154,9 @@ body {
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums lining-nums;
   font-size: var(--v-text-digits);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
 
 /* listening ring around the mic */
@@ -158,12 +171,12 @@ body {
   height: 100%; /* Studio's wrapper otherwise stays at its 600px minimum */
 }
 .v-studio {
-  --ag-chart-palette-fills-1-color: var(--v-evergreen);
+  --ag-chart-palette-fills-1-color: var(--v-brand);
   --ag-chart-palette-fills-2-color: var(--v-sky);
   --ag-chart-palette-fills-3-color: var(--v-marigold);
   --ag-chart-palette-fills-4-color: var(--v-terracotta);
   --ag-chart-palette-fills-5-color: var(--v-ink-3);
-  --ag-chart-palette-strokes-1-color: var(--v-evergreen);
+  --ag-chart-palette-strokes-1-color: var(--v-brand);
   --ag-chart-palette-strokes-2-color: var(--v-sky);
   --ag-chart-palette-strokes-3-color: var(--v-marigold);
   --ag-chart-palette-strokes-4-color: var(--v-terracotta);
@@ -188,6 +201,17 @@ body {
 }
 .v-rise { animation: v-rise var(--v-dur) var(--v-ease) both; }
 
+/* The funds marker waiting on hold */
+@keyframes v-halo {
+  from { box-shadow: 0 0 0 0 rgb(168 83 0 / 0.45); }
+  to { box-shadow: 0 0 0 16px rgb(168 83 0 / 0); }
+}
+.v-halo { animation: v-halo 1.6s ease-out infinite; }
+
+/* Walkthrough progress */
+@keyframes v-fill { from { width: 0; } to { width: 100%; } }
+.v-fill { animation: v-fill linear both; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -195,4 +219,48 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Bryntum: night where the recipient lives, on their own row of the deadline timeline. */
+.b-sch-resource-time-range.v-night {
+  background: color-mix(in srgb, var(--v-navy) 9%, transparent);
+  border: 0;
+}
+
+/* English subtitle under a line in another language (components/En.tsx). */
+@layer components {
+  .v-sub {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--v-ink-3);
+    font-family: var(--font-sans, inherit);
+  }
+  .v-sub-on-dark {
+    color: inherit;
+    opacity: 0.85;
+  }
+}
+
+/* AG Studio's filter titles default to a grey below 4.5:1 on white. */
+.v-studio .ag-studio-filter-widget-title {
+  color: var(--v-ink-3);
+}
+/* In a right-to-left block the English line keeps left-to-right order but lines up with the text above it. */
+[dir="rtl"] .v-sub {
+  text-align: right;
+}
+[dir="rtl"] .text-center .v-sub,
+[dir="rtl"] button .v-sub {
+  text-align: center;
+}
+
+/* Read-back stage: the checked amount sits on a Signal Blue highlight inside the sentence. */
+.v-stage bdi.tabular-nums {
+  background: var(--v-signal);
+  color: var(--v-navy);
+  border-radius: 10px;
+  padding: 0 0.35em;
 }

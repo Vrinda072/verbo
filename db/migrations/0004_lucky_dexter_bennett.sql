@@ -1,0 +1,1 @@
+ALTER TABLE "case_messages" ADD COLUMN "english_text" text;

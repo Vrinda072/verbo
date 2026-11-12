@@ -80,10 +80,15 @@ export function dueTimerEvent(args: {
   linkSentAt: Date | null;
   remindersSent: number;
   now: Date;
+  /** Operator-set deadline. Replaces the standard 72 hours. */
+  escalateAt?: Date | null;
+  /** True while it is night where the recipient lives: the reminder waits for their morning. Escalation does not. */
+  recipientQuiet?: boolean;
 }): "REMINDER_SENT" | "ESCALATED" | null {
   if (!args.linkSentAt || !OPEN_STATES.has(args.state) || args.state === "OPENED") return null;
   const hours = (args.now.getTime() - args.linkSentAt.getTime()) / 3_600_000;
-  if (hours >= ESCALATE_AFTER_H) return "ESCALATED";
-  if (hours >= REMINDER_AFTER_H && args.remindersSent === 0) return "REMINDER_SENT";
+  const escalateDue = args.escalateAt ? args.now >= args.escalateAt : hours >= ESCALATE_AFTER_H;
+  if (escalateDue) return "ESCALATED";
+  if (hours >= REMINDER_AFTER_H && args.remindersSent === 0 && !args.recipientQuiet) return "REMINDER_SENT";
   return null;
 }

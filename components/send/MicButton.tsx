@@ -41,7 +41,7 @@ export function MicButton({
         aria-pressed={listening}
         aria-label={label}
         className={`relative grid h-28 w-28 place-items-center rounded-full shadow-v transition-colors duration-200 focus-visible:outline-offset-8 disabled:opacity-70 ${
-          listening ? "bg-terracotta text-paper" : "bg-evergreen text-evergreen-ink hover:opacity-90"
+          listening ? "bg-terracotta text-paper" : "bg-brand text-brand-ink hover:opacity-90"
         }`}
       >
         {listening && <span aria-hidden className="v-pulse absolute inset-0 rounded-full border-4 border-terracotta" />}
@@ -84,7 +84,7 @@ function Waveform({ analyser, active }: { analyser: AnalyserNode | null; active:
     const c = canvas.current;
     if (!c) return;
     const g = c.getContext("2d")!;
-    const color = getComputedStyle(document.documentElement).getPropertyValue("--v-evergreen").trim() || "currentColor";
+    const color = getComputedStyle(document.documentElement).getPropertyValue("--v-brand").trim() || "currentColor";
     const muted = getComputedStyle(document.documentElement).getPropertyValue("--v-line-strong").trim() || "currentColor";
     const data = new Uint8Array(analyser?.frequencyBinCount ?? 0);
     const bars = 40;

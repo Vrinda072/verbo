@@ -1,8 +1,12 @@
 "use client";
+import { CONTACTS } from "@/lib/contacts";
+import { En, Tpl } from "@/components/En";
+import { NameDiff } from "@/components/NameDiff";
 import { useEffect, useState } from "react";
-import { labelsFor } from "@/lib/bridge/readback";
+import { labelsFor, languageNameIn, LANGUAGES } from "@/lib/bridge/readback";
 import { decimalToCents } from "@/lib/agents/numbers";
 import { useReadAloud } from "@/lib/speech/useReadAloud";
+import type { SpokenPart } from "@/lib/speech/spoken";
 
 export interface UnderstandResponse {
   draftId: string | null;
@@ -17,6 +21,8 @@ export interface UnderstandResponse {
   amount: { cents: number; currency: string; localized: string; digits: string } | null;
   amountSource: "numerals" | "words" | null;
   currencyAssumed: boolean;
+  /** Paying a typed number one digit away from this contact's number. */
+  nearContact?: string;
 }
 
 /**
@@ -51,9 +57,13 @@ export function ConfirmCard({
   const vars = { amount: data.amount.localized, recipient: data.recipient.name };
   // Same fixed templates as the screen, so the voice can never say anything the card doesn't.
   const spoken = [L.t("readback", vars), ...data.lookAlikes.map((o) => L.t("lookalike", { other: o.name }))].join(" ");
-  const voice = useReadAloud(spoken, L.usedLang);
+  const parts: SpokenPart[] = [
+    { key: "readback", vars },
+    ...data.lookAlikes.map((o) => ({ key: "lookalike" as const, vars: { other: o.name } })),
+  ];
+  const voice = useReadAloud(spoken, L.usedLang, parts);
   useEffect(() => {
-    if (voice.available && !muted()) voice.play();
+    if (voice.available && !muted()) void voice.play();
     // Once per card, as soon as a voice is ready.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [voice.available]);
@@ -61,44 +71,83 @@ export function ConfirmCard({
   return (
     <section
       aria-labelledby="confirm-title"
-      className="v-rise mx-auto w-full max-w-xl rounded-v-lg border border-line bg-card p-6 shadow-v-lg sm:p-8"
+      className="v-rise mx-auto w-full max-w-xl rounded-v-lg bg-card p-6 shadow-v-lg sm:p-8"
     >
-      <div lang={L.usedLang} dir={L.dir}>
-        <h2 id="confirm-title" className="text-xl font-semibold">
+      {/* The read-back stage: the sentence in the sender's language leads; English and the checked facts follow. */}
+      <div lang={L.usedLang} dir={L.dir} className="v-stage rounded-[24px] bg-navy p-6 text-navy-ink sm:p-7">
+        <h2 id="confirm-title" className="text-sm font-medium text-navy-ink/80">
           {L.t("title")}
+          <En L={L} k="title" className="v-sub-on-dark text-xs" />
         </h2>
-        <p className="mt-2 text-xl text-ink-2">{L.t("readback", vars)}</p>
-      </div>
-      {voice.available && (
-        <button type="button" onClick={voice.play} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-v border border-line-strong px-4 text-sm font-bold hover:bg-paper-2">
-          <SpeakerIcon />
-          {voice.speaking ? "Speaking…" : "Hear it again"}
-        </button>
-      )}
-      {showEnglish && <p className="mt-1 text-sm text-ink-3">{en.t("readback", vars)}</p>}
-
-      <p className="v-digits mt-6 text-ink" aria-label={`${data.amount.currency} ${data.amount.digits}`}>
-        ${whole}
-        <span className="text-ink-3">.{frac}</span>
-      </p>
-      <p className="text-sm font-bold uppercase tracking-wider text-ink-3">{data.amount.currency}</p>
-
-      <div className="mt-5 rounded-v border border-line bg-paper-2 p-4">
-        <p className="text-sm text-ink-3">to</p>
-        <p className="text-3xl font-bold">{data.recipient.name}</p>
+        <p className="mt-3 text-2xl font-semibold leading-snug sm:text-[1.75rem]">
+          <Tpl L={L} k="readback" vars={vars} />
+        </p>
+        {showEnglish && (
+          <p lang="en" dir="ltr" className="v-sub v-sub-on-dark text-base">
+            {en.t("readback", vars)}
+          </p>
+        )}
+        {voice.available && (
+          <button type="button" dir="ltr" onClick={() => void voice.play()} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-navy-2 px-4 text-sm font-medium text-navy-ink hover:bg-white/15">
+            <SpeakerIcon />
+            {voice.speaking ? "Speaking…" : "Hear it again"}
+          </button>
+        )}
+        <dl dir="ltr" className="mt-5 grid grid-cols-2 gap-4 border-t border-navy-2 pt-4 text-sm sm:grid-cols-3">
+          <div>
+            <dt className="text-navy-ink/75">To</dt>
+            <dd className="text-lg font-semibold">{data.recipient.name}</dd>
+          </div>
+          <div>
+            <dt className="text-navy-ink/75">Amount checked</dt>
+            <dd className="text-lg font-semibold tabular-nums" aria-label={`${data.amount.currency} ${data.amount.digits}`}>
+              ${whole}.{frac} <span className="text-sm font-normal text-navy-ink/75">{data.amount.currency}</span>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-navy-ink/75">PayPal opens in</dt>
+            <dd lang={L.usedLang} className="text-lg font-semibold">
+              {LANGUAGES.find((l) => l.code === L.usedLang)?.nativeName ?? "English"}
+            </dd>
+          </div>
+        </dl>
         {data.heard.recipient && data.heard.recipient !== data.recipient.name && (
-          <p className="mt-1 text-sm text-ink-3">
+          <p dir="ltr" className="mt-3 text-sm text-navy-ink/75">
             You said: <span lang={L.usedLang}>“{data.heard.recipient}”</span>
           </p>
         )}
       </div>
 
+      {data.lookAlikes.length > 0 && (
+        <div role="note" lang={L.usedLang} dir={L.dir} className="mt-4 rounded-v bg-marigold-soft p-4 text-marigold-ink">
+          {data.lookAlikes.map((o) => (
+            <p key={o.id} className="font-medium">
+              <Tpl L={L} k="lookalike" vars={{ other: o.name }} />
+              <En L={L} k="lookalike" vars={{ other: o.name }} />
+            </p>
+          ))}
+          <ul dir="ltr" className="mt-3 grid gap-2">
+            {[{ name: data.recipient.name, now: true }, ...data.lookAlikes.map((o) => ({ name: o.name, now: false }))].map((row, i, all) => {
+              const c = CONTACTS.find((x) => x.name === row.name);
+              return (
+                <li key={row.name} className={`flex flex-wrap items-baseline justify-between gap-x-3 rounded-v px-3 py-2 ${row.now ? "bg-card text-ink" : "text-ink-2"}`}>
+                  <NameDiff name={row.name} other={all[i === 0 ? 1 : 0].name} className="text-xl font-semibold" />
+                  <span lang={L.usedLang} className="text-sm">
+                    {c ? `${languageNameIn(c.language, L.usedLang)} · ${c.city} · ${L.t(c.paidBefore ? "opt_paid" : "opt_new")}` : ""}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
       <div className="mt-4 space-y-3">
-        {data.lookAlikes.map((o) => (
-          <Notice key={o.id} tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("lookalike", { other: o.name }) : undefined}>
-            {L.t("lookalike", { other: o.name })}
+        {data.nearContact && (
+          <Notice tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("number_near", { contact: data.nearContact }) : undefined}>
+            <Tpl L={L} k="number_near" vars={{ contact: data.nearContact }} />
           </Notice>
-        ))}
+        )}
         {data.risk?.signals.includes("pressure_language") && (
           <Notice tone="warn" lang={L.usedLang} dir={L.dir} english={showEnglish ? en.t("pressure") : undefined}>
             {L.t("pressure")}
@@ -122,19 +171,17 @@ export function ConfirmCard({
       </div>
 
       {data.risk?.hold && (
-        <div className="mt-4 rounded-v border-2 border-terracotta/60 bg-terracotta-soft p-4">
-          <p className="text-sm font-bold uppercase tracking-wider text-terracotta">Safety hold</p>
-          <p lang={L.usedLang} dir={L.dir} className="mt-1 font-bold">
-            {L.t("hold_notice", { minutes: String(holdMinutes) })}
-          </p>
-          {showEnglish && <p className="mt-1 text-sm opacity-80">{en.t("hold_notice", { minutes: String(holdMinutes) })}</p>}
-        </div>
+        <p lang={L.usedLang} dir={L.dir} className="mt-4 rounded-v bg-sky-soft px-4 py-3 font-medium text-ink">
+          {L.t("hold_notice", { minutes: String(holdMinutes) })}
+          <En L={L} k="hold_notice" vars={{ minutes: String(holdMinutes) }} />
+        </p>
       )}
 
       {needsTyped && (
         <div className="mt-5">
-          <label htmlFor="typed-amount" className="block font-bold" lang={L.usedLang} dir={L.dir}>
+          <label htmlFor="typed-amount" className="block font-semibold" lang={L.usedLang} dir={L.dir}>
             {L.t("typed_amount")}
+            <En L={L} k="typed_amount" />
           </label>
           <input
             id="typed-amount"
@@ -143,27 +190,31 @@ export function ConfirmCard({
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
             aria-invalid={typed !== "" && !typedOk}
-            className="mt-2 w-full rounded-v border-2 border-line-strong bg-paper px-4 py-3 text-2xl font-bold tabular-nums outline-none focus:border-sky"
+            className="mt-2 w-full rounded-full border-2 border-line-strong bg-paper px-4 py-3 text-2xl font-semibold tabular-nums outline-none focus:border-sky"
             placeholder="0.00"
           />
-          {typed !== "" && !typedOk && <p className="mt-1 text-sm font-bold text-terracotta">That doesn’t match the amount above.</p>}
+          {typed !== "" && !typedOk && <p className="mt-1 text-sm font-semibold text-terracotta">That doesn’t match the amount above.</p>}
         </div>
       )}
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+      {/* Pinned to the bottom of the screen on phones, so the decision is always within thumb reach. */}
+      <div className="sticky bottom-0 -mx-6 mt-6 grid gap-2 border-t border-line bg-card px-6 pb-4 pt-3 grid-cols-2 sm:static sm:mx-0 sm:border-0 sm:p-0">
         <button
           type="button"
           disabled={busy || !typedOk}
           onClick={() => onConfirm(needsTyped ? typedCents ?? undefined : undefined)}
-          className="min-h-14 rounded-v bg-evergreen px-6 text-lg font-bold text-evergreen-ink shadow-v transition-transform hover:opacity-90 disabled:translate-y-0 disabled:opacity-50"
+          className="col-span-2 min-h-14 rounded-full bg-brand px-6 text-lg font-semibold text-brand-ink shadow-v transition-transform hover:opacity-90 disabled:translate-y-0 disabled:opacity-50"
         >
           <span lang={L.usedLang}>{busy ? "…" : L.t("confirm")}</span>
+          {!busy && <En L={L} k="confirm" className="v-sub-on-dark" />}
         </button>
-        <button type="button" onClick={onEdit} disabled={busy} className="min-h-14 rounded-v border-2 border-line-strong px-6 font-bold hover:bg-paper-2">
+        <button type="button" onClick={onEdit} disabled={busy} className="min-h-12 rounded-full px-6 font-semibold text-brand hover:bg-brand-soft">
           <span lang={L.usedLang}>{L.t("edit")}</span>
+          <En L={L} k="edit" />
         </button>
-        <button type="button" onClick={onCancel} disabled={busy} className="min-h-14 rounded-v px-6 font-bold text-terracotta hover:bg-terracotta-soft">
+        <button type="button" onClick={onCancel} disabled={busy} className="min-h-12 rounded-full px-6 font-semibold text-terracotta hover:bg-terracotta-soft">
           <span lang={L.usedLang}>{L.t("cancel")}</span>
+          <En L={L} k="cancel" />
         </button>
       </div>
 
@@ -205,17 +256,17 @@ function Notice({
   lang: string;
   dir: "ltr" | "rtl";
 }) {
-  const cls = tone === "warn" ? "border-marigold/70 bg-marigold-soft text-marigold-ink" : "border-sky/40 bg-sky-soft text-ink";
+  const cls = tone === "warn" ? "bg-marigold-soft text-marigold-ink" : "bg-sky-soft text-ink";
   return (
-    <div role="note" className={`flex gap-3 rounded-v border p-4 ${cls}`}>
-      <span aria-hidden className="mt-0.5 font-bold">
+    <div role="note" dir={dir} className={`flex gap-3 rounded-v p-4 ${cls}`}>
+      <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-card text-sm font-semibold">
         {tone === "warn" ? "!" : "i"}
       </span>
       <div>
-        <p lang={lang} dir={dir} className="font-bold">
+        <p lang={lang} dir={dir} className="font-medium">
           {children}
         </p>
-        {english && <p className="mt-1 text-sm opacity-80">{english}</p>}
+        {english && <p lang="en" dir="ltr" className="v-sub">{english}</p>}
       </div>
     </div>
   );

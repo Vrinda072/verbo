@@ -1,5 +1,6 @@
 /** What each side of a case may see. No emails, no PayPal ids, sender shown by short name to the recipient. */
 import { SENDER } from "@/lib/contacts";
+import { numbersOf } from "@/lib/bridge/translate";
 import { caseDetail } from "./service";
 
 type Detail = NonNullable<Awaited<ReturnType<typeof caseDetail>>>;
@@ -12,6 +13,9 @@ function messages(d: Detail) {
     lang: m.lang,
     translatedText: m.translatedText,
     translatedLang: m.translatedLang,
+    englishText: m.englishText,
+    /** Numbers in a translated message. Each was found again in the translation, or it would not have been kept. */
+    numbers: m.translatedText ? [...new Set(numbersOf(m.text))] : [],
     at: m.at.toISOString(),
   }));
 }

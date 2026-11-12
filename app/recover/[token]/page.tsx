@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { Logo } from "@/components/SiteHeader";
 import { caseDetail, caseFromToken, recordView } from "@/lib/recovery/service";
 import { recipientView } from "@/lib/recovery/views";
@@ -14,12 +13,7 @@ const HAS_TEMPLATE = new Set(templateLanguages());
 async function pickLanguage(param: string | undefined, caseLang: string | undefined): Promise<string> {
   if (param && HAS_TEMPLATE.has(param)) return param;
   if (caseLang && HAS_TEMPLATE.has(caseLang)) return caseLang;
-  const accept = (await headers()).get("accept-language") ?? "";
-  const fromBrowser = accept
-    .split(",")
-    .map((p) => p.split(";")[0].trim().split("-")[0])
-    .find((l) => HAS_TEMPLATE.has(l));
-  return fromBrowser ?? "en";
+  return "en";
 }
 
 export default async function RecoverPage({
