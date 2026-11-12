@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hourIn, isQuiet, nextDaytime, quietRanges, timeZoneFor } from "@/lib/localTime";
+import { hourIn, isQuiet, nextDaytime, quietRanges, timeZoneFor } from "@/lib/people/localTime";
 import { dueTimerEvent } from "@/lib/recovery/state";
 
 describe("the recipient's own clock", () => {

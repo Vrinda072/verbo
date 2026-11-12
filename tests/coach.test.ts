@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cleanDrafts, coachMessages, draftIsSafe, type CoachInput } from "@/lib/agents/recovery/coach";
-import type { GeminiCreate } from "@/lib/ai/gemini";
+import type { GeminiCreate } from "@/lib/agents/gemini";
 
 const input = (over: Partial<CoachInput> = {}): CoachInput => ({
   senderName: "Sreenivas",

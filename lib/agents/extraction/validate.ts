@@ -3,7 +3,7 @@
  * Output is either a `ValidDraft` (ready for the fixed read-back template + explicit confirmation)
  * or a list of problems the UI must resolve with the user.
  */
-import { CONTACTS, type Contact } from "@/lib/contacts";
+import { CONTACTS, type Contact } from "@/lib/people/contacts";
 import { money, MAX_SANDBOX_CENTS as MAX_CENTS } from "@/lib/paypal/money";
 import type { Money } from "@/lib/paypal/types";
 import { spokenCurrencies } from "@/lib/agents/currency";

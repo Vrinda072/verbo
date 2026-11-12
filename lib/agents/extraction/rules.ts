@@ -3,7 +3,7 @@
  * Built for real speech output: tolerates spelling variation in names, reads number words, and refuses to guess
  * when it hears more than one amount. Anything it can't read becomes null, and validation then asks the user.
  */
-import { CONTACTS, type Contact } from "@/lib/contacts";
+import { CONTACTS, type Contact } from "@/lib/people/contacts";
 import { spokenCurrencies } from "@/lib/agents/currency";
 import { dollarsAndCents, distinctNumerals } from "@/lib/agents/numbers";
 import { parseNumberWords } from "@/lib/agents/numberWords";

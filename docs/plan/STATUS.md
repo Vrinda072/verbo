@@ -5,7 +5,7 @@
 - **English subtitles everywhere:** every line shown in another language now has its English under it: the Home read-backs,
   Send's spoken questions, the review card and its buttons, the hold and sent screens, both sides of the recovery chat and the
   Case Desk conversation. Chat messages store an English copy (`case_messages.english_text`, migration 0004), translated when
-  neither side writes English. In right-to-left pages the English lines up with the text above it (`components/En.tsx`).
+  neither side writes English. In right-to-left pages the English lines up with the text above it (`components/ui/En.tsx`).
 - **Impeccable** (impeccable.style) installed as a Claude Code plugin; its detector now reports no issues on Home, Send, Examples
   and the Case Desk at desktop and phone width. Fixes: input overflow on Send, long footer line, AG Studio title contrast, a
   nested card, the dimmed phone in Examples (now greyscale instead of faded text), the eyebrow above "Case Desk", themed text
@@ -20,7 +20,7 @@
 - **Recovery:** translated messages show "Numbers checked: …" and a "Show original" toggle, in the reader's language (new templates in
   all six languages, machine-written). Case details show each message's language pair and the numbers kept.
 - **Reminders in the recipient's daytime (built):** contacts carry a time zone. A reminder that falls due between 21:00 and 08:00
-  where the recipient lives waits for their morning; escalation never waits (`lib/localTime.ts`, `dueTimerEvent`). The Bryntum
+  where the recipient lives waits for their morning; escalation never waits (`lib/people/localTime.ts`, `dueTimerEvent`). The Bryntum
   Deadlines tab shades each recipient's night on their own row and shows their local time.
 - **Wrong numbers:** "Or pay a phone number" on Send. A number one digit (or one swapped pair) off a contact's is stopped: it shows the
   differing digits, who the number really reaches, the language they read and their local time, and offers the contact instead.
@@ -69,7 +69,7 @@
 
 - **Bryntum:** Deadlines tab in the Case Desk. Dragging a bar moves `cases.escalate_at` and logs `DEADLINE_MOVED`.
 - **APIMatic:** order creation uses PayPal's generated Server SDK, confirmed on the sandbox including idempotency. The Context
-  Plugin isn't installed, because the installer needs the `claude` command. See `docs/apimatic.md`.
+  Plugin isn't installed, because the installer needs the `claude` command. See `docs/guides/apimatic.md`.
 - **Not verified:** authorize, capture and void through the real sandbox still need a person to approve as the buyer.
 - **Bryntum CSS:** served from `public/bryntum` (copied on install). The CSS bundler turns one of its rules into a page-wide margin.
 - **Dropped:** a voice shopping agent using Channel3 was built and removed before commit, because it pulled away from the recovery
@@ -78,7 +78,7 @@
 
 ## Nov 7 — ready to deploy on Render
 
-- **Added:** `render.yaml` (web, Postgres, hourly reminders and escalations) and `docs/DEPLOY.md`. **Not deployed yet:** it
+- **Added:** `render.yaml` (web, Postgres, hourly reminders and escalations) and `docs/guides/DEPLOY.md`. **Not deployed yet:** it
   needs Vrinda's Render account, and secrets are entered in Render's dashboard.
 - **Why paid plans:** Render's free Postgres expires after 30 days, before judging ends on Dec 15; its free web service
   sleeps after 15 idle minutes. Prices were not confirmed against the $50 credit.
@@ -197,7 +197,7 @@ Vrinda reported the mic wouldn't connect, stopped mid-sentence and missed words.
   until its stated retry time, identical requests reuse the answer, and when all are out the rules parser and MyMemory
   take over without a network call. Answers are kept in memory only.
 - **Eval on `gemini-3.5-flash-lite`:** 51/57 on the first full run, 57/57 after fixes, guards 11/11, offline parser
-  57/57 (`docs/eval-gemini.md`, `docs/eval.md`). These are our own scripted scenarios, and the fixes were made against
+  57/57 (`docs/eval/eval-gemini.md`, `docs/eval/eval.md`). These are our own scripted scenarios, and the fixes were made against
   six of them, so 57/57 is not a first-attempt score or a measure of real-world accuracy.
   An earlier partial run on `gemini-3.6-flash` got through 19 scenarios, all passing, before its quota ran out.
 - **Money errors the run exposed, now blocked in code:** 500 rupees accepted as $500 when the model left currency empty;
@@ -217,7 +217,7 @@ Vrinda reported the mic wouldn't connect, stopped mid-sentence and missed words.
 - AI no longer depends on `MOCK`, which now only controls PayPal.
 - If Gemini fails (quota, network, bad answer), the rules parser and MyMemory take over and the card says so.
 - **Tested with a stand-in client only (107 tests).** Not yet run against real Gemini: needs `GEMINI_API_KEY` in `.env`.
-  Then run `npm run eval -- --extractor=gemini`, which writes `docs/eval-gemini.md`.
+  Then run `npm run eval -- --extractor=gemini`, which writes `docs/eval/eval-gemini.md`.
 - Free-tier content is used to improve Google's products; the Send page says so. Exact free limits aren't published in
   the docs (they're shown in AI Studio), so the eval is paced at 7 s per request.
 
@@ -232,7 +232,7 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
 - **Offline parser for real speech:** number words (en/es/pt/hi/te/ar, typed confirmation still required), "12 dollars
   34 cents", spelling variants of names, refuses two different amounts, recognises more foreign currencies.
 - **Ambiguous names** now show tappable contact buttons.
-- **Tested:** 102 tests; eval 48/48 and 9/9 (`docs/eval.md`, same caveats). Live MyMemory te → es. Mic code driven by a
+- **Tested:** 102 tests; eval 48/48 and 9/9 (`docs/eval/eval.md`, same caveats). Live MyMemory te → es. Mic code driven by a
   **stand-in recogniser**, because the app's Browser pane blocks microphones.
 - **Real voice:** Vrinda tried Hindi in Chrome (Nov 6) and reported poor recognition and a failing flow. Telugu by real
   voice is not confirmed. The server had 14 understand requests and only 3 stored drafts, all English.
@@ -324,7 +324,7 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
   release after the window (status page polling or `npm run release-holds`). Low risk releases straight away.
 - **Checked in the browser (mock mode):** Telugu "send 12.34 to Manuel Lopes urgently" → high risk with 4 reasons →
   Telugu hold screen → cancel → **VOIDED**. Low-risk English send → **COMPLETED**.
-- **Eval** (`npm run eval` → `docs/eval.md`): 50 team-written scenarios. Offline rules run: 41/41 pipeline,
+- **Eval** (`npm run eval` → `docs/eval/eval.md`): 50 team-written scenarios. Offline rules run: 41/41 pipeline,
   9/9 deliberately wrong model outputs caught by code. Caveats in the doc (same team wrote parser and scenarios).
 - **65 tests**, typecheck clean.
 
@@ -352,7 +352,7 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
 
 - Keys in `.env`: PayPal client id/secret ✅ (OAuth verified; all 10 webhook event types exist), Soniox ✅, sandbox emails ✅.
 - Demo personas renamed to match the real sandbox accounts: **Sreenivas Rao** (sender), **Manuel Lopez** (intended), **Manuel Lopes** (look-alike), **Verbo** (platform business).
-- `languages.json` generated from Soniox: **60 languages, all tier B** (real-time STT + translation reported by the provider; none native-reviewed yet). See `docs/language-coverage.md`.
+- `languages.json` generated from Soniox: **60 languages, all tier B** (real-time STT + translation reported by the provider; none native-reviewed yet). See `docs/guides/language-coverage.md`.
 - `money-loop` now takes `--wait=<minutes>`.
 
 ### Voice send (built today)
@@ -388,7 +388,7 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
 ### Next (Day 3)
 1. Pre-send risk scoring (similar name, unusual amount, first-time, pressure language, language mismatch) + 10-minute hold UI.
 2. Persist transfers + webhook events in the DB; wire `/paypal/return` to authorize and run the hold.
-3. `scripts/eval.ts` over scripted scenarios → `docs/eval.md`; rerun the speech spike once Soniox has credit.
+3. `scripts/eval.ts` over scripted scenarios → `docs/eval/eval.md`; rerun the speech spike once Soniox has credit.
 
 ## Day 1 — Wed Nov 4, 2026
 
@@ -402,8 +402,8 @@ Soniox has no credit left and no Anthropic key is set, so voice and translation 
 - **`scripts/money-loop.ts`:** all three paths pass in `--mock` mode. **Not yet run live** (needs keys).
 - **Webhook endpoint** `POST /api/paypal/webhook`: signature verification, de-dupe by event id (tested locally). `scripts/register-webhook.ts` registers it.
 - **DB:** embedded **PGlite** locally (Docker is installed but not running, and the disk is nearly full); Postgres on Render later. First migration is tested.
-- **`scripts/gen-languages.ts`:** written; generates `languages.json` + `docs/language-coverage.md` from Soniox `/v1/models`. **Not run** (needs `SONIOX_API_KEY`).
-- **`docs/STRATEGY.md`:** written from the official rules page.
+- **`scripts/gen-languages.ts`:** written; generates `languages.json` + `docs/guides/language-coverage.md` from Soniox `/v1/models`. **Not run** (needs `SONIOX_API_KEY`).
+- **`docs/plan/STRATEGY.md`:** written from the official rules page.
 
 ### Blocked / not done
 - **Disk space:** the Mac had **38 MB free** when we started. I cleared npm's cache (2.6 GB, packages only); **~1.2 GB is free now.** AG Grid, PDF and audio libraries need more.

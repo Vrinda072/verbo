@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
-import { En } from "@/components/En";
-import { NameDiff } from "@/components/NameDiff";
-import { Digits } from "@/components/Digits";
-import { MoneyPath } from "@/components/MoneyPath";
+import { En } from "@/components/ui/En";
+import { NameDiff } from "@/components/ui/NameDiff";
+import { Digits } from "@/components/ui/Digits";
+import { MoneyPath } from "@/components/ui/MoneyPath";
 
 const ar = labelsFor("ar");
 const te = labelsFor("te");

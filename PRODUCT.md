@@ -80,7 +80,7 @@ into PayPal while being its own design.
 - Working flows: Send, Examples (`/demo`), recovery (`/recover/[token]`), Case Desk (`/desk`), payment status with the PayPal
   calls behind it.
 - Synthetic data only: about 300 seeded cases and simulated contacts, each labelled "simulated" in the UI and the data.
-- Evaluation numbers come only from Verbo's own scripted scenarios (`scripts/eval.ts`, `docs/eval.md`) and must say so.
+- Evaluation numbers come only from Verbo's own scripted scenarios (`scripts/eval.ts`, `docs/eval/eval.md`) and must say so.
 - No real users, testimonials, partners, adoption figures or loss statistics exist. Do not invent them.
 
 ## Product Principles

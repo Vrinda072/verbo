@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 import { DemoStage } from "./DemoStage";
 import { TrapExplorer } from "./TrapExplorer";
 

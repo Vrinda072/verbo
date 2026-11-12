@@ -1,5 +1,5 @@
 /** What each side of a case may see. No emails, no PayPal ids, sender shown by short name to the recipient. */
-import { SENDER } from "@/lib/contacts";
+import { SENDER } from "@/lib/people/contacts";
 import { numbersOf } from "@/lib/bridge/translate";
 import { caseDetail } from "./service";
 

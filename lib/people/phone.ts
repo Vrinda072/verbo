@@ -3,7 +3,7 @@
  * a number one digit away (one digit changed, or two neighbours swapped) is flagged with the contact it nearly is.
  */
 import { normalizeDigits } from "@/lib/agents/numbers";
-import { CONTACTS, PEOPLE, type Contact } from "@/lib/contacts";
+import { CONTACTS, PEOPLE, type Contact } from "@/lib/people/contacts";
 
 export const digitsOf = (s: string) => normalizeDigits(s).replace(/\D/g, "");
 

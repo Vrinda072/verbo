@@ -1,7 +1,7 @@
 /** Read models for the Case Desk. Live sandbox cases and simulated ones share tables; `simulated` tells them apart. */
 import { desc, inArray, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { personById } from "@/lib/contacts";
+import { personById } from "@/lib/people/contacts";
 import { evidenceScore } from "@/lib/evidence/meter";
 import type { RiskAssessment } from "@/lib/risk/score";
 

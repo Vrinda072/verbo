@@ -3,7 +3,7 @@
  * miss, so reminders wait for their daytime. The time zone comes from the contact; a name we don't know falls back to
  * a common zone for the language.
  */
-import { PEOPLE } from "@/lib/contacts";
+import { PEOPLE } from "@/lib/people/contacts";
 
 const BY_LANGUAGE: Record<string, string> = {
   en: "America/New_York",

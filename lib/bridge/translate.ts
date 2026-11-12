@@ -9,9 +9,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import { geminiJson, realGeminiCreate, type GeminiCreate } from "@/lib/ai/gemini";
+import { geminiJson, realGeminiCreate, type GeminiCreate } from "@/lib/agents/gemini";
 import { normalizeDigits } from "@/lib/agents/numbers";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 export interface Translation {
   text: string | null;

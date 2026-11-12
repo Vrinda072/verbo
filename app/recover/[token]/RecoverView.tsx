@@ -1,7 +1,7 @@
 "use client";
-import { En, EnText, Tpl } from "@/components/En";
+import { En, EnText, Tpl } from "@/components/ui/En";
 import { useCallback, useEffect, useState } from "react";
-import { Logo } from "@/components/SiteHeader";
+import { Logo } from "@/components/ui/SiteHeader";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { formatAmount, labelsFor } from "@/lib/bridge/readback";
 import type { RecipientView } from "@/lib/recovery/views";

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 import { publicView, tick } from "@/lib/transfers/service";
 import { TransferStatus } from "./TransferStatus";
 import { caseForTransfer } from "@/lib/recovery/service";

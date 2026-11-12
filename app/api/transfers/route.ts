@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createTransferFromDraft, publicView, TransferError } from "@/lib/transfers/service";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 
 export const dynamic = "force-dynamic";
 

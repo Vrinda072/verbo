@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { formatAmount } from "@/lib/bridge/readback";
 import { LANGUAGES } from "@/lib/bridge/readback";
-import { log } from "@/lib/log";
+import { log } from "@/lib/core/log";
 import { money, MAX_SANDBOX_CENTS } from "@/lib/paypal/money";
-import { digitsOf, lookupNumber } from "@/lib/phone";
-import { overLimit } from "@/lib/rateLimit";
+import { digitsOf, lookupNumber } from "@/lib/people/phone";
+import { overLimit } from "@/lib/core/rateLimit";
 import { createNumberDraft, summarizeRisk } from "@/lib/transfers/service";
 
 export const dynamic = "force-dynamic";

@@ -6,7 +6,7 @@
  *   npm run speech-spike -- --only=es    # one language
  *   npm run speech-spike -- --file=clip.m4a --lang=te --expect=c_lopez:1234   # a real recording
  *
- * Results are written to docs/speech-spike.md. Synthetic voices are NOT real speakers; the doc says so.
+ * Results are written to docs/eval/speech-spike.md. Synthetic voices are NOT real speakers; the doc says so.
  * Needs SONIOX_API_KEY, macOS `say`, and ffmpeg.
  */
 import "dotenv/config";
@@ -18,7 +18,7 @@ import WebSocket from "ws";
 import { buildConfig, mintTemporaryKey, SONIOX_AUTH_PROTOCOL, SONIOX_WS_URL, TranscriptAccumulator, type SonioxResponse } from "@/lib/speech/soniox";
 import { understand } from "@/lib/agents/extraction";
 import { getExtractor } from "@/lib/agents/extraction";
-import { CONTACTS } from "@/lib/contacts";
+import { CONTACTS } from "@/lib/people/contacts";
 
 interface Case {
   lang: string;
@@ -105,7 +105,7 @@ async function main() {
   console.log(`\n${pass}/${cases.length} passed (extractor: ${extractor.kind})`);
   if (!file && !arg("only")) {
     writeFileSync(
-      "docs/speech-spike.md",
+      "docs/eval/speech-spike.md",
       `# Speech spike (${new Date().toISOString().slice(0, 10)})\n\n` +
         `Pipeline: macOS \`say\` **synthetic voice** → Soniox \`stt-rt-v6\` over WebSocket (temporary key, same path as the browser) → ` +
         `extraction (\`${extractor.kind}\`) → code validation. **These are synthetic voices, not real speakers; they say nothing about accuracy for real users.** ` +
@@ -113,7 +113,7 @@ async function main() {
         `Result: **${pass}/${cases.length}** cases resolved to the expected recipient and amount.\n\n` +
         `| Lang | Audio | Transcript | Detected | Validated as | OK |\n|---|---|---|---|---|---|\n${rows.join("\n")}\n`,
     );
-    console.log("Wrote docs/speech-spike.md");
+    console.log("Wrote docs/eval/speech-spike.md");
   }
 }
 

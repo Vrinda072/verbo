@@ -1,6 +1,6 @@
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 import { SendFlow } from "./SendFlow";
-import { config } from "@/lib/config";
+import { config } from "@/lib/core/config";
 
 export const metadata = { title: "Send" };
 export const dynamic = "force-dynamic";
