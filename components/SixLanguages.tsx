@@ -4,12 +4,25 @@ import { useEffect, useState } from "react";
 import { formatAmount, labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 import { money } from "@/lib/paypal/money";
 
-const CODES = ["hi", "te", "ar", "pt", "es", "en"];
+const CODES = ["en", "hi", "te", "ar", "pt", "es"];
 const AMOUNT = money(4000);
 const RECIPIENT = "Manuel Lopes";
 const EN = labelsFor("en");
 
-/** One payment in each read-back language. The written amount changes by language; the checked value never does. */
+/** The recipient's Latin-script name kept in its own direction inside a right-to-left sentence. */
+function withName(text: string) {
+  const i = text.indexOf(RECIPIENT);
+  if (i < 0) return text;
+  return (
+    <>
+      {text.slice(0, i)}
+      <bdi dir="ltr">{RECIPIENT}</bdi>
+      {text.slice(i + RECIPIENT.length)}
+    </>
+  );
+}
+
+/** One payment in each read-back language. The words change by language; the amount is written $40.00 in all of them. */
 function line(code: string) {
   const L = labelsFor(code);
   const info = LANGUAGES.find((l) => l.code === code)!;
@@ -22,7 +35,7 @@ function line(code: string) {
     english: info.englishName,
     native: info.nativeName,
     confirm: L.t("confirm"),
-    // The English subtitle, with the amount written the way this language writes it.
+    // The English subtitle.
     subtitle: code === "en" ? null : EN.t("readback", { amount: formatAmount(AMOUNT, "en").localized, recipient: RECIPIENT }),
     confirmEn: code === "en" ? null : EN.t("confirm"),
     before: at < 0 ? text : text.slice(0, at),
@@ -32,7 +45,7 @@ function line(code: string) {
 }
 
 export function SixLanguages() {
-  const [code, setCode] = useState("hi");
+  const [code, setCode] = useState("en");
   // One orchestrated movement on the page: the read-back steps through the six languages.
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -65,12 +78,12 @@ export function SixLanguages() {
         <div className="flex flex-col gap-6 rounded-[28px] bg-navy p-7 text-navy-ink sm:p-9">
           <p className="text-navy-ink/75">Read back to you in {cur.english}</p>
           <p key={cur.code} lang={cur.code} dir={cur.dir} className="v-rise text-3xl font-semibold leading-snug sm:text-4xl">
-            {cur.before}
+            {withName(cur.before)}
             {cur.amount && <bdi dir="ltr" className="whitespace-nowrap rounded-[10px] bg-signal px-2.5 text-navy">{cur.amount.replace(/[\u200e\u200f]/g, "")}</bdi>}
-            {cur.after}
+            {withName(cur.after)}
           </p>
           {cur.subtitle && (
-            <p key={`${cur.code}-en`} lang="en" className="v-sub v-sub-on-dark -mt-3 text-lg">
+            <p key={`${cur.code}-en`} lang="en" dir="ltr" className="v-sub v-sub-on-dark -mt-3 text-lg">
               {cur.subtitle}
             </p>
           )}
@@ -118,9 +131,9 @@ export function SixLanguages() {
             >
               <span className="text-sm text-ink-3 max-sm:col-span-2">{l.english}</span>
               <span lang={l.code} dir={l.dir} className="text-xl leading-snug">
-                {l.before}
+                {withName(l.before)}
                 <bdi dir="ltr" className="border-b-[3px] border-signal">{l.amount.replace(/[\u200e\u200f]/g, "")}</bdi>
-                {l.after}
+                {withName(l.after)}
                 {l.subtitle && (
                   <span lang="en" dir="ltr" className="v-sub">
                     {l.subtitle}
@@ -131,7 +144,7 @@ export function SixLanguages() {
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-sm text-ink-3">The right-hand column is the value code checks. How it is written changes by language. The value never does.</p>
+        <p className="mt-3 text-sm text-ink-3">The words change by language. The amount is written the same way in every one of them, and the right-hand column is the value code checks.</p>
       </section>
     </>
   );

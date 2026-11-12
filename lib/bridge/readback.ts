@@ -13,7 +13,10 @@ export type TemplateKey =
   | "rc_returned" | "rc_refused" | "rc_untranslated" | "rc_translated" | "rc_expired"
   | "ask_back" | "case_sent" | "returned_sender" | "ask_which" | "ask_amount" | "ask_recipient"
   | "ask_same_sound" | "ask_option_known" | "ask_option_new" | "word_one" | "word_two"
-  | "numbers_checked" | "show_original" | "show_translation" | "number_near";
+  | "numbers_checked" | "show_original" | "show_translation" | "number_near"
+  | "s_heading" | "s_step_speak" | "s_step_check" | "s_step_approve" | "s_say" | "s_type" | "s_pay_number" | "s_phone"
+  | "s_amount" | "s_check" | "s_problem" | "s_which" | "s_asking" | "s_answer" | "opt_paid" | "opt_new"
+  | "near_title" | "near_body" | "near_pay" | "near_anyway" | "near_edit";
 
 interface TemplateEntry {
   source: "authored" | "machine" | "native";
@@ -28,6 +31,10 @@ export const PLACEHOLDERS: Partial<Record<TemplateKey, string[]>> = {
   ask_which: ["a", "b"],
   numbers_checked: ["numbers"],
   number_near: ["contact"],
+  near_title: ["contact"],
+  near_body: ["owner", "city", "language"],
+  near_pay: ["contact"],
+  near_anyway: ["owner"],
   ask_option_known: ["n", "name", "letter"],
   ask_option_new: ["n", "name", "letter"],
   lookalike: ["other"],
@@ -64,6 +71,8 @@ export interface ReadbackLabels {
   machineTranslated: boolean;
   reviewed: boolean;
   t: (key: TemplateKey, vars?: Record<string, string>) => string;
+  /** The template split into literal text and filled-in values, so a screen can isolate each value's direction. */
+  parts: (key: TemplateKey, vars?: Record<string, string>) => { text: string; value?: string }[];
 }
 
 export function langDir(code: string): "ltr" | "rtl" {
@@ -83,12 +92,33 @@ export function labelsFor(lang: string): ReadbackLabels {
     machineTranslated: e.source === "machine",
     reviewed: e.reviewed,
     t: (key, vars = {}) => e.strings[key].replace(/\{(\w+)\}/g, (_m, k: string) => vars[k] ?? `{${k}}`),
+    parts: (key, vars = {}) =>
+      e.strings[key]
+        .split(/(\{\w+\})/)
+        .filter(Boolean)
+        .map((seg) => {
+          const m = /^\{(\w+)\}$/.exec(seg);
+          return m ? { text: vars[m[1]] ?? seg, value: m[1] } : { text: seg };
+        }),
   };
 }
 
-/** Amount formatted by code (Intl), in the speaker's locale, plus a plain-digit version for the big display. */
-export function formatAmount(m: Money, lang: string): { localized: string; digits: string } {
-  const localized = new Intl.NumberFormat(lang, { style: "currency", currency: m.currency }).format(m.cents / 100);
+/**
+ * Amount formatted by code (Intl). Always written the American way ("$40.00"), whatever the language around it, so the
+ * figure a sender checks is identical in every read-back. `lang` is kept for callers; it no longer changes the format.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept so existing callers stay valid
+export function formatAmount(m: Money, _lang?: string): { localized: string; digits: string } {
+  const localized = new Intl.NumberFormat("en-US", { style: "currency", currency: m.currency }).format(m.cents / 100);
   const digits = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(m.cents / 100);
   return { localized, digits };
+}
+
+/** A language's name written in the reader's own language ("Arabic" reads "अरबी" in Hindi). */
+export function languageNameIn(code: string, readerLang: string): string {
+  try {
+    return new Intl.DisplayNames([readerLang], { type: "language" }).of(code) ?? code;
+  } catch {
+    return LANGUAGES.find((l) => l.code === code)?.englishName ?? code;
+  }
 }

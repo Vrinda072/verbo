@@ -1,5 +1,5 @@
 "use client";
-import { En, EnText } from "@/components/En";
+import { En, EnText, Tpl } from "@/components/En";
 import { useCallback, useEffect, useState } from "react";
 import { labelsFor, LANGUAGES } from "@/lib/bridge/readback";
 import type { SenderCaseView } from "@/lib/recovery/views";
@@ -113,12 +113,12 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
     <div className="mt-8 border-t border-line pt-6 text-left">
       {returned ? (
         <p lang={L.usedLang} dir={L.dir} className="rounded-v bg-brand-soft p-4 text-lg font-semibold text-brand">
-          {L.t("returned_sender", { recipient: c.recipientName })}
+          <Tpl L={L} k="returned_sender" vars={{ recipient: c.recipientName }} />
           <En L={L} k="returned_sender" vars={{ recipient: c.recipientName }} />
         </p>
       ) : (
         <p lang={L.usedLang} dir={L.dir} className="rounded-v bg-sky-soft p-4 font-semibold">
-          {L.t("case_sent", { recipient: c.recipientName })}
+          <Tpl L={L} k="case_sent" vars={{ recipient: c.recipientName }} />
           <En L={L} k="case_sent" vars={{ recipient: c.recipientName }} />
         </p>
       )}

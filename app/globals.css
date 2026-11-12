@@ -256,3 +256,11 @@ a {
 [dir="rtl"] button .v-sub {
   text-align: center;
 }
+
+/* Read-back stage: the checked amount sits on a Signal Blue highlight inside the sentence. */
+.v-stage bdi.tabular-nums {
+  background: var(--v-signal);
+  color: var(--v-navy);
+  border-radius: 10px;
+  padding: 0 0.35em;
+}

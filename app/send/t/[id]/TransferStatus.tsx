@@ -1,5 +1,5 @@
 "use client";
-import { En } from "@/components/En";
+import { En, Tpl } from "@/components/En";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { labelsFor } from "@/lib/bridge/readback";
@@ -176,7 +176,7 @@ export function TransferStatus({ initial, caseId }: { initial: TransferView; cas
         <>
           <Check />
           <h1 lang={L.usedLang} dir={L.dir} className="mt-3 text-2xl font-semibold text-success">
-            {L.t("sent", { recipient: t.recipientName })}
+            <Tpl L={L} k="sent" vars={{ recipient: t.recipientName }} />
           </h1>
           {showEnglish && <p className="mt-1 text-ink-3">{en.t("sent", { recipient: t.recipientName })}</p>}
           <SenderCase transferId={t.id} lang={t.language} initialCaseId={caseId} />

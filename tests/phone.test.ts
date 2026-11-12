@@ -12,25 +12,25 @@ beforeAll(() => {
 
 describe("one digit off", () => {
   it("finds a changed digit and a swapped pair, and nothing further", () => {
-    expect(oneDigitApart("919848022339", "919848022338")).toEqual([11]);
-    expect(oneDigitApart("919848022383", "919848022338")).toEqual([10, 11]);
-    expect(oneDigitApart("919848022399", "919848022338")).toBeNull();
-    expect(oneDigitApart("919848022338", "919848022338")).toBeNull();
+    expect(oneDigitApart("14085550139", "14085550138")).toEqual([10]);
+    expect(oneDigitApart("14085550183", "14085550138")).toEqual([9, 10]);
+    expect(oneDigitApart("14085550199", "14085550138")).toBeNull();
+    expect(oneDigitApart("14085550138", "14085550138")).toBeNull();
   });
 
   it("matches a contact's own number exactly", () => {
-    expect(lookupNumber("+91 98480 22338")).toEqual({ owner: CONTACTS.find((c) => c.id === "c_kiran"), near: null });
+    expect(lookupNumber("+1 (408) 555-0138")).toEqual({ owner: CONTACTS.find((c) => c.id === "c_kiran"), near: null });
   });
 
   it("names the stranger a mistyped number reaches, and the contact it nearly was", () => {
-    const r = lookupNumber("+91 98480 22339");
+    const r = lookupNumber("+1 (408) 555-0139");
     expect(r.owner?.name).toBe("Fatima Haddad");
     expect(r.owner?.language).toBe("ar");
     expect(r.near?.contact.name).toBe("Kiran Reddy");
   });
 
   it("reads digits in other scripts", () => {
-    expect(digitsOf("+९१ ९८४८० २२३३९")).toBe("919848022339");
+    expect(digitsOf("+१ (४०८) ५५५-०१३९")).toBe("14085550139");
   });
 
   it("gives every stranger a different language from the contact they nearly are", () => {

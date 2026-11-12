@@ -25,3 +25,23 @@ export function EnText({ text, show = true, className = "" }: { text: string | n
     </span>
   );
 }
+
+/**
+ * A template line in the reader's language with every filled-in value (amount, name, number) isolated left-to-right,
+ * so "$40.00" stays "$40.00" inside Arabic and a Latin name never reorders the sentence around it.
+ */
+export function Tpl({ L, k, vars }: { L: ReadbackLabels; k: TemplateKey; vars?: Record<string, string> }) {
+  return (
+    <>
+      {L.parts(k, vars).map((p, i) =>
+        p.value ? (
+          <bdi key={i} dir="ltr" className={p.value === "amount" ? "whitespace-nowrap tabular-nums" : undefined}>
+            {p.text.replace(/[\u200e\u200f\u061c]/g, "")}
+          </bdi>
+        ) : (
+          <span key={i}>{p.text}</span>
+        ),
+      )}
+    </>
+  );
+}

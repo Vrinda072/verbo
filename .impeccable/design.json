@@ -454,7 +454,7 @@
       "kind": "input",
       "refersTo": "input",
       "description": "Phone and amount fields: large tabular text, blue outline on focus.",
-      "html": "<label class=\"ds-field\">Phone number<input class=\"ds-input\" placeholder=\"+91 98480 22339\" inputmode=\"tel\"></label>",
+      "html": "<label class=\"ds-field\">Phone number<input class=\"ds-input\" placeholder=\"+1 (408) 555-0139\" inputmode=\"tel\"></label>",
       "css": ".ds-field{display:grid;gap:4px;font:400 .875rem/1.4 'Noto Sans',system-ui,sans-serif;color:var(--v-ink-3,#4d6189)}.ds-input{min-height:48px;padding:0 16px;border:2px solid var(--v-line,#dce6f5);border-radius:12px;background:#fff;color:var(--v-ink,#071a4d);font-size:1.125rem;font-variant-numeric:tabular-nums;outline:none;caret-color:var(--v-brand,#0b5cd6)}.ds-input::placeholder{color:var(--v-placeholder,#5f7096)}.ds-input:focus{border-color:var(--v-brand,#0b5cd6)}"
     },
     {
@@ -493,7 +493,7 @@
       "name": "Digit Diff",
       "kind": "custom",
       "description": "Signature: two numbers with the differing digit marked.",
-      "html": "<div class=\"ds-diff\"><span>You typed</span><b>+91984802233<mark>9</mark></b><span>Kiran Reddy</span><b>+91984802233<mark>8</mark></b></div>",
+      "html": "<div class=\"ds-diff\"><span>You typed</span><b>+1408555013<mark>9</mark></b><span>Kiran Reddy</span><b>+1408555013<mark>8</mark></b></div>",
       "css": ".ds-diff{display:grid;grid-template-columns:auto 1fr;gap:8px 24px;align-items:baseline;padding:12px 16px;background:var(--v-paper,#f4f7fc);border-radius:12px;font:400 .875rem/1.4 'Noto Sans',system-ui,sans-serif;color:var(--v-ink-3,#4d6189)}.ds-diff b{justify-self:end;color:var(--v-ink,#071a4d);font-size:1.125rem;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.02em}.ds-diff mark{background:var(--v-marigold-soft,#fff4e0);color:var(--v-marigold-ink,#6b3a00);border-radius:4px;padding:0 2px;text-decoration:underline 2px var(--v-marigold,#a85300);text-underline-offset:2px}"
     }
   ],
