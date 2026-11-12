@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="Noto Sans, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <title>How a Verbo payment works</title>
+  <desc>Speech goes through speech-to-text and Gemini into a strict schema; code validates the name and amount and scores risk; a fixed template reads the payment back in the sender's language; the sender confirms and approves on PayPal; PayPal authorizes, holds risky payments for 10 minutes, then captures and pays out, or voids. After a mistake, the recipient gets a signed link to a page in their language and can return the money.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4d6189"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0d7a48"/></marker>
+  </defs>
+  <rect width="960" height="520" rx="20" fill="#f4f7fc"/>
+
+  <!-- lane 1 -->
+  <text x="32" y="44" font-size="15" font-weight="700" fill="#071a4d">Before money moves</text>
+  <text x="32" y="64" font-size="12" fill="#4d6189">AI helps with the words. Code decides the money.</text>
+
+  <g font-size="13">
+    <rect x="32" y="84" width="150" height="92" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="48" y="110" font-weight="700" fill="#071a4d">1 · Speak</text>
+    <text x="48" y="132" fill="#34476b">Any of 6 read-back</text>
+    <text x="48" y="150" fill="#34476b">languages</text>
+    <text x="48" y="168" font-size="11" fill="#4d6189">Groq Whisper</text>
+
+    <rect x="214" y="84" width="150" height="92" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="230" y="110" font-weight="700" fill="#071a4d">2 · Extract</text>
+    <text x="230" y="132" fill="#34476b">Into a strict zod</text>
+    <text x="230" y="150" fill="#34476b">schema</text>
+    <text x="230" y="168" font-size="11" fill="#4d6189">Gemini · rules fallback</text>
+
+    <rect x="396" y="84" width="168" height="92" rx="14" fill="#071a4d"/>
+    <text x="412" y="110" font-weight="700" fill="#fff">3 · Code checks</text>
+    <text x="412" y="132" fill="#dbe7fb">Amount must match</text>
+    <text x="412" y="150" fill="#dbe7fb">what was said</text>
+    <text x="412" y="168" font-size="11" fill="#8fd3ff">names · numbers · risk</text>
+
+    <rect x="596" y="84" width="160" height="92" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="612" y="110" font-weight="700" fill="#071a4d">4 · Read back</text>
+    <text x="612" y="132" fill="#34476b">Fixed template in their</text>
+    <text x="612" y="150" fill="#34476b">language + English</text>
+    <text x="612" y="168" font-size="11" fill="#4d6189">ElevenLabs voice</text>
+
+    <rect x="788" y="84" width="140" height="92" rx="14" fill="#0b5cd6"/>
+    <text x="804" y="110" font-weight="700" fill="#fff">5 · Confirm</text>
+    <text x="804" y="132" fill="#e7f0fc">A tap, then</text>
+    <text x="804" y="150" fill="#e7f0fc">approval on</text>
+    <text x="804" y="168" fill="#e7f0fc">PayPal</text>
+  </g>
+  <g stroke="#4d6189" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="184" y1="130" x2="211" y2="130"/>
+    <line x1="366" y1="130" x2="393" y2="130"/>
+    <line x1="566" y1="130" x2="593" y2="130"/>
+    <line x1="758" y1="130" x2="785" y2="130"/>
+  </g>
+
+  <!-- PayPal lane -->
+  <path d="M858 178 V214 H120 V240" fill="none" stroke="#4d6189" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="136" y="234" font-size="12" fill="#4d6189">PayPal sandbox</text>
+  <g font-size="13">
+    <rect x="32" y="244" width="190" height="64" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="48" y="270" font-weight="700" fill="#071a4d">Authorize</text>
+    <text x="48" y="290" font-size="11" fill="#4d6189">Orders v2 · APIMatic SDK</text>
+
+    <rect x="254" y="244" width="210" height="64" rx="14" fill="#fff4e0"/>
+    <text x="270" y="270" font-weight="700" fill="#6b3a00">Hold if risky: 10 min</text>
+    <text x="270" y="290" font-size="11" fill="#6b3a00">Cancel = void, nothing moves</text>
+
+    <rect x="496" y="244" width="200" height="64" rx="14" fill="#e4f5ec"/>
+    <text x="512" y="270" font-weight="700" fill="#0d7a48">Capture + payout</text>
+    <text x="512" y="290" font-size="11" fill="#0d7a48">Payments v2 · Payouts v1</text>
+
+    <rect x="728" y="244" width="200" height="64" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="744" y="270" font-weight="700" fill="#071a4d">Idempotency keys</text>
+    <text x="744" y="290" font-size="11" fill="#4d6189">on every money call</text>
+  </g>
+  <g stroke="#4d6189" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="224" y1="276" x2="251" y2="276"/>
+    <line x1="466" y1="276" x2="493" y2="276"/>
+  </g>
+
+  <!-- lane 2 -->
+  <line x1="32" y1="340" x2="928" y2="340" stroke="#dce6f5"/>
+  <text x="32" y="372" font-size="15" font-weight="700" fill="#071a4d">After a mistake</text>
+  <text x="32" y="392" font-size="12" fill="#4d6189">The recipient is treated as someone who wants to help.</text>
+  <g font-size="13">
+    <rect x="32" y="412" width="200" height="76" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="48" y="438" font-weight="700" fill="#071a4d">Open a case</text>
+    <text x="48" y="458" fill="#34476b">Coach drafts a polite</text>
+    <text x="48" y="476" fill="#34476b">request; sender edits it</text>
+
+    <rect x="264" y="412" width="210" height="76" rx="14" fill="#fff" stroke="#dce6f5"/>
+    <text x="280" y="438" font-weight="700" fill="#071a4d">Signed, expiring link</text>
+    <text x="280" y="458" fill="#34476b">Page in the recipient's</text>
+    <text x="280" y="476" fill="#34476b">language, two-way chat</text>
+
+    <rect x="506" y="412" width="190" height="76" rx="14" fill="#e4f5ec"/>
+    <text x="522" y="438" font-weight="700" fill="#0d7a48">One-tap return</text>
+    <text x="522" y="458" fill="#0d7a48">Recipient approves</text>
+    <text x="522" y="476" fill="#0d7a48">on PayPal</text>
+
+    <rect x="728" y="412" width="200" height="76" rx="14" fill="#071a4d"/>
+    <text x="744" y="438" font-weight="700" fill="#fff">Case Desk</text>
+    <text x="744" y="458" fill="#dbe7fb">Deadlines, reminders in</text>
+    <text x="744" y="476" fill="#dbe7fb">their daytime, evidence</text>
+  </g>
+  <g stroke="#4d6189" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="234" y1="450" x2="261" y2="450"/>
+    <line x1="476" y1="450" x2="503" y2="450"/>
+    <line x1="698" y1="450" x2="725" y2="450"/>
+  </g>
+</svg>
