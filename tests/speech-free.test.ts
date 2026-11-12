@@ -143,6 +143,32 @@ describe("Whisper transcription (stand-in server, no network)", () => {
     await expect(transcribe(input, (async () => { throw new Error("down"); }) as never, "k")).rejects.toMatchObject({ code: "busy" });
   });
 
+  it("trims a pasted key and says why a call failed without logging the key", async () => {
+    const { transcribe } = await import("@/lib/speech/transcribe");
+    let auth = "";
+    await transcribe(
+      input,
+      (async (_u: string, init: RequestInit) => {
+        auth = (init.headers as Record<string, string>).Authorization;
+        return json({ text: "ok" });
+      }) as never,
+      "  test-key\r\n",
+    );
+    expect(auth).toBe("Bearer test-key");
+    await expect(transcribe(input, fetch, "  \n")).rejects.toMatchObject({ code: "not_configured" });
+    await expect(transcribe(input, (async () => json({}, 429)) as never, "k")).rejects.toMatchObject({ code: "busy", detail: { status: 429 } });
+    await expect(transcribe(input, (async () => json({}, 401)) as never, "k")).rejects.toMatchObject({ code: "failed", detail: { status: 401 } });
+    const refused = Object.assign(new TypeError("fetch failed"), { cause: { code: "ECONNREFUSED" } });
+    await expect(transcribe(input, (async () => { throw refused; }) as never, "k")).rejects.toMatchObject({
+      code: "busy",
+      detail: { error: "TypeError ECONNREFUSED" },
+    });
+    // A header error quotes the header value; only the error's name may reach the log.
+    const badHeader = new TypeError('Headers.append: "Bearer secret-key" is an invalid header value.');
+    const failed = await transcribe(input, (async () => { throw badHeader; }) as never, "k").catch((e) => e);
+    expect(JSON.stringify(failed.detail)).not.toContain("secret-key");
+  });
+
   it("the route refuses bad requests and says when no key is set, and never echoes audio", async () => {
     const { POST } = await import("@/app/api/stt/transcribe/route");
     const post = (form: FormData) => POST(new Request("http://x/api/stt/transcribe", { method: "POST", body: form }));

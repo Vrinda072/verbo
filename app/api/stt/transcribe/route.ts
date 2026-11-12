@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ text });
   } catch (err) {
     const code = err instanceof TranscribeFailed ? err.code : "failed";
-    log.warn("transcription failed", { code });
+    log.warn("transcription failed", { code, ...(err instanceof TranscribeFailed ? err.detail : {}) });
     return NextResponse.json({ error: code }, { status: code === "empty" ? 422 : 503 });
   }
 }
