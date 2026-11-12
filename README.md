@@ -7,93 +7,135 @@
 Say a payment in your own language. Verbo checks the name and the amount with code, reads the payment back in your
 language, and helps you get the money back if it still goes to the wrong person.
 
-**Live demo: [verbo-371g.onrender.com](https://verbo-371g.onrender.com)**
+**[Live demo](https://verbo-371g.onrender.com)** · **[Run it locally](#run-it-locally)** · **[Tools used](#tools-used)** · **[MIT license](LICENSE)**
+
+<!-- Demo video: add the YouTube link here -->
 
 <img src="docs/img/phone-demo.gif" alt="A simulated phone plays one payment in English, Hindi, Telugu and Arabic: the sender speaks, Verbo asks which of two similar names they mean, reads the payment back with $40.00 checked, and confirms it was sent." width="240">
 
-<sub>The Home page demo: one payment in English, Hindi, Telugu and Arabic. The amount reads $40.00 in every language. Simulated data, no money moves.</sub>
+<sub>One payment in English, Hindi, Telugu and Arabic. The amount reads $40.00 in every language. Simulated data; no money moves.</sub>
 
 </div>
 
-<br>
+## What it is
 
-## Contents
+People send money to family and friends every day in a language that isn't their first. A name that sounds like another
+name, a phone number one digit off, *forty* heard as *fourteen*: small mistakes send money to the wrong person. When that
+person speaks another language, there is often no way to even ask for it back.
 
-[Try it in 60 seconds](#try-it-in-60-seconds) · [Why](#why) · [What makes it different](#what-makes-it-different) · [What you see](#what-you-see) · [How it works](#how-it-works) · [Does it work?](#does-it-work) · [Built with](#built-with) · [Run it locally](#run-it-locally) · [Limits and what's next](#limits-and-whats-next) · [References](#references) · [Layout](#repository-layout)
+Verbo is a safety layer for PayPal person-to-person payments. The words can change between languages; the name and the
+amount can't. An AI model only turns speech into structured fields. Code checks them, a fixed template reads them back, and
+the person confirms before PayPal approves anything.
 
-## Try it in 60 seconds
+## Features
 
-The live site runs in mock mode: no PayPal login is needed, and no money moves.
+**Before the money moves**
 
-1. Open **[verbo-371g.onrender.com](https://verbo-371g.onrender.com)**. It runs on Render's free plan, so the first visit after
-   15 idle minutes can take up to a minute to wake up.
-2. On **Home**, pick a language under the phone and watch the same payment play in it.
-3. Go to **Send**, choose *Type instead*, and type `Send 40 dollars to Manuel`. Verbo asks which Manuel you mean, because two
-   contacts sound the same.
-4. On **Send**, choose *Pay a phone number*, enter `+1 (408) 555-0139` and `60`. Verbo stops: that number is one digit off
-   Kiran Reddy's, and it belongs to someone who reads PayPal in Arabic.
-5. Open **Examples** for three short stories, and **Case Desk** for the operator view.
+- **Speak or type a payment** in English, Hindi, Telugu, Spanish, Portuguese or Arabic (right to left).
+- **Read-back in your language**, from a fixed template with English underneath. The amount is always written `$40.00`, and
+  it is read aloud.
+- **Names that sound the same.** Two contacts called Lopez and Lopes? Verbo asks which one, out loud, in your language.
+- **A number one digit off.** Verbo stops, shows who the number really reaches and the language they read, and offers the
+  contact you probably meant.
+- **Amounts said in words** must be typed in digits, because *forty* and *fourteen* are easy to mishear.
+- **Risk hold.** Pressure wording, a first payment or an unusual amount raises the risk. Risky payments are authorized on
+  PayPal and held for 10 minutes; one tap cancels and voids the authorization.
 
-## Why
+**After a mistake**
 
-Person-to-person payments assume that the sender and the recipient understand each other. When they don't, small mistakes
-become permanent: a name that sounds like another name, a phone number one digit off, *forty* heard as *fourteen*. Voice
-assistants make paying easier, and they also make these mistakes easier. Verbo is a prototype of a safety layer PayPal could
-build into its own app, so money is not lost to a language barrier.
-
-## What makes it different
-
-- **Language-proof money.** The words change between languages; the name and the amount don't. Every read-back is a fixed
-  template, and code writes the checked values into it. The amount is always written `$40.00`, even inside Arabic.
-- **The AI never decides money.** Gemini only turns speech into a strict schema. Code checks the amount against what was
-  actually said, resolves the recipient, scores the risk and decides whether to hold the payment.
-- **Recovery works across languages.** The person who got the money by mistake gets a private page in their own language,
-  a translated chat, and a one-tap return. They are treated as someone who wants to help.
-- **Every line has English under it.** Anyone helping the sender, a judge or an operator, can follow every screen.
-
-## What you see
+- **Asking for the money back.** AI drafts a polite request; the sender edits and sends it.
+- **A page in the recipient's language.** A signed, expiring link opens a private page with a translated chat and a one-tap
+  return through PayPal.
+- **Case Desk** for operators: every case, a sender × recipient language grid, recovery deadlines on a timeline, and an
+  evidence packet (PDF, JSON and SHA-256) per case.
 
 <table>
 <tr>
 <td width="50%" valign="top">
 <img width="300" src="docs/img/send-readback-ar.png" alt="The Send review card in Arabic: the read-back sentence with $30.00 highlighted and kept left-to-right, the English line under it, the checked amount, and a notice that a contact named Manuel Lopes also exists, with the differing letter marked.">
-<br><b>Read-back in the sender's language.</b> A fixed template in Arabic, with its English under it. The amount stays
-<code>$30.00</code> inside right-to-left text. A sound-alike contact is shown with the one different letter marked.
+<br><b>Read-back in Arabic.</b> The amount stays <code>$30.00</code> inside right-to-left text, and a sound-alike contact is
+shown with the one different letter marked.
 </td>
 <td width="50%" valign="top">
-<img width="360" src="docs/img/wrong-number.png" alt="A warning that the typed number is one digit off Kiran Reddy's number, with both numbers shown and the differing digit marked, who the number belongs to and the language they read, and a button to pay Kiran Reddy instead.">
-<br><b>A number one digit off.</b> Code compares every typed number with every contact's. It shows who the number reaches,
-the language they read, their local time, and offers the contact instead.
+<img width="360" src="docs/img/wrong-number.png" alt="A warning that the typed number is one digit off a contact's number, with both numbers shown and the differing digit marked, who the number belongs to and the language they read, and a button to pay the contact instead.">
+<br><b>A number one digit off.</b> Verbo shows who the number reaches, the language they read and their local time, and
+offers the contact instead.
 </td>
 </tr>
 </table>
 
-<div align="center">
-<img src="docs/img/checks.png" alt="Six checks with an example each: names that sound the same, a number one digit off, amounts said in words, pressure and first payments, a 10-minute hold, and a return page in the recipient's language." width="600">
-</div>
+## Try the live demo
 
-| Check | What happens |
+**[verbo-371g.onrender.com](https://verbo-371g.onrender.com)** runs in mock mode: no PayPal login, no keys, and no money
+moves. It is on Render's free plan, so the first visit after 15 idle minutes can take up to a minute to load.
+
+1. On **Home**, pick a language under the phone and watch the same payment play in it.
+2. Go to **Send**, tap the microphone and say "Send 40 dollars to Manuel" (or choose *Type instead*). Verbo asks which Manuel
+   you mean, because two contacts sound the same.
+3. On **Send**, choose *Pay a phone number* and enter `+1 (408) 555-0158` and `60`. Verbo stops: the number is one digit off
+   Lakshmi Rao's, and it belongs to someone who reads PayPal in Spanish.
+4. Type `Send 300 dollars to Kiran now. It's urgent, don't tell anyone.`, confirm and approve. The payment is held for
+   10 minutes; tap *Cancel this payment* and nothing moves.
+5. Open **Examples** for three short stories, and **Case Desk** for the operator view.
+
+## Run it locally
+
+Requires **Node.js 20 or later**. No keys or database are needed: by default Verbo uses mock PayPal, an offline rules
+parser and an embedded database (PGlite).
+
+```bash
+git clone https://github.com/Vrinda072/verbo.git
+cd verbo
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Open http://localhost:3000.
+
+**Optional keys** (in `.env`; `npm run check-env` lists which are set, by name only):
+
+| Variable | Turns on |
 |---|---|
-| **Names that sound the same** | Compared letter by letter, across scripts. Verbo asks "one or two?" aloud and shows who was paid before. |
-| **A number one digit off** | The payment stops before review and offers the contact you probably meant. |
-| **Amounts said in words** | *Forty* and *fourteen* are easy to mishear, so an amount said only in words must be typed in digits. |
-| **Pressure and first payments** | Urgent wording, a first-time recipient or an unusual amount raises the risk score. |
-| **A 10-minute hold** | High-risk payments are authorized on PayPal and held. Cancelling voids the authorization. |
-| **Recovery in their language** | A signed, expiring link to a page in the recipient's language, with a one-tap return. |
+| `GEMINI_API_KEY` | Gemini for extraction, translation and the recovery coach (free key from Google AI Studio) |
+| `GROQ_API_KEY` | Whisper speech-to-text (otherwise the browser's own recognition) |
+| `ELEVENLABS_API_KEY` | The read-aloud voice (otherwise the browser's voice) |
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `MOCK=0` | Real PayPal **sandbox** calls |
+| `AG_GRID_LICENSE_KEY` | Removes the AG Grid Enterprise watermark |
+| `DATABASE_URL` | Postgres instead of the embedded database |
 
-<table>
-<tr>
-<td width="50%" valign="top">
-<img width="360" src="docs/img/examples.png" alt="The Examples page: three stories (names that sound alike, numbers said as words, currency words), here showing Lopez and Lopes with what was said in Hindi, what could go wrong and what Verbo does.">
-<br><b>Examples.</b> Three short stories: what was said, what could have gone wrong, and what Verbo does instead.
-</td>
-<td width="50%" valign="top">
-<img width="360" src="docs/img/case-desk.png" alt="The Case Desk overview: totals for cases, open, returned and escalated, charts of cases by outcome, recovery by recipient language, evidence readiness and pre-send risk.">
-<br><b>Case Desk.</b> The operator view: recovery cases, a language grid, a deadline timeline and an evidence packet per case.
-Most cases here are simulated and labelled as such.
-</td>
-</tr>
-</table>
+```bash
+npm test                 # 232 Vitest tests
+npm run typecheck
+npm run eval             # scripted scenarios, results in docs/eval/
+npm run money-loop       # PayPal sandbox: send, void and return paths (needs sandbox keys)
+```
+
+To host your own copy, [`render.yaml`](render.yaml) deploys the web service and Postgres in one step
+([deploy guide](docs/guides/DEPLOY.md)).
+
+## Tools used
+
+**AI models and services**
+
+| Tool | How Verbo uses it |
+|---|---|
+| **Google Gemini** (`gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-3.6-flash`) | Turns what was said into a strict zod schema (recipient, amount, currency); translates the recovery chat; drafts the money-back request; summarises cases on the Case Desk. It never decides money: code validates every field, and a rules parser takes over if the model fails. |
+| **Groq Whisper** (`whisper-large-v3-turbo`) | Speech-to-text for the microphone on Send. |
+| **ElevenLabs** (`eleven_v4_turbo`) | Reads the payment and the follow-up questions aloud in the sender's language, in one voice. |
+
+**PayPal and partner tools**
+
+| Tool | How Verbo uses it |
+|---|---|
+| **PayPal** Orders v2, Payments v2, Payouts v1, Webhooks (sandbox) | Authorize, hold, capture, void, payout and the return payment. Every money-changing call carries an idempotency key. |
+| **APIMatic** | The PayPal Server SDK, generated by APIMatic, creates orders and opens PayPal's page in the person's language. Each payment page lists the PayPal calls behind it. ([notes](docs/guides/apimatic.md)) |
+| **AG Grid** and **AG Studio** | Case Desk grid and dashboard, the language grid, and the people you can pay on Send, grouped by how their names sound. |
+| **Bryntum** Scheduler Pro | Recovery deadlines on the Case Desk; each row shades night-time where the recipient lives. |
+| **Render** | Hosts the live demo (web service and Postgres). |
+
+**Built with:** Next.js, TypeScript, Drizzle ORM, PGlite / Postgres, zod and Vitest. The demo video was made with Remotion
+and ElevenLabs voices.
 
 ## How it works
 
@@ -101,127 +143,24 @@ Most cases here are simulated and labelled as such.
 <img src="docs/img/architecture.svg" alt="Before money moves: speak, extract with Gemini into a strict schema, code checks, fixed-template read-back, confirm and approve on PayPal. PayPal authorizes, holds risky payments for 10 minutes, then captures and pays out. After a mistake: open a case, a signed link to a page in the recipient's language, one-tap return, Case Desk." width="720">
 </div>
 
-1. **Speak.** Groq Whisper turns speech into text. Typing works too.
-2. **Extract.** Gemini fills a strict zod schema: recipient, amount, currency. If the model fails or isn't configured, a
-   rules parser takes over.
-3. **Code checks.** The amount must appear in what was said (Telugu, Devanagari and Arabic digits are normalised). Only US
-   dollars are accepted, and Verbo never converts. The recipient is resolved against the address book, sound-alike names and
-   near-miss numbers are found, and a risk score decides whether to hold.
-4. **Read back.** A fixed template in the sender's language states the payment, with English under it. ElevenLabs reads
-   it aloud. Follow-up questions also come from fixed templates.
-5. **Confirm.** The final step is always a tap, then approval on PayPal's own page, opened in the sender's language.
-6. **PayPal.** The order is authorized first and captured only after any hold. Every money-changing call carries an
-   idempotency key (`PayPal-Request-Id`, payout `sender_batch_id`).
+1. **Speak.** Whisper turns speech into text.
+2. **Extract.** Gemini fills a strict schema.
+3. **Check.** Code confirms the amount appears in what was said (native-script digits included), resolves the recipient,
+   finds sound-alike names and near-miss numbers, and scores the risk.
+4. **Read back.** A fixed template in the sender's language, with English underneath, read aloud by ElevenLabs.
+5. **Confirm.** The person taps to confirm, then approves on PayPal's own page.
+6. **Pay.** PayPal authorizes first and captures only after any hold.
 
-The recovery coach drafts the message asking for the money back. It only suggests text: the sender edits and sends it, and
-code drops any draft containing a link, contact details, or a number other than the case amount.
+**Tested with our own scripted scenarios** (no real users or fraud data): 57 of 57 scenarios matched the expected result
+with both the offline parser and Gemini, and 11 of 11 deliberately wrong model outputs were caught by code
+([eval report](docs/eval/eval-gemini.md)). The full sandbox money loop ran against PayPal on Nov 5, 2026.
 
-## Does it work?
+## Notes
 
-All numbers below come from Verbo's own scripted scenarios and test runs. There are no real users, no real voice audio and no
-fraud data behind them.
-
-| What | Result | Source |
-|---|---|---|
-| Scripted scenarios, offline rules parser | **57 / 57** matched the expected recipient, amount and risk (or the expected refusal) | [docs/eval/eval.md](docs/eval/eval.md) |
-| Same scenarios with Gemini | **57 / 57** | [docs/eval/eval-gemini.md](docs/eval/eval-gemini.md) |
-| Deliberately wrong model output | **11 / 11** caught by code validation | both eval reports |
-| Unit and integration tests | **231** passing | `npm test` |
-| Live PayPal sandbox money loop (Nov 5, 2026) | Send, authorize, capture and payout; a risk hold voided; a return payment. All three completed. | [docs/plan/STATUS.md](docs/plan/STATUS.md) |
-
-The scenarios cover English, Telugu, Hindi, Spanish, Portuguese and Arabic, native-script digits, decimal commas,
-sound-alike names, pressure wording, unusual amounts, unsupported currencies and off-topic requests. The rules parser and the
-scenarios were written by the same team, so a high offline score mainly shows the parts agree with each other; the eval
-report lists every expectation that was corrected and why.
-
-## Built with
-
-| Tool | How Verbo uses it | Where |
-|---|---|---|
-| **PayPal** Orders v2, Payments v2, Payouts v1, Webhooks (sandbox) | Authorize, hold, capture, void, payout, and the return payment. Every call was checked against PayPal's OpenAPI specs. | `lib/paypal/` |
-| **APIMatic** | PayPal's Server SDK, generated by APIMatic, creates every order and opens PayPal's page in the person's language. Each payment page lists the PayPal calls behind it. The PayPal Context Plugin was used to review that code. | `lib/paypal/sdk.ts`, `lib/paypal/trail.ts`, [notes](docs/guides/apimatic.md) |
-| **Gemini** | Speech understanding into a strict schema, chat translation, the recovery coach, and the Case Desk analyst | `lib/agents/` |
-| **Groq Whisper** | Speech to text | `lib/speech/`, `app/api/stt/` |
-| **ElevenLabs** | Reads the payment and the follow-up questions aloud, in one voice ("River"). Browser voice when no key is set. | `lib/speech/elevenlabs.ts` |
-| **AG Grid** and AG Studio | Case grid, dashboard, a sender × recipient language grid, and the people you can pay on Send, grouped by how their names sound | `app/desk/`, `components/send/PeopleGrid.tsx` |
-| **Bryntum** Scheduler Pro | Recovery deadlines; drag a bar to change when a case escalates. Each row shades night where the recipient lives, and reminders wait for their morning. | `app/desk/timeline/`, `lib/people/localTime.ts` |
-| **Render** | Hosts the live demo: web service and Postgres from one Blueprint | [`render.yaml`](render.yaml), [deploy guide](docs/guides/DEPLOY.md) |
-
-**Languages.** Read-backs are written for six languages: English, Hindi, Telugu, Spanish, Portuguese and Arabic (right to
-left). The five non-English template sets are machine-translated and not yet reviewed by native speakers; the app says so.
-The speech provider lists 60 languages ([coverage](docs/guides/language-coverage.md)).
-
-**Accessibility.** Large type, WCAG 2.1 AA contrast, full keyboard and screen-reader support, right-to-left layout, and
-reduced motion respected.
-
-## Run it locally
-
-Works with no keys, using mock payments and the rules parser.
-
-```bash
-npm install
-cp .env.example .env
-npm run dev
-```
-
-Open http://localhost:3000. Add keys to `.env` to use real services; `npm run check-env` lists which are set, by name only.
-
-```bash
-npm test                 # Vitest
-npm run typecheck
-npm run eval             # scripted scenarios, writes docs/eval/
-npm run verify-templates # keys, placeholders, no digits, script direction
-npm run money-loop       # sandbox: send, void and return paths
-```
-
-## Limits and what's next
-
-- **Sandbox only.** No real money moves, and the live demo runs in mock mode so judges don't need a PayPal login.
-- **Templates need native review.** Hindi, Telugu, Spanish, Portuguese and Arabic were machine-translated.
-- **No real microphone tests yet.** Speech was tested with simulated recordings and transcripts.
-- **Simulated data.** Contacts, history and most Case Desk cases are synthetic and labelled "simulated".
-- **Free hosting.** The live site sleeps after 15 idle minutes, its database expires after 30 days, and the hourly reminder
-  job isn't deployed (Render has no free scheduled jobs). Reminders and links are shown, not sent by SMS or email.
-- **Recovery is voluntary.** Verbo cannot take money from anyone's account.
-- **Next:** native-speaker review of the templates, real audio tests, delivering recovery links by SMS, and more read-back
-  languages from the provider's list.
-
-## References
-
-**PayPal and APIMatic**
-
-1. PayPal REST APIs: [Orders v2](https://developer.paypal.com/docs/api/orders/v2/), [Payments v2](https://developer.paypal.com/docs/api/payments/v2/), [Payouts v1](https://developer.paypal.com/docs/api/payments.payouts-batch/v1/), [Webhooks](https://developer.paypal.com/api/rest/webhooks/), and [idempotency](https://developer.paypal.com/api/rest/reference/idempotency/).
-2. [PayPal Server SDK](https://developer.paypal.com/serversdk/typescript/getting-started/how-to-get-started), generated by [APIMatic](https://www.apimatic.io/).
-
-**AI and speech**
-
-3. Google Gemini API: [structured output](https://ai.google.dev/gemini-api/docs/structured-output).
-4. [zod](https://zod.dev/): the schema the model output must pass.
-5. Groq: [speech to text](https://console.groq.com/docs/speech-to-text).
-6. ElevenLabs: [text to speech](https://elevenlabs.io/docs/capabilities/text-to-speech).
-
-**Language and accessibility**
-
-7. W3C: [inline markup and bidirectional text](https://www.w3.org/International/articles/inline-bidi-markup/) (why every value is wrapped in `<bdi>`).
-8. MDN: [Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) and [Intl.DisplayNames](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames).
-9. W3C: [WCAG 2.1](https://www.w3.org/TR/WCAG21/).
-
-**Interface and hosting**
-
-10. [AG Grid](https://www.ag-grid.com/) and AG Studio · [Bryntum Scheduler Pro](https://bryntum.com/products/schedulerpro/) · [Render Blueprints](https://render.com/docs/blueprint-spec).
-
-## Repository layout
-
-| Folder | What is in it |
-|---|---|
-| `app/` | Screens (Home, Send, Examples, recovery page, Case Desk) and API routes |
-| `components/` | `ui/` shared pieces, `home/` the Home page, `send/` the Send flow |
-| `lib/` | `core/` config and logging, `people/` simulated contacts and name checks, `paypal/`, `transfers/`, `recovery/`, `risk/`, `agents/`, `bridge/` (languages and templates), `speech/`, `desk/`, `evidence/` |
-| `db/` | Database schema, client and migrations |
-| `scripts/` | Command-line tools: environment check, sandbox money loop, evaluation, language list |
-| `tests/` | Vitest suites |
-| `docs/` | `plan/` brief and status, `eval/` scripted evaluation results, `guides/` deployment and APIMatic notes, `img/` images |
+- **Sandbox only.** No real money moves. People, phone numbers and most Case Desk cases are simulated and labelled so.
+- The five non-English template sets were machine-translated and have not yet been reviewed by native speakers.
+- Verbo is an independent hackathon project, not a PayPal product.
 
 ## License
 
-[MIT](LICENSE). Verbo is an independent hackathon project that runs on the PayPal sandbox. It is not a PayPal product.
+[MIT](LICENSE)
