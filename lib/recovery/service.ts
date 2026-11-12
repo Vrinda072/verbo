@@ -3,19 +3,21 @@
  * signed link in their language and can return the money with one tap (they approve a PayPal order themselves —
  * Verbo cannot take money from anyone), refuse, or reply. Timers send a reminder at 24 h and escalate at 72 h.
  */
+import { isQuiet, timeZoneFor } from "@/lib/localTime";
 import { randomUUID } from "node:crypto";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { config } from "@/lib/config";
-import { CONTACTS, SENDER } from "@/lib/contacts";
+import { personById, SENDER } from "@/lib/contacts";
 import { getPayPal } from "@/lib/paypal";
+import { paypalLocale } from "@/lib/paypal/locale";
 import type { MockPayPalClient } from "@/lib/paypal/mock";
 import { completeReturn, startReturn } from "@/lib/paypal/flows";
 import { getTransfer, getTransferByOrder, insertTransfer, type StoredTransfer } from "@/lib/store/transfers";
 import { step, tick, TransferError } from "@/lib/transfers/service";
 import { getTranslator } from "@/lib/bridge/translate";
 import { signRecoveryToken, verifyRecoveryToken } from "./token";
-import { dueTimerEvent, nextCaseState, OPEN_STATES, type CaseEvent, type CaseState } from "./state";
+import { dueTimerEvent, ESCALATE_AFTER_H, nextCaseState, OPEN_STATES, type CaseEvent, type CaseState } from "./state";
 import { log } from "@/lib/log";
 
 type CaseRow = typeof schema.cases.$inferSelect;
@@ -60,7 +62,7 @@ export async function openCase(transferId: string, now = new Date()): Promise<{ 
   const t = await getTransfer(transferId);
   if (!t || t.meta.kind !== "send") throw new TransferError("not_found", 404);
   if (t.state !== "COMPLETED" && t.state !== "PAYOUT_PENDING") throw new TransferError("transfer_not_completed", 409);
-  const contact = CONTACTS.find((c) => c.id === t.meta.recipientId);
+  const contact = personById(t.meta.recipientId);
 
   const id = `case_${randomUUID()}`;
   const [row] = await db
@@ -103,6 +105,9 @@ export async function postMessage(c: CaseRow, author: "sender" | "recipient", te
   if (!clean) throw new TransferError("empty_message");
   const target = author === "sender" ? c.recipientLanguage : c.senderLanguage;
   const tr = await getTranslator().translate(clean, lang, target);
+  // An English copy for the subtitles. Reuses the translation when one side is English.
+  const english =
+    lang.split("-")[0] === "en" ? clean : target.split("-")[0] === "en" ? tr.text : (await getTranslator().translate(clean, lang, "en")).text;
   const db = await getDb();
   await db.insert(schema.caseMessages).values({
     caseId: c.id,
@@ -111,6 +116,7 @@ export async function postMessage(c: CaseRow, author: "sender" | "recipient", te
     lang,
     translatedText: tr.text,
     translatedLang: tr.text ? target : null,
+    englishText: english ?? null,
     translator: tr.text ? tr.translator : "none",
     at: now,
   });
@@ -141,6 +147,7 @@ export async function startCaseReturn(c: CaseRow, now = new Date()): Promise<{ a
     original,
     returnerEmail: original.recipientEmail,
     urls: { returnUrl: `${config.baseUrl}/paypal/return`, cancelUrl: `${config.baseUrl}/paypal/return?cancelled=1` },
+    locale: paypalLocale(c.recipientLanguage),
   });
   if (pp.kind === "mock") r.approveUrl = `${config.baseUrl}/paypal/return?token=${r.orderId}`;
   await insertTransfer(r, { kind: "return", originalTransferId: original.id, recipientId: "sender", language: c.recipientLanguage });
@@ -176,7 +183,8 @@ export async function processTimers(now = new Date()) {
     .where(and(inArray(schema.cases.state, [...OPEN_STATES]), eq(schema.cases.simulated, 0)));
   const done: { caseId: string; event: string }[] = [];
   for (const c of open) {
-    const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, remindersSent: c.remindersSent, now });
+    const recipientQuiet = isQuiet(now, timeZoneFor(c.recipientName, c.recipientLanguage));
+    const ev = dueTimerEvent({ state: c.state as CaseState, linkSentAt: c.linkSentAt, escalateAt: c.escalateAt, remindersSent: c.remindersSent, now, recipientQuiet });
     if (!ev) continue;
     try {
       await applyEvent(c, ev, "system", {
@@ -190,6 +198,34 @@ export async function processTimers(now = new Date()) {
     }
   }
   return done;
+}
+
+export class DeadlineError extends Error {
+  constructor(public code: "not_found" | "not_open" | "out_of_range") {
+    super(code);
+  }
+}
+
+export const MAX_DEADLINE_DAYS = 14;
+
+/** Move the escalation deadline. Recorded on the immutable timeline, so it appears in the evidence packet. */
+export async function moveDeadline(caseId: string, at: Date, now = new Date()) {
+  const db = await getDb();
+  const c = await loadCase(caseId);
+  if (!c) throw new DeadlineError("not_found");
+  if (!OPEN_STATES.has(c.state as CaseState) || !c.linkSentAt) throw new DeadlineError("not_open");
+  if (at <= now || at.getTime() > now.getTime() + MAX_DEADLINE_DAYS * 86_400_000) throw new DeadlineError("out_of_range");
+  const previous = c.escalateAt ?? new Date(c.linkSentAt.getTime() + ESCALATE_AFTER_H * 3_600_000);
+  await db.update(schema.cases).set({ escalateAt: at, updatedAt: now }).where(eq(schema.cases.id, caseId));
+  await db.insert(schema.caseEvents).values({
+    caseId,
+    event: "DEADLINE_MOVED",
+    fromState: c.state,
+    toState: c.state,
+    actor: "operator",
+    at: now,
+    data: { from: previous.toISOString(), to: at.toISOString() },
+  });
 }
 
 export async function caseDetail(caseId: string) {

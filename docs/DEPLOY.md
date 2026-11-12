@@ -6,7 +6,7 @@
 1. In Render, claim the hackathon credits from the sponsor page and apply them to your account.
 2. Choose **New → Blueprint**, connect the `Vrinda072/verbo` GitHub repository, and select the `main` branch.
 3. Render asks for each value below. Copy them from your local `.env`, after rotating any key that was pasted in chat.
-   - `GEMINI_API_KEY`, `GROQ_API_KEY`, `AG_STUDIO_LICENSE_KEY`
+   - `GEMINI_API_KEY`, `GROQ_API_KEY`, `AG_STUDIO_LICENSE_KEY`, `ELEVENLABS_API_KEY`
    - `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`
    - `SANDBOX_SENDER_EMAIL`, `SANDBOX_INTENDED_RECIPIENT_EMAIL`, `SANDBOX_WRONG_RECIPIENT_EMAIL`
 4. Apply the Blueprint, wait for the first deploy, then open the `.onrender.com` link.

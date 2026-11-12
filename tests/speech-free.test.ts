@@ -88,7 +88,7 @@ describe("sound-alike names from speech", () => {
   it("doesn't ask when typed, or when no contact sounds alike", async () => {
     const { understand } = await import("@/lib/agents/extraction");
     expect((await understand(typedOrSpoken)).result.ok).toBe(true);
-    const k = await understand({ transcript: "Send 20 dollars to Kiran Reddy", language: "en" }, undefined, undefined, { fromVoice: true });
+    const k = await understand({ transcript: "Send 20 dollars to Lakshmi Rao", language: "en" }, undefined, undefined, { fromVoice: true });
     expect(k.result.ok).toBe(true);
   });
 });

@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Noto_Sans, Noto_Sans_Arabic, Noto_Sans_Devanagari, Noto_Sans_Display, Noto_Sans_Telugu } from "next/font/google";
 import { APP_NAME } from "@/lib/config";
 import "./globals.css";
 
-/** Inter: clear at small sizes, with distinct numerals for amounts. Other scripts fall back to Noto or system fonts. */
-const inter = Inter({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-inter",
-  display: "swap",
-});
+/** One type family across the scripts Verbo reads back in, so Hindi, Telugu, Arabic and Latin text sit together. */
+const noto = Noto_Sans({ subsets: ["latin", "latin-ext"], variable: "--font-noto", display: "swap" });
+const notoDisplay = Noto_Sans_Display({ subsets: ["latin", "latin-ext"], weight: ["600", "700"], variable: "--font-noto-display", display: "swap" });
+const deva = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-deva", display: "swap" });
+const telu = Noto_Sans_Telugu({ subsets: ["telugu"], variable: "--font-telu", display: "swap" });
+const arab = Noto_Sans_Arabic({ subsets: ["arabic"], variable: "--font-arab", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: `${APP_NAME}: voice payments with safety checks`, template: `%s · ${APP_NAME}` },
@@ -17,15 +17,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f7f9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c1117" },
-  ],
+  themeColor: "#071a4d",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${noto.variable} ${notoDisplay.variable} ${deva.variable} ${telu.variable} ${arab.variable}`}>
       <body className="min-h-dvh bg-paper text-ink antialiased">
         <a
           href="#main"

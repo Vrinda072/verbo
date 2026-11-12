@@ -5,7 +5,7 @@ import { toChatBody, toChatMessages, verboAdapter } from "@/lib/desk/studioAdapt
 
 const row = (over: Partial<DeskRow>): DeskRow => ({
   id: "case_1", shortId: "ABC", simulated: true, state: "LINK_SENT", cents: 1234, senderName: "S", senderLanguage: "hi", recipientName: "R",
-  recipientLanguage: "pt", riskLevel: "high", openedAt: "", updatedAt: "", ageHours: 72, lastEvent: null, remindersSent: 0, messages: 2, evidence: 85, everReturned: false, ...over,
+  recipientLanguage: "pt", riskLevel: "high", openedAt: "", updatedAt: "", ageHours: 72, lastEvent: null, linkSentAt: null, escalateAt: null, remindersSent: 0, messages: 2, evidence: 85, everReturned: false, ...over,
 });
 
 describe("request cap for AI routes", () => {

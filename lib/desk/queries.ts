@@ -1,7 +1,7 @@
 /** Read models for the Case Desk. Live sandbox cases and simulated ones share tables; `simulated` tells them apart. */
 import { desc, inArray, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
-import { CONTACTS } from "@/lib/contacts";
+import { personById } from "@/lib/contacts";
 import { evidenceScore } from "@/lib/evidence/meter";
 import type { RiskAssessment } from "@/lib/risk/score";
 
@@ -21,6 +21,8 @@ export interface DeskRow {
   ageHours: number;
   lastEvent: string | null;
   remindersSent: number;
+  linkSentAt: string | null;
+  escalateAt: string | null;
   messages: number;
   evidence: number;
   everReturned: boolean;
@@ -38,6 +40,8 @@ export async function listDeskRows(now = new Date()): Promise<DeskRow[]> {
     recipient_name: string;
     recipient_language: string;
     reminders_sent: number;
+    link_sent_at: string | null;
+    escalate_at: string | null;
     created_at: string;
     updated_at: string;
     risk_level: string | null;
@@ -51,7 +55,7 @@ export async function listDeskRows(now = new Date()): Promise<DeskRow[]> {
   // Both PGlite and node-postgres return { rows } from execute().
   const rows = (await db.execute(sql`
     select c.id, c.simulated, c.state, c.amount_cents, c.sender_name, c.sender_language, c.recipient_name,
-           c.recipient_language, c.reminders_sent, c.created_at, c.updated_at,
+           c.recipient_language, c.reminders_sent, c.link_sent_at, c.escalate_at, c.created_at, c.updated_at,
            t.risk_level, t.order_id, t.capture_id, t.draft_id, r.capture_id as return_capture,
            (select array_agg(e.event order by e.id) from case_events e where e.case_id = c.id) as events,
            (select count(*)::int from case_messages m where m.case_id = c.id) as msg_count
@@ -77,6 +81,8 @@ export async function listDeskRows(now = new Date()): Promise<DeskRow[]> {
       ageHours: Math.round((now.getTime() - new Date(r.created_at).getTime()) / 3_600_000),
       lastEvent: events[events.length - 1] ?? null,
       remindersSent: r.reminders_sent,
+      linkSentAt: r.link_sent_at ? new Date(r.link_sent_at).toISOString() : null,
+      escalateAt: r.escalate_at ? new Date(r.escalate_at).toISOString() : null,
       messages: Number(r.msg_count),
       everReturned: events.includes("RETURNED"),
       evidence: evidenceScore({
@@ -117,7 +123,7 @@ export async function listAlerts(limit = 50): Promise<AlertRow[]> {
       draftId: d.id,
       createdAt: d.createdAt.toISOString(),
       language: d.language,
-      recipientName: CONTACTS.find((c) => c.id === d.recipientId)?.name ?? d.recipientId,
+      recipientName: personById(d.recipientId)?.name ?? d.recipientId,
       cents: d.amountCents,
       level: risk.level,
       signals: risk.signals.map((s) => s.code),

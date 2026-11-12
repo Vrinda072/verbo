@@ -1,12 +1,29 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CONTACTS } from "@/lib/contacts";
-import { LANGUAGES } from "@/lib/bridge/readback";
+import { labelsFor, languageNameIn } from "@/lib/bridge/readback";
+import { En } from "@/components/En";
+import { ANSWER_MS, matchChoice, MAX_FOLLOW_UPS, mergeAnswer, nextQuestion, questionParts, questionText, SPEECH_TIMEOUT_MS, type Question } from "@/lib/speech/clarify";
+import { useReadAloud } from "@/lib/speech/useReadAloud";
 import { useSpeech, type SpeechProvider } from "@/lib/speech/useSpeech";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
 import { MicButton } from "@/components/send/MicButton";
+import { NameDiff } from "@/components/NameDiff";
 import { ConfirmCard, type UnderstandResponse } from "@/components/send/ConfirmCard";
 import { Stepper } from "@/components/send/Stepper";
+import { PayNumber, type NumberResponse } from "@/components/send/PayNumber";
+import dynamic from "next/dynamic";
+
+const PeopleGrid = dynamic(() => import("@/components/send/PeopleGrid"), { ssr: false, loading: () => <p className="text-ink-3">Loading contacts…</p> });
+
+/** Requests that show each check. Judges can say or type them. */
+const TRY = [
+  { say: "Send 40 dollars to Manuel Lopez", shows: "Names that sound alike, in Spanish and Portuguese" },
+  { say: "Send 30 dollars to Mohamed Ali", shows: "Mohamed or Mohamad: Arabic or English" },
+  { say: "Send 20 dollars to Ana Souza", shows: "Souza or Sousa: Portuguese or Spanish" },
+  { say: "Send sixty dollars to Kiran Reddy", shows: "An amount in words must be typed in digits" },
+  { say: "Send 900 dollars to Ana Souza right now, it's urgent", shows: "Pressure, a first payment and a large amount: held" },
+];
 
 type Phase = "input" | "understanding" | "review" | "creating" | "created" | "cancelled";
 
@@ -40,28 +57,108 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
   const [nonce, setNonce] = useState("");
   const terms = useMemo(() => CONTACTS.map((c) => c.name), []);
   const mic = useSpeech(speechProvider, lang, terms);
-  const langInfo = LANGUAGES.find((l) => l.code === lang);
   const heardByVoice = useRef("");
   const [typing, setTyping] = useState(false);
+  const [question, setQuestion] = useState<Question | null>(null);
+  const followUps = useRef(0);
+  const chosenName = useRef<string | undefined>(undefined);
+  // What has been understood so far. A failed answer is left out, so "banana" can't muddle the next attempt.
+  const base = useRef("");
+  const askedKind = useRef<Question["kind"] | null>(null);
+  const L = labelsFor(lang);
+  const [payingNumber, setPayingNumber] = useState(false);
+  const askRef = useRef<HTMLHeadingElement>(null);
+  const questionLine = question ? questionText(question, L) : "";
+  const voice = useReadAloud(questionLine, L.usedLang, question ? questionParts(question) : undefined);
+  const micStatus = useRef(mic.status);
+  micStatus.current = mic.status;
+  // Move focus to the question so screen readers and keyboards land on it, not on the page body.
+  useEffect(() => {
+    if (result && !result.ok) askRef.current?.focus();
+  }, [result]);
   const step = phase === "created" ? 2 : phase === "review" || phase === "creating" ? 1 : 0;
   const working = phase === "understanding" || mic.status === "finishing";
 
-  // Default to the browser language when we support it.
-  useEffect(() => {
-    const nav = navigator.language?.split("-")[0];
-    if (nav && LANGUAGES.some((l) => l.code === nav)) setLang(nav);
-  }, []);
+  // English is the default; the sender picks their language with the picker.
 
   // When the mic finishes, check what was said.
   useEffect(() => {
     if (mic.status === "done" && mic.transcript) {
+      if (question) {
+        void answer(question, mic.transcript);
+        return;
+      }
       heardByVoice.current = mic.transcript;
+      base.current = mic.transcript;
+      followUps.current = 0;
+      chosenName.current = undefined;
       void check(mic.transcript);
     }
+    if (mic.status === "error") setQuestion(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mic.status]);
 
-  async function check(text: string, chosenRecipient?: string) {
+  // Ask aloud, then listen. Without a voice for this language the question stays on screen and the person taps the mic.
+  useEffect(() => {
+    if (!question) return;
+    let done = false;
+    const listen = () => {
+      if (done || micStatus.current === "listening" || micStatus.current === "connecting") return;
+      done = true;
+      void mic.start();
+    };
+    if (new URLSearchParams(window.location.search).has("quiet")) {
+      const t = setTimeout(listen, 400);
+      return () => clearTimeout(t);
+    }
+    if (!voice.available) return;
+    void voice.play(listen);
+    const t = setTimeout(listen, SPEECH_TIMEOUT_MS);
+    return () => {
+      done = true;
+      clearTimeout(t);
+    };
+    // Once per question.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question]);
+
+  // A follow-up answer is short, so recording ends by itself. The person doesn't need to touch the screen.
+  useEffect(() => {
+    if (!question || mic.status !== "listening") return;
+    const t = setTimeout(() => mic.stop(), ANSWER_MS[question.kind]);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question, mic.status]);
+
+  function ask(q: Question | null) {
+    if (q && followUps.current < MAX_FOLLOW_UPS) {
+      followUps.current += 1;
+      setQuestion({ ...q });
+    } else setQuestion(null);
+  }
+
+  function answer(q: Question, said: string) {
+    const original = base.current;
+    if (q.kind === "which") {
+      heardByVoice.current = original;
+      mic.setTranscript(original);
+      const pick = matchChoice(said);
+      if (!pick) return ask(q); // Unclear: ask again rather than guess.
+      setQuestion(null);
+      chosenName.current = pick === 1 ? q.a : q.b;
+      return check(original);
+    }
+    setQuestion(null);
+    const merged = mergeAnswer(original, said);
+    heardByVoice.current = merged;
+    askedKind.current = q.kind;
+    mic.setTranscript(merged);
+    return check(merged);
+  }
+
+  async function check(text: string, tapped?: string) {
+    const chosenRecipient = tapped ?? chosenName.current;
+    if (tapped) chosenName.current = tapped;
     setError(null);
     setPhase("understanding");
     try {
@@ -75,6 +172,10 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       setResult(data);
       setNonce(crypto.randomUUID());
       setPhase(data.ok ? "review" : "input");
+      const next = !data.ok && text === heardByVoice.current ? nextQuestion(data.problems) : null;
+      if (askedKind.current && next?.kind !== askedKind.current) base.current = text;
+      askedKind.current = null;
+      ask(next);
     } catch {
       setError("Verbo couldn’t check that just now. Nothing was sent. Please try again.");
       setPhase("input");
@@ -113,6 +214,9 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
     setError(null);
     mic.setTranscript("");
     setTyping(false);
+    setQuestion(null);
+    followUps.current = 0;
+    chosenName.current = undefined;
     setPhase("input");
   }
 
@@ -122,9 +226,12 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Send a payment</h1>
+          <h1 lang={L.usedLang} dir={L.dir} className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            {L.t("s_heading")}
+            <En L={L} k="s_heading" className="text-base font-normal tracking-normal" />
+          </h1>
           <div className="mt-4">
-            <Stepper current={step} />
+            <Stepper current={step} L={L} />
           </div>
         </div>
         <LanguagePicker value={lang} onChange={setLang} />
@@ -134,18 +241,32 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.25fr_0.75fr]">
           <div className="grid gap-6">
             {mic.status !== "unavailable" && (
-              <section aria-label="Microphone" className="rounded-v-lg border border-line bg-card px-6 py-10 text-center shadow-v sm:py-12">
+              <section aria-label="Microphone" className="rounded-v-lg bg-card px-6 py-10 text-center shadow-v sm:py-12">
                 {working ? (
                   <Working stage={phase === "understanding" ? 1 : 0} />
                 ) : (
                   <>
-                    <p className="mb-6 text-lg">
-                      Say the recipient and amount in{" "}
-                      <strong lang={lang} dir={langInfo?.dir}>
-                        {langInfo?.nativeName ?? lang}
-                      </strong>
-                      {langInfo && langInfo.nativeName !== langInfo.englishName && <span className="text-ink-3"> ({langInfo.englishName})</span>}
+                    {question ? (
+                      <div role="status" className="mb-6">
+                        <p lang={L.usedLang} dir={L.dir} className="text-sm text-ink-3">
+                          {L.t(voice.speaking ? "s_asking" : "s_answer")}
+                          <En L={L} k={voice.speaking ? "s_asking" : "s_answer"} className="text-xs" />
+                        </p>
+                        <p lang={L.usedLang} dir={L.dir} className="mx-auto mt-1 max-w-lg text-2xl font-medium leading-snug">
+                          {questionLine}
+                        </p>
+                        {L.usedLang !== "en" && (
+                          <p lang="en" dir="ltr" className="v-sub mx-auto max-w-lg text-base">
+                            {questionText(question, labelsFor("en"))}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                    <p lang={L.usedLang} dir={L.dir} className="mb-6 text-xl font-medium">
+                      {L.t("s_say")}
+                      <En L={L} k="s_say" className="text-base" />
                     </p>
+                    )}
                     <MicButton status={mic.status} analyser={mic.analyser} onStart={mic.start} onStop={mic.stop} />
                   </>
                 )}
@@ -165,13 +286,13 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                   if (mic.transcript.trim()) void check(mic.transcript.trim());
                 }}
               >
-                <label htmlFor="transcript" className="block text-sm font-bold uppercase tracking-wider text-ink-3">
+                <label htmlFor="transcript" className="block text-sm font-semibold text-ink-3">
                   What you said (you can edit it)
                 </label>
                 <textarea
                   id="transcript"
                   lang={lang}
-                  dir={langInfo?.dir}
+                  dir="auto"
                   rows={2}
                   value={mic.transcript}
                   onChange={(e) => mic.setTranscript(e.target.value)}
@@ -183,25 +304,38 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                   <button
                     type="submit"
                     disabled={!mic.transcript.trim() || phase === "understanding" || mic.status === "listening"}
-                    className="min-h-12 shrink-0 rounded-v bg-ink px-6 font-bold text-paper disabled:opacity-40"
+                    className="min-h-12 shrink-0 rounded-full bg-brand px-6 font-semibold text-paper disabled:opacity-40"
                   >
-                    {phase === "understanding" ? "Checking…" : "Check"}
+                    {phase === "understanding" ? "…" : <span lang={L.usedLang}>{L.t("s_check")}</span>}
+                    {phase !== "understanding" && <En L={L} k="s_check" className="v-sub-on-dark text-xs" />}
                   </button>
                 </div>
               </form>
             ) : (
-              <button type="button" onClick={() => setTyping(true)} className="justify-self-center rounded-v px-4 py-2 font-bold text-ink-2 underline underline-offset-4 hover:text-ink">
-                Type instead
-              </button>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button type="button" onClick={() => setTyping(true)} className="min-h-12 rounded-full px-5 font-semibold text-brand hover:bg-brand-soft">
+                  <span lang={L.usedLang}>{L.t("s_type")}</span>
+                  <En L={L} k="s_type" className="text-xs" />
+                </button>
+                {!payingNumber && (
+                  <button type="button" onClick={() => setPayingNumber(true)} className="min-h-12 rounded-full px-5 font-semibold text-brand hover:bg-brand-soft">
+                    <span lang={L.usedLang}>{L.t("s_pay_number")}</span>
+                    <En L={L} k="s_pay_number" className="text-xs" />
+                  </button>
+                )}
+              </div>
             )}
 
-          {result && !result.ok && (
-            <div role="alert" className="mx-auto w-full max-w-xl rounded-v-lg border border-terracotta/50 bg-terracotta-soft p-5">
-              <p className="font-bold text-terracotta">Nothing was sent. More information is needed:</p>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
+          {result && !result.ok && (!question || question.kind === "which") && (
+            <div className="mx-auto w-full max-w-xl rounded-v-lg bg-marigold-soft p-5 text-marigold-ink">
+              <h2 ref={askRef} tabIndex={-1} lang={L.usedLang} dir={L.dir} className="text-lg font-semibold outline-none">
+                {result.problems.some((p) => p.code === "recipient_ambiguous") ? L.t("s_which") : L.t("s_problem")}
+                <En L={L} k={result.problems.some((p) => p.code === "recipient_ambiguous") ? "s_which" : "s_problem"} />
+              </h2>
+              <ul className="mt-2 space-y-1">
                 {result.problems.map((p, i) => (
                   <li key={i}>
-                    {PROBLEM_TEXT[p.code]?.(p) ?? p.code}
+                    {p.code !== "recipient_ambiguous" && (PROBLEM_TEXT[p.code]?.(p) ?? p.code)}
                     {(p.code === "recipient_not_found" || p.code === "missing_recipient") && (
                       <span className="mt-2 block">
                         <span className="block">Or select a recipient:</span>
@@ -211,7 +345,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                               key={c.id}
                               type="button"
                               onClick={() => void check(mic.transcript.trim(), c.name)}
-                              className="min-h-12 rounded-v border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
+                              className="min-h-12 rounded-full border-2 border-line-strong bg-card px-5 font-semibold hover:bg-paper-2"
                             >
                               {c.name}
                             </button>
@@ -220,23 +354,50 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
                       </span>
                     )}
                     {p.code === "recipient_ambiguous" && (
-                      <span className="mt-2 flex flex-wrap gap-2">
-                        {(p.candidates as string[]).map((name) => (
-                          <button
-                            key={name}
-                            type="button"
-                            onClick={() => void check(mic.transcript.trim(), name)}
-                            className="min-h-12 rounded-v border-2 border-line-strong bg-card px-5 font-bold hover:bg-paper-2"
-                          >
-                            {name}
-                          </button>
-                        ))}
+                      <span className="mt-3 grid gap-2">
+                        {(p.candidates as string[]).map((name, n) => {
+                          const c = CONTACTS.find((x) => x.name === name);
+                          return (
+                            <button
+                              key={name}
+                              type="button"
+                              onClick={() => void check(mic.transcript.trim(), name)}
+                              className="flex min-h-14 items-center gap-3 rounded-v border-2 border-line bg-card px-4 py-2 text-start text-ink hover:border-brand"
+                            >
+                              <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy text-sm font-semibold text-navy-ink">{n + 1}</span>
+                              <span>
+                                <span className="block text-lg font-semibold">
+                                  <NameDiff name={name} other={(p.candidates as string[]).find((x) => x !== name) ?? name} />
+                                </span>
+                                {c && (
+                                  <span lang={L.usedLang} className="block text-sm text-ink-2">
+                                    {languageNameIn(c.language, L.usedLang)} · {c.city} · {L.t(c.paidBefore ? "opt_paid" : "opt_new")}
+                                  </span>
+                                )}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </span>
                     )}
                   </li>
                 ))}
               </ul>
             </div>
+          )}
+          {payingNumber && (
+          <section className="rounded-v-lg bg-card p-6 shadow-v">
+            <PayNumber
+              lang={lang}
+              onClose={() => setPayingNumber(false)}
+              onReview={(r: NumberResponse) => {
+                heardByVoice.current = "";
+                setResult(r);
+                setNonce(crypto.randomUUID());
+                setPhase("review");
+              }}
+            />
+          </section>
           )}
           {error && (
             <p role="alert" className="mx-auto max-w-xl rounded-v border border-terracotta/50 bg-terracotta-soft p-4 text-center">
@@ -245,42 +406,53 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           )}
           </div>
 
-          <aside className="grid gap-6">
-            <section aria-labelledby="try-title" className="rounded-v-lg border border-line bg-paper-2 p-6">
-              <h2 id="try-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
-                Example
-              </h2>
-              <p lang={lang} dir={langInfo?.dir} className="mt-3 text-lg font-medium leading-snug">
-                “{EXAMPLES[lang] ?? EXAMPLES.en}”
-              </p>
-              {lang !== "en" && EXAMPLES[lang] && <p className="mt-2 text-sm text-ink-3">“{EXAMPLES.en}”</p>}
-            </section>
-            <section aria-labelledby="contacts-title" className="rounded-v-lg border border-line bg-card p-6">
-              <h2 id="contacts-title" className="text-sm font-bold uppercase tracking-wider text-ink-3">
-                People you can pay (simulated)
-              </h2>
+          <aside className="grid content-start gap-6">
+            <details className="group rounded-v-lg bg-navy p-6 text-navy-ink">
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 text-lg font-semibold">
+                Examples to try (simulated)
+                <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
+              </summary>
               <ul className="mt-3 grid gap-2">
-                {CONTACTS.map((c) => (
-                  <li key={c.id}>
+                {TRY.map((t) => (
+                  <li key={t.say}>
                     <button
                       type="button"
                       onClick={() => {
                         setTyping(true);
-                        mic.setTranscript(`${mic.transcript} ${c.name}`.trim());
+                        mic.setTranscript(t.say);
                       }}
-                      className="flex min-h-11 w-full items-center gap-3 rounded-v px-2 text-left font-bold hover:bg-paper-2"
+                      className="w-full rounded-v bg-navy-2 px-4 py-3 text-left hover:bg-white/10"
                     >
-                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-evergreen-soft text-sm text-evergreen">
-                        {c.name[0]}
-                      </span>
-                      {c.name}
+                      <span className="block font-medium">“{t.say}”</span>
+                      <span className="block text-sm text-navy-ink/75">{t.shows}</span>
                     </button>
                   </li>
                 ))}
               </ul>
-            </section>
+              <p className="mt-4 text-sm text-navy-ink/75">
+                Or pay +1 (408) 555-0139: one digit off Kiran Reddy&apos;s number, it reaches someone who reads Arabic.
+              </p>
+            </details>
           </aside>
         </div>
+      )}
+
+      {(phase === "input" || phase === "understanding") && (
+        <details className="group mt-10">
+          <summary className="flex min-h-12 cursor-pointer list-none flex-wrap items-baseline justify-between gap-3">
+            <span className="text-2xl font-bold">
+              People you can pay <span className="text-base font-normal text-ink-3">({CONTACTS.length}, simulated)</span>
+            </span>
+            <span className="text-sm font-semibold text-brand group-open:hidden">Show all</span>
+          </summary>
+          <p className="mb-3 text-sm text-ink-3">Grouped by how the names sound. Click a person to use their name.</p>
+          <PeopleGrid
+            onPick={(name) => {
+              setTyping(true);
+              mic.setTranscript(`${mic.transcript} ${name}`.trim());
+            }}
+          />
+        </details>
       )}
 
       {(phase === "review" || phase === "creating") && reviewable && (
@@ -307,8 +479,8 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
       )}
 
       {phase === "created" && created && result?.recipient && result.amount && (
-        <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg border border-line bg-card p-8 text-center shadow-v-lg">
-          <p className="text-sm font-bold uppercase tracking-wider text-evergreen">Confirmed</p>
+        <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg bg-card p-8 text-center shadow-v-lg">
+          <p className="text-sm font-semibold text-brand">Confirmed</p>
           <h2 className="mt-2 text-2xl font-semibold">
             One last step on PayPal: approve ${result.amount.digits} to {result.recipient.name}
           </h2>
@@ -319,7 +491,7 @@ export function SendFlow({ holdMinutes, speechProvider }: { holdMinutes: number;
           </p>
           <a
             href={created.approveUrl ?? `/send/t/${created.id}`}
-            className="mt-6 inline-flex min-h-14 items-center rounded-v bg-evergreen px-8 text-lg font-bold text-evergreen-ink shadow-v"
+            className="mt-6 inline-flex min-h-14 items-center rounded-full bg-brand px-8 text-lg font-semibold text-brand-ink shadow-v"
           >
             Approve on PayPal
           </a>
@@ -337,11 +509,11 @@ function Working({ stage }: { stage: 0 | 1 }) {
   return (
     <div role="status" className="mx-auto flex max-w-sm flex-col gap-4 py-10 text-left">
       {lines.map((line, i) => (
-        <p key={line} className={`flex items-center gap-3 text-xl font-bold ${i > stage ? "text-ink-3" : ""}`}>
+        <p key={line} className={`flex items-center gap-3 text-xl font-semibold ${i > stage ? "text-ink-3" : ""}`}>
           {i < stage ? (
-            <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-evergreen text-sm text-evergreen-ink">✓</span>
+            <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-brand text-sm text-brand-ink">✓</span>
           ) : i === stage ? (
-            <span aria-hidden className="v-spin h-7 w-7 rounded-full border-4 border-line-strong border-t-evergreen" />
+            <span aria-hidden className="v-spin h-7 w-7 rounded-full border-4 border-line-strong border-t-brand" />
           ) : (
             <span aria-hidden className="h-7 w-7 rounded-full border-2 border-line-strong" />
           )}
@@ -355,10 +527,10 @@ function Working({ stage }: { stage: 0 | 1 }) {
 
 function Done({ title, body, onAgain }: { title: string; body: string; onAgain: () => void }) {
   return (
-    <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg border border-line bg-card p-8 text-center shadow-v">
+    <div className="v-rise mx-auto mt-10 max-w-xl rounded-v-lg bg-card p-8 text-center shadow-v">
       <h2 className="text-2xl font-semibold">{title}</h2>
       <p className="mt-2 text-ink-2">{body}</p>
-      <button type="button" onClick={onAgain} className="mt-6 min-h-12 rounded-v bg-evergreen px-6 font-bold text-evergreen-ink">
+      <button type="button" onClick={onAgain} className="mt-6 min-h-12 rounded-full bg-brand px-6 font-semibold text-brand-ink">
         Start again
       </button>
     </div>

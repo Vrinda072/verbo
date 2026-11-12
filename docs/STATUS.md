@@ -1,5 +1,81 @@
 # Status
 
+## Nov 11 — redesign around language safety
+
+- **English subtitles everywhere:** every line shown in another language now has its English under it: the Home read-backs,
+  Send's spoken questions, the review card and its buttons, the hold and sent screens, both sides of the recovery chat and the
+  Case Desk conversation. Chat messages store an English copy (`case_messages.english_text`, migration 0004), translated when
+  neither side writes English. In right-to-left pages the English lines up with the text above it (`components/En.tsx`).
+- **Impeccable** (impeccable.style) installed as a Claude Code plugin; its detector now reports no issues on Home, Send, Examples
+  and the Case Desk at desktop and phone width. Fixes: input overflow on Send, long footer line, AG Studio title contrast, a
+  nested card, the dimmed phone in Examples (now greyscale instead of faded text), the eyebrow above "Case Desk", themed text
+  selection, caret, placeholders and scrollbars, balanced headings, and the orange mark colour moved into a token.
+
+- **Purpose made visible:** Home leads with "The words change. The money doesn't." and the same read-back in six languages, with the
+  checked value (40.00 USD) unchanged beside each. Type is the Noto family so Devanagari, Telugu, Arabic and Latin match.
+- **PayPal in the person's language:** orders.create now sets `experience_context.locale` from the sender's language, and the return order
+  from the recipient's. The sandbox accepted en-US, hi-IN, te-IN, es-MX, pt-BR and ar-EG. Whether PayPal's page is translated is PayPal's choice.
+- **Examples:** "Three ways money gets lost in translation" (sound-alike names, numbers said as words, currency words), each tied to a real check.
+- **Case Desk:** a Languages tab, an AG Grid of sender language × recipient language with counts and returns per pair.
+- **Recovery:** translated messages show "Numbers checked: …" and a "Show original" toggle, in the reader's language (new templates in
+  all six languages, machine-written). Case details show each message's language pair and the numbers kept.
+- **Reminders in the recipient's daytime (built):** contacts carry a time zone. A reminder that falls due between 21:00 and 08:00
+  where the recipient lives waits for their morning; escalation never waits (`lib/localTime.ts`, `dueTimerEvent`). The Bryntum
+  Deadlines tab shades each recipient's night on their own row and shows their local time.
+- **Wrong numbers:** "Or pay a phone number" on Send. A number one digit (or one swapped pair) off a contact's is stopped: it shows the
+  differing digits, who the number really reaches, the language they read and their local time, and offers the contact instead.
+  Sending anyway adds the `number_near_contact` risk signal, which holds the payment. Three simulated strangers, each reading a
+  different language from the contact they nearly are.
+- **More sound-alike people (simulated):** Kiran Reddy / Kiran Reddi (Telugu / Hindi), Ana Souza / Ana Sousa (Portuguese / Spanish),
+  Mohamed Ali / Mohamad Ali (Arabic / English), plus Manuel Lopez / Lopes. Send has a "Try these" panel and an AG Grid of everyone you
+  can pay, grouped by how the names sound (the same test the voice check uses).
+- **PayPal calls per payment:** the payment page lists each PayPal operation behind it, in order: orders.create through the APIMatic
+  SDK with the approval-page locale, then authorize, hold, capture or void, payout, each with its idempotency key. Derived from the
+  transfer's own state history (`lib/paypal/trail.ts`).
+- **Home:** the "How AI is used" section and the language buttons are gone; the read-back steps through the six languages by itself
+  (off when reduced motion is set).
+
+## Nov 10 — spoken follow-ups on Send
+
+- **Added:** when a voice request is missing the name or amount, or matches two similar contacts, Verbo asks aloud and listens. Answers
+  to similar names are "one" or "two", matched by code. Up to 3 follow-ups per payment, then the on-screen controls take over.
+- **Voice:** ElevenLabs (`eleven_v4_turbo`) when `ELEVENLABS_API_KEY` is set, otherwise browser speech. `/api/tts` only voices fixed
+  templates with contact names and a formatted amount, caches clips in memory, and allows 30 requests a minute. Without a key or
+  on any failure, the browser voice is used, and without that the question appears on screen.
+- **Sound-alike names:** the question tells them apart by the letter that differs and whether the sender has paid them before,
+  both from code and the address book ("Say one for Manuel Lopez, spelled with the letter Z, who you have paid before").
+  River's audio, transcribed back with Whisper, came through with Z and S in en, es, pt and ar; Hindi and Telugu audio was
+  complete but Whisper stopped early, so those two are not confirmed by ear.
+- **Unchanged:** the payment is always confirmed by tap, then approved on PayPal.
+- **Not verified:** a real microphone. The flow was tested with simulated recordings and transcripts. New question templates in hi, te, es,
+  pt and ar are machine-written and need native review.
+
+## Nov 10 — recovery coach
+
+- **Added:** after a wrong payment, Gemini drafts up to 3 messages in the sender's language, and new ones after each reply. The sender
+  picks, edits and sends. Code drops drafts with links, contact details, or any number other than the case amount.
+- **Fallback:** a fixed English message in English. In other languages no suggestion is shown if the model is unavailable.
+- **Limit:** 20 coach requests a minute, shared across visitors. Drafts are not back-translated for accuracy or tone.
+
+## Nov 10 — PayPal-style redesign
+
+- **New look:** account-style home and shell, navy bar, soft cards and pill buttons, Figtree type, light theme only. The logo stays
+  Verbo's own, and the footer says this is not a PayPal product.
+- **New on screen:** money path (where the funds are, from real payment state), letter-level comparison of similar names, a hold
+  countdown ring, and a walkthrough that plays by itself.
+- **Local demo:** `/demo` had no bug. The dev server had been stopped.
+
+## Nov 10 — sponsor tools
+
+- **Bryntum:** Deadlines tab in the Case Desk. Dragging a bar moves `cases.escalate_at` and logs `DEADLINE_MOVED`.
+- **APIMatic:** order creation uses PayPal's generated Server SDK, confirmed on the sandbox including idempotency. The Context
+  Plugin isn't installed, because the installer needs the `claude` command. See `docs/apimatic.md`.
+- **Not verified:** authorize, capture and void through the real sandbox still need a person to approve as the buyer.
+- **Bryntum CSS:** served from `public/bryntum` (copied on install). The CSS bundler turns one of its rules into a page-wide margin.
+- **Dropped:** a voice shopping agent using Channel3 was built and removed before commit, because it pulled away from the recovery
+  story and could not add to the prize total. AG Grid remains the sponsor prize target.
+- **Prizes:** the rules allow one sponsor prize per project, plus one grand or honorable mention prize.
+
 ## Nov 7 — ready to deploy on Render
 
 - **Added:** `render.yaml` (web, Postgres, hourly reminders and escalations) and `docs/DEPLOY.md`. **Not deployed yet:** it

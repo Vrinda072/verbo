@@ -89,6 +89,8 @@ export const cases = pgTable(
     currency: text("currency").notNull().default("USD"),
     reason: text("reason").notNull().default("wrong_recipient"),
     linkSentAt: timestamp("link_sent_at", { withTimezone: true }),
+    /** Set when an operator moves the deadline on the timeline. Null means the standard 72 hours after the link. */
+    escalateAt: timestamp("escalate_at", { withTimezone: true }),
     remindersSent: integer("reminders_sent").notNull().default(0),
     returnTransferId: text("return_transfer_id"),
     simulated: integer("simulated").notNull().default(0),
@@ -125,6 +127,8 @@ export const caseMessages = pgTable(
     lang: text("lang").notNull(),
     translatedText: text("translated_text"),
     translatedLang: text("translated_lang"),
+    /** The message in English, so every reader can see an English line under it. Null when no translation was possible. */
+    englishText: text("english_text"),
     translator: text("translator", { enum: ["anthropic", "gemini", "mymemory", "template", "none"] }).notNull(),
     at: timestamp("at", { withTimezone: true }).notNull(),
   },

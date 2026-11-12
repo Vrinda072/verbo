@@ -49,6 +49,8 @@ export interface CreateOrderInput {
   /** Prefills the PayPal login (sandbox convenience). */
   payerEmail?: string;
   requestId: string;
+  /** Language of PayPal's approval page (experience_context.locale), e.g. "hi-IN". */
+  locale?: string;
 }
 
 export interface CreatedOrder {

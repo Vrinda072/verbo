@@ -22,6 +22,20 @@
       "when": 1793864820846,
       "tag": "0002_recovery_cases",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794315384425,
+      "tag": "0003_colorful_nemesis",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794418230316,
+      "tag": "0004_lucky_dexter_bennett",
+      "breakpoints": true
     }
   ]
 }

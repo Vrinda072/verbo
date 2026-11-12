@@ -31,6 +31,8 @@ const OPTIONAL: Record<string, string> = {
   GEMINI_API_KEY: "needed for AI understanding and translation (free key from Google AI Studio)",
   ANTHROPIC_API_KEY: "optional alternative to Gemini",
   AG_GRID_LICENSE_KEY: "removes the AG Grid watermark",
+  ELEVENLABS_API_KEY: "natural voice for questions and read-back; without it the browser voice is used",
+  ELEVENLABS_VOICE_ID: "optional: another ElevenLabs voice",
   AG_STUDIO_LICENSE_KEY: "removes the AG Studio watermark",
 };
 
