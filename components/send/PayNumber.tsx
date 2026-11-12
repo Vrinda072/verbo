@@ -4,6 +4,7 @@ import { decimalToCents } from "@/lib/agents/numbers";
 import type { UnderstandResponse } from "./ConfirmCard";
 import { labelsFor, languageNameIn } from "@/lib/bridge/readback";
 import { En, Tpl } from "@/components/En";
+import { Digits } from "@/components/Digits";
 
 export type NumberResponse = UnderstandResponse & {
   number: {
@@ -14,27 +15,6 @@ export type NumberResponse = UnderstandResponse & {
 };
 
 const localTime = (tz: string) => new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: tz }).format(new Date());
-
-/** A phone number with the digits that differ from another number marked. */
-function Digits({ digits, positions }: { digits: string; positions: number[] }) {
-  // US numbers read as +1 (408) 555-0139; others fall back to plain digits.
-  const sep: Record<number, string> = digits.length === 11 && digits[0] === "1" ? { 1: " (", 4: ") ", 7: "-" } : {};
-  return (
-    <span dir="ltr" className="font-semibold tabular-nums tracking-wide">
-      +
-      {digits.split("").map((d, i) => (
-        <span key={i}>
-          {sep[i]}
-          {positions.includes(i) ? (
-            <mark className="rounded-[4px] bg-marigold-soft px-0.5 text-marigold-ink underline decoration-marigold decoration-2 underline-offset-2">{d}</mark>
-          ) : (
-            d
-          )}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 /**
  * Pay a phone number. Code checks the number against every contact's: one digit off stops here, shows who the number
