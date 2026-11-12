@@ -22,6 +22,8 @@ const EVENT_TEXT: Record<string, string> = {
 export function SenderCase({ transferId, lang, initialCaseId }: { transferId: string; lang: string; initialCaseId: string | null }) {
   const [c, setC] = useState<SenderCaseView | null>(null);
   const [caseId, setCaseId] = useState(initialCaseId);
+  // The recipient's link only comes back when the case is opened; keep it so later refreshes don't drop it.
+  const [link, setLink] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +73,7 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
     if (r.ok) {
       setC(body);
       setCaseId(body.id);
+      if (body.link) setLink(body.link);
     } else setError("Couldn’t open a case. Please try again.");
     setBusy(false);
   }
@@ -124,8 +127,8 @@ export function SenderCase({ transferId, lang, initialCaseId }: { transferId: st
       )}
       <p className="mt-2 text-sm text-ink-3">
         Their page is in {nameOf(c.recipientLanguage)}. Delivery is simulated in this demo —{" "}
-        {c.link && (
-          <a href={c.link} target="_blank" rel="noreferrer" className="font-semibold text-sky underline">
+        {(c.link ?? link) && (
+          <a href={(c.link ?? link)!} target="_blank" rel="noreferrer" className="font-semibold text-sky underline">
             open their page
           </a>
         )}
