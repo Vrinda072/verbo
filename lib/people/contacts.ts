@@ -60,12 +60,12 @@ export const CONTACTS: Contact[] = [
 
 /**
  * People outside the address book whose numbers are one digit away from a contact's. They exist so a mistyped number
- * reaches someone real-looking who speaks another language. Synthetic, like everyone here.
+ * reaches someone real-looking who speaks another language. US numbers, so they live in the US. Synthetic, like everyone here.
  */
 export const STRANGERS: Contact[] = [
-  { id: "s_fatima", name: "Fatima Haddad", aliases: [], language: "ar", paidBefore: false, phone: "+1 (408) 555-0139", city: "Amman", timeZone: "Asia/Amman", stranger: true, simulated: true },
-  { id: "s_lucia", name: "Lucía Gómez", aliases: [], language: "es", paidBefore: false, phone: "+1 (408) 555-0175", city: "Bogotá", timeZone: "America/Bogota", stranger: true, simulated: true },
-  { id: "s_joao", name: "João Pereira", aliases: [], language: "pt", paidBefore: false, phone: "+1 (415) 555-0143", city: "Porto", timeZone: "Europe/Lisbon", stranger: true, simulated: true },
+  { id: "s_fatima", name: "Fatima Haddad", aliases: [], language: "ar", paidBefore: false, phone: "+1 (408) 555-0139", city: "Dearborn", timeZone: "America/Detroit", stranger: true, simulated: true },
+  { id: "s_lucia", name: "Lucía Gómez", aliases: [], language: "es", paidBefore: false, phone: "+1 (408) 555-0158", city: "San Jose", timeZone: "America/Los_Angeles", stranger: true, simulated: true },
+  { id: "s_joao", name: "João Pereira", aliases: [], language: "pt", paidBefore: false, phone: "+1 (415) 555-0143", city: "San Francisco", timeZone: "America/Los_Angeles", stranger: true, simulated: true },
 ];
 
 /** Everyone money can reach: the address book plus strangers. Name matching uses CONTACTS only. */
