@@ -1,5 +1,5 @@
 "use client";
-import { En, EnText } from "@/components/En";
+import { En, EnText, Tpl } from "@/components/En";
 import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/components/SiteHeader";
 import { LanguagePicker } from "@/components/send/LanguagePicker";
@@ -75,14 +75,14 @@ export function RecoverView({ token, initial, initialLang }: { token: string; in
                 <circle cx="24" cy="24" r="22" fill="var(--v-success-soft)" />
                 <path d="M14 25l7 7 13-15" fill="none" stroke="var(--v-success)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <h1 className="mt-3 text-2xl font-semibold text-success">{L.t("rc_returned", { sender: v.senderName })}</h1>
+              <h1 className="mt-3 text-2xl font-semibold text-success"><Tpl L={L} k="rc_returned" vars={{ sender: v.senderName }} /></h1>
               <En L={L} k="rc_returned" vars={{ sender: v.senderName }} className="text-base" />
             </div>
           ) : (
             <>
               <h1 className="text-2xl font-semibold leading-tight">{L.t("rc_title")}</h1>
               <En L={L} k="rc_title" className="text-base" />
-              <p className="mt-3 text-xl text-ink-2">{L.t("rc_body", { sender: v.senderName, amount: amount.localized })}</p>
+              <p className="mt-3 text-xl text-ink-2"><Tpl L={L} k="rc_body" vars={{ sender: v.senderName, amount: amount.localized }} /></p>
               <En L={L} k="rc_body" vars={{ sender: v.senderName, amount: amount.localized }} />
               <p dir="ltr" className="v-digits mt-6 text-center" aria-hidden>
                 ${whole}

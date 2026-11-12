@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       nearContact: near?.contact.name,
       number: {
         typed: digitsOf(phone),
-        owner: { name: owner.name, language: langName(owner.language), city: owner.city, timeZone: owner.timeZone },
+        owner: { name: owner.name, language: langName(owner.language), languageCode: owner.language, city: owner.city, timeZone: owner.timeZone },
         near: near ? { name: near.contact.name, phone: near.contact.phone, digits: digitsOf(near.contact.phone), positions: near.positions } : null,
       },
     });
